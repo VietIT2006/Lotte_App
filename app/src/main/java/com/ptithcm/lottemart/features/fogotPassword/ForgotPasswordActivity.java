@@ -16,8 +16,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         TextInputEditText edtInput = findViewById(R.id.edtEmailPhone);
         MaterialButton btnSend = findViewById(R.id.btnSendCode);
-
-        // Data cứng để test
         final String HARDCODED_EMAIL = "admin@lottemart.vn";
 
         btnSend.setOnClickListener(v -> {
