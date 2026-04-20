@@ -12,7 +12,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.auth_forgot_password);
+        setContentView(R.layout.user_activity_forgot_password);
 
         TextInputEditText edtInput = findViewById(R.id.edtEmailPhone);
         MaterialButton btnSend = findViewById(R.id.btnSendCode);
