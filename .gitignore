@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Backend Node.js
+/backend/node_modules
+/backend/.env
