@@ -123,8 +123,10 @@ public class RegisterActivity extends AppCompatActivity {
         // Giả lập lưu vào SessionManager cho Dynamic Mock Data
         sessionManager.registerMockUser(email, password, fullName);
 
-        // Giả lập logic thành công
-        Toast.makeText(this, "Đăng ký thành công! Bạn có thể đăng nhập ngay.", Toast.LENGTH_LONG).show();
+        // Giả lập logic thành công, chuyển hướng sang màn hình OTP
+        Toast.makeText(this, "Vui lòng nhập mã OTP để xác nhận", Toast.LENGTH_SHORT).show();
+        android.content.Intent intent = new android.content.Intent(this, OtpVerificationActivity.class);
+        startActivity(intent);
         finish();
     }
 
