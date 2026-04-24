@@ -1,0 +1,197 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:title="Theo dõi đơn hàng" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mã đơn hàng: #LM982301"
+            android:textColor="@color/on_surface"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Giao hàng dự kiến: 10:30 - 11:30 Hôm nay"
+            android:textColor="@color/grey_text" />
+
+        <!-- 5-Step Progress Tracker (Visual Mockup) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp">
+
+            <View
+                android:id="@+id/trackerLine"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:background="@color/surface_variant"
+                app:layout_constraintTop_toTopOf="@id/step1"
+                app:layout_constraintBottom_toBottomOf="@id/step1" />
+
+            <View
+                android:id="@+id/trackerActiveLine"
+                android:layout_width="150dp"
+                android:layout_height="4dp"
+                android:background="@color/primary"
+                app:layout_constraintTop_toTopOf="@id/step1"
+                app:layout_constraintBottom_toBottomOf="@id/step1"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <View
+                android:id="@+id/step1"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/bg_step_active"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/step2"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/bg_step_active"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/step3"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/step3"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/bg_step_inactive"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/step4"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/bg_step_inactive"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/step3"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/step5"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/bg_step_inactive"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Labels -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Đã nhận"
+                android:textSize="10sp"
+                app:layout_constraintStart_toStartOf="@id/step1"
+                app:layout_constraintEnd_toEndOf="@id/step1"
+                app:layout_constraintTop_toBottomOf="@id/step1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Đang soạn"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                app:layout_constraintStart_toStartOf="@id/step2"
+                app:layout_constraintEnd_toEndOf="@id/step2"
+                app:layout_constraintTop_toBottomOf="@id/step2" />
+
+             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Hoàn tất"
+                android:textSize="10sp"
+                app:layout_constraintStart_toStartOf="@id/step5"
+                app:layout_constraintEnd_toEndOf="@id/step5"
+                app:layout_constraintTop_toBottomOf="@id/step5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Driver Info -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/surface_container_low">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:gravity="center_vertical">
+                
+                <androidx.cardview.widget.CardView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    app:cardCornerRadius="24dp">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@android:drawable/ic_menu_myplaces"
+                        app:tint="@color/primary" />
+                </androidx.cardview.widget.CardView>
+                
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nguyễn Văn A"
+                        android:textStyle="bold" />
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tài xế Lotte Express"
+                        android:textSize="12sp"
+                        android:textColor="@color/grey_text" />
+                </LinearLayout>
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_icon_button"
+                    android:src="@android:drawable/ic_menu_call"
+                    app:tint="@color/on_surface" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
