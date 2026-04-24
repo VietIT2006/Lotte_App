@@ -29,6 +29,18 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+        <activity
+            android:name=".features.auth.OtpVerificationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.ProductDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.CartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.OrderTrackingActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
