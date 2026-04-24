@@ -2,8 +2,13 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.LotteMart" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="android:windowBackground">@color/surface</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
     </style>
 
     <style name="Theme.LotteMart" parent="Base.Theme.LotteMart" />
-</resources>
+</resources>

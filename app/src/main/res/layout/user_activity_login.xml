@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/peach_bg"
+    android:background="@color/surface"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,9 +16,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
-            android:text="@string/login_title"
-            android:textColor="@color/black"
-            android:textSize="28sp"
+            android:text="Chào mừng bạn!"
+            android:textColor="@color/on_surface"
+            android:textSize="32sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:gravity="center"
-            android:text="@string/login_desc"
+            android:text="Đăng nhập để trải nghiệm mua sắm cao cấp tại Lotte Mart"
             android:textColor="@color/grey_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -39,16 +39,18 @@
         <!-- Email/Phone Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilEmail"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="48dp"
-            android:hint="@string/hint_email_phone"
-            app:boxBackgroundColor="@color/white"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
+            android:hint="Email hoặc Số điện thoại"
+            app:boxBackgroundColor="@color/surface_container_lowest"
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="1dp"
             app:layout_constraintTop_toBottomOf="@id/tvLoginDesc">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -61,16 +63,18 @@
         <!-- Password Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilPassword"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/hint_password"
-            app:boxBackgroundColor="@color/white"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
+            android:hint="Mật khẩu"
+            app:boxBackgroundColor="@color/surface_container_lowest"
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="1dp"
             app:passwordToggleEnabled="true"
             app:layout_constraintTop_toBottomOf="@id/tilEmail">
 
@@ -86,34 +90,77 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@string/link_forgot_password"
-            android:textColor="@color/lotte_red"
+            android:text="Quên mật khẩu?"
+            android:textColor="@color/primary"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tilPassword" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
-            android:backgroundTint="@color/lotte_red"
-            android:text="@string/btn_login"
+            android:background="@drawable/bg_button_gradient"
+            android:text="Đăng nhập"
             android:textAllCaps="false"
+            android:textColor="@color/white"
             android:textSize="18sp"
-            app:cornerRadius="30dp"
+            android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/tvForgotPassword" />
 
         <TextView
-            android:id="@+id/tvSignUp"
+            android:id="@+id/tvOr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/link_register"
+            android:text="Hoặc tiếp tục với"
             android:textColor="@color/grey_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btnLogin" />
 
+        <LinearLayout
+            android:id="@+id/socialButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvOr">
+
+            <ImageButton
+                android:id="@+id/btnFacebook"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/bg_social_button"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:padding="12dp"
+                android:scaleType="fitCenter"/>
+
+            <ImageButton
+                android:id="@+id/btnGoogle"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_social_button"
+                android:src="@android:drawable/ic_menu_compass"
+                android:padding="12dp"
+                android:scaleType="fitCenter"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Chưa có tài khoản? Đăng ký ngay"
+            android:textColor="@color/grey_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/socialButtons" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
+
