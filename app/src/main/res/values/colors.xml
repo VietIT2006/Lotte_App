@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand Colors -->
+    <color name="primary">#BB0004</color>
+    <color name="primary_container">#E1251B</color>
+    <color name="on_primary">#FFFFFF</color>
+    
+    <!-- Surface Colors -->
+    <color name="surface">#FFF8F7</color>
+    <color name="on_surface">#291714</color>
+    <color name="surface_container_low">#FFF0EE</color>
+    <color name="surface_container_lowest">#FFFFFF</color>
+    <color name="surface_variant">#FCDBD6</color>
+    
+    <!-- Accent Colors -->
+    <color name="tertiary">#005DA3</color>
+    <color name="outline_variant">#E7BDB7</color>
+    
+    <!-- Utility -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="lotte_red">#D31111</color>
-    <color name="peach_bg">#FFF5F2</color>
-</resources>
+    <color name="grey_text">#5D3F3B</color>
+    <color name="error">#BA1A1A</color>
+</resources>

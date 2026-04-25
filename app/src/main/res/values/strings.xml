@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Lotte Mart</string>
+    <string name="login_title">Chào mừng trở lại</string>
+    <string name="login_desc">Vui lòng đăng nhập để tiếp tục mua sắm</string>
+    <string name="register_title">Tạo tài khoản</string>
+    <string name="register_desc">Tham gia cùng chúng tôi để trải nghiệm mua sắm tuyệt vời</string>
+    <string name="forgot_password_title">Quên mật khẩu?</string>
+    <string name="btn_login">Đăng nhập</string>
+    <string name="btn_register">Đăng ký</string>
+    <string name="btn_send_code">Gửi mã</string>
+    <string name="hint_email_phone">Email hoặc Số điện thoại</string>
+    <string name="hint_password">Mật khẩu</string>
+    <string name="hint_confirm_password">Xác nhận mật khẩu</string>
+    <string name="hint_full_name">Họ và tên</string>
+    <string name="link_forgot_password">Quên mật khẩu?</string>
+    <string name="link_register">Chưa có tài khoản? Đăng ký ngay</string>
+    <string name="link_login">Đã có tài khoản? Đăng nhập</string>
 </resources>
