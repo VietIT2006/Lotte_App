@@ -16,6 +16,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
+                android:id="@+id/ivProductImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
@@ -90,11 +91,12 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:lineSpacingExtra="4dp"
-                android:text="Nho Shine Muscat được nhập khẩu trực tiếp từ các nông trang hữu cơ. Trái nho to, tròn, da căng bóng, có vị ngọt thanh và mùi hương đặc trưng của hoa mẫu đơn. Sản phẩm được đóng gói kỹ lưỡng, đảm bảo độ tươi ngon khi đến tay khách hàng."
+                android:text="Đang tải mô tả..."
                 android:textColor="@color/grey_text"
                 android:textSize="14sp" />
 

@@ -15,6 +15,9 @@
     <!-- Accent Colors -->
     <color name="tertiary">#005DA3</color>
     <color name="outline_variant">#E7BDB7</color>
+    <color name="lotte_red">#BB0004</color>
+    <color name="peach_bg">#FFF0EE</color>
+    <color name="grey_border">#E0E0E0</color>
     
     <!-- Utility -->
     <color name="black">#FF000000</color>

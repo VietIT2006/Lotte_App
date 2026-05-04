@@ -1,8 +1,10 @@
 package com.ptithcm.lottemart.features.auth;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,23 +14,32 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.ptithcm.lottemart.R;
-import com.ptithcm.lottemart.data.local.SessionManager;
+import com.ptithcm.lottemart.data.api.ApiResponse;
+import com.ptithcm.lottemart.data.api.AuthApiService;
+import com.ptithcm.lottemart.data.api.RegisterRequest;
+import com.ptithcm.lottemart.data.models.User;
+import com.ptithcm.lottemart.data.remote.RetrofitClient;
 import com.ptithcm.lottemart.utils.Validator;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    private static final String TAG = "RegisterActivity";
     private TextInputLayout tilFullName, tilRegisterEmail, tilRegisterPassword, tilConfirmPassword;
     private TextInputEditText etFullName, etRegisterEmail, etRegisterPassword, etConfirmPassword;
-    private MaterialButton btnRegister;
+    private android.widget.Button btnRegister;
     private TextView tvSignIn;
-    private SessionManager sessionManager;
+    private AuthApiService authApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_activity_register);
 
-        sessionManager = new SessionManager(this);
+        authApiService = RetrofitClient.getClient().create(AuthApiService.class);
 
         initViews();
         setupListeners();
@@ -54,7 +65,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         tvSignIn.setOnClickListener(v -> finish());
 
-        // Xóa lỗi khi người dùng nhập liệu
         etFullName.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -95,10 +105,10 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (email.isEmpty()) {
-            tilRegisterEmail.setError("Vui lòng nhập Email hoặc Số điện thoại");
+            tilRegisterEmail.setError("Vui lòng nhập Email");
             isValid = false;
         } else if (!Validator.isEmailOrPhone(email)) {
-            tilRegisterEmail.setError("Định dạng Email hoặc Số điện thoại không hợp lệ");
+            tilRegisterEmail.setError("Định dạng Email không hợp lệ");
             isValid = false;
         }
 
@@ -120,14 +130,37 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (!isValid) return;
 
-        // Giả lập lưu vào SessionManager cho Dynamic Mock Data
-        sessionManager.registerMockUser(email, password, fullName);
+        btnRegister.setEnabled(false);
+        btnRegister.setText("Đang đăng ký...");
 
-        // Giả lập logic thành công, chuyển hướng sang màn hình OTP
-        Toast.makeText(this, "Vui lòng nhập mã OTP để xác nhận", Toast.LENGTH_SHORT).show();
-        android.content.Intent intent = new android.content.Intent(this, OtpVerificationActivity.class);
-        startActivity(intent);
-        finish();
+        // Use email as username
+        RegisterRequest request = new RegisterRequest(email, email, "", password, fullName);
+        authApiService.register(request).enqueue(new Callback<ApiResponse<User>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<User>> call, Response<ApiResponse<User>> response) {
+                btnRegister.setEnabled(true);
+                btnRegister.setText("Đăng ký");
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Toast.makeText(RegisterActivity.this, "Đăng ký thành công! Vui lòng đăng nhập.", Toast.LENGTH_LONG).show();
+                    finish(); // Go back to login
+                } else {
+                    String errorMsg = "Đăng ký thất bại";
+                    if (response.body() != null && response.body().getMessage() != null) {
+                        errorMsg = response.body().getMessage();
+                    }
+                    Toast.makeText(RegisterActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<User>> call, Throwable t) {
+                btnRegister.setEnabled(true);
+                btnRegister.setText("Đăng ký");
+                Log.e(TAG, "Register failure", t);
+                Toast.makeText(RegisterActivity.this, "Lỗi kết nối máy chủ", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private abstract static class SimpleTextWatcher implements TextWatcher {
