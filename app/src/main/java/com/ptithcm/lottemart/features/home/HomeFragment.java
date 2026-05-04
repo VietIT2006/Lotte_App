@@ -75,9 +75,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void fetchCategories() {
-        apiService.getCategories().enqueue(new Callback<ApiResponse<List<Category>>>() {
+        apiService.getCategories().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Category>>> call, Response<ApiResponse<List<Category>>> response) {
+            public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     categoryAdapter.setCategories(response.body().getData());
                 } else {
@@ -86,7 +86,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Category>>> call, Throwable t) {
+            public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> call, Throwable t) {
                 Log.e(TAG, "Error fetching categories", t);
                 Toast.makeText(getContext(), "Không thể tải danh mục", Toast.LENGTH_SHORT).show();
             }
@@ -94,9 +94,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void fetchFeaturedProducts() {
-        apiService.getFeaturedProducts().enqueue(new Callback<ApiResponse<List<Product>>>() {
+        apiService.getFeaturedProducts().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
+            public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     productAdapter.setProducts(response.body().getData());
                 } else {
@@ -105,7 +105,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable t) {
+            public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, Throwable t) {
                 Log.e(TAG, "Error fetching featured products", t);
                 Toast.makeText(getContext(), "Không thể tải sản phẩm nổi bật", Toast.LENGTH_SHORT).show();
             }

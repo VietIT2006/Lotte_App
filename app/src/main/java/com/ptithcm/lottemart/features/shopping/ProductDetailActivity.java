@@ -61,9 +61,9 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void fetchProductDetails() {
         if (productId == null) return;
 
-        apiService.getProductById(productId).enqueue(new Callback<ApiResponse<Product>>() {
+        apiService.getProductById(productId).enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.Product>>() {
             @Override
-            public void onResponse(Call<ApiResponse<Product>> call, Response<ApiResponse<Product>> response) {
+            public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.Product>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.Product>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     displayProduct(response.body().getData());
                 } else {
@@ -72,7 +72,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<Product>> call, Throwable t) {
+            public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.Product>> call, Throwable t) {
                 Log.e(TAG, "Error fetching product details", t);
                 Toast.makeText(ProductDetailActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
             }
