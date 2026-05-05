@@ -60,8 +60,19 @@ public class HomeFragment extends Fragment {
     private void initViews(View view) {
         rvCategories = view.findViewById(R.id.rvCategories);
         rvFeatured = view.findViewById(R.id.rvFeatured);
+        View searchContainer = view.findViewById(R.id.searchContainer);
 
-        categoryAdapter = new CategoryAdapter(getContext(), new ArrayList<>());
+        searchContainer.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.search.SearchActivity.class);
+            startActivity(intent);
+        });
+
+        categoryAdapter = new CategoryAdapter(getContext(), new ArrayList<>(), category -> {
+            Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.categories.CategoryProductsActivity.class);
+            intent.putExtra("CATEGORY_ID", category.getId());
+            intent.putExtra("CATEGORY_NAME", category.getName());
+            startActivity(intent);
+        });
         rvCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvCategories.setAdapter(categoryAdapter);
 

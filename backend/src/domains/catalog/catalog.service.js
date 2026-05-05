@@ -30,6 +30,22 @@ class CatalogService {
         const { rows } = await db.query(query, [id]);
         return rows[0];
     }
+
+    async searchProducts(q, sortBy) {
+        let query = 'SELECT * FROM products WHERE is_active = true AND name ILIKE $1';
+        const params = [`%${q}%`];
+        
+        if (sortBy === 'price_asc') {
+            query += ' ORDER BY price ASC';
+        } else if (sortBy === 'price_desc') {
+            query += ' ORDER BY price DESC';
+        } else {
+            query += ' ORDER BY created_at DESC';
+        }
+        
+        const { rows } = await db.query(query, params);
+        return rows;
+    }
 }
 
 module.exports = new CatalogService();

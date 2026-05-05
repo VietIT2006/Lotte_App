@@ -20,4 +20,7 @@ public interface ProductApiService {
 
     @GET("catalog/products/{id}")
     Call<ApiResponse<Product>> getProductById(@Path("id") String id);
+
+    @GET("catalog/products/search")
+    Call<ApiResponse<List<Product>>> searchProducts(@Query("q") String query, @Query("sort_by") String sortBy);
 }

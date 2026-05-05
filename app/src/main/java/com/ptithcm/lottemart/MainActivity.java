@@ -12,12 +12,14 @@ import com.ptithcm.lottemart.features.home.HomeFragment;
 
 public class MainActivity extends AppCompatActivity {
 
+    private BottomNavigationView bottomNav;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_activity_main);
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav = findViewById(R.id.bottom_navigation);
         
         // Mặc định nạp HomeFragment khi vừa vào MainActivity
         if (savedInstanceState == null) {
@@ -44,6 +46,12 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    public void navigateToHome() {
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_home);
+        }
     }
 
     private void loadFragment(Fragment fragment) {

@@ -56,6 +56,19 @@ class CatalogController {
             next(error);
         }
     }
+
+    async searchProducts(req, res, next) {
+        try {
+            const { q, sort_by } = req.query;
+            const products = await catalogService.searchProducts(q, sort_by);
+            res.status(200).json({
+                success: true,
+                data: products
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new CatalogController();

@@ -37,6 +37,7 @@ public class CartFragment extends Fragment {
     private CartItemAdapter adapter;
     private ProductApiService apiService;
     private TextView tvTotalAmount;
+    private View emptyCartContainer, cartContent, bottomBar;
 
     @Nullable
     @Override
@@ -50,10 +51,13 @@ public class CartFragment extends Fragment {
 
         rvCart = view.findViewById(R.id.rvCartItems);
         tvTotalAmount = view.findViewById(R.id.tvTotalAmount);
+        emptyCartContainer = view.findViewById(R.id.emptyCartContainer);
+        cartContent = view.findViewById(R.id.cartContent); // I need to wrap the scrollview content or just hide the scrollview
+        bottomBar = view.findViewById(R.id.bottomBar);
         
-        adapter = new CartItemAdapter(getContext(), new ArrayList<>());
-        rvCart.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvCart.setAdapter(adapter);
+        view.findViewById(R.id.btnBackToHome).setOnClickListener(v -> {
+            ((com.ptithcm.lottemart.MainActivity)getActivity()).navigateToHome();
+        });
 
         apiService = RetrofitClient.getClient().create(ProductApiService.class);
         fetchCartItems();
@@ -61,7 +65,9 @@ public class CartFragment extends Fragment {
         Button btnCheckout = view.findViewById(R.id.btnCheckout);
         if (btnCheckout != null) {
             btnCheckout.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), OrderTrackingActivity.class);
+                Intent intent = new Intent(getActivity(), PaymentSuccessActivity.class);
+                intent.putExtra("ORDER_ID", String.valueOf((int)(Math.random() * 10000)));
+                intent.putExtra("TOTAL_AMOUNT", tvTotalAmount.getText().toString());
                 startActivity(intent);
             });
         }
@@ -76,7 +82,15 @@ public class CartFragment extends Fragment {
                     List<CartItem> cartItems = new ArrayList<>();
                     double total = 0;
                     
-                    if (products != null) {
+                    if (products == null || products.isEmpty()) {
+                        emptyCartContainer.setVisibility(View.VISIBLE);
+                        cartContent.setVisibility(View.GONE);
+                        bottomBar.setVisibility(View.GONE);
+                    } else {
+                        emptyCartContainer.setVisibility(View.GONE);
+                        cartContent.setVisibility(View.VISIBLE);
+                        bottomBar.setVisibility(View.VISIBLE);
+                        
                         for (int i = 0; i < products.size(); i++) {
                             Product p = products.get(i);
                             cartItems.add(new CartItem(String.valueOf(i + 1), p, 1));

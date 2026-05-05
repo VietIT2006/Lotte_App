@@ -40,6 +40,19 @@
             android:name=".features.shopping.ProductDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".features.search.SearchActivity"
+            android:windowSoftInputMode="stateVisible"
+            android:exported="false" />
+        <activity
+            android:name=".features.categories.CategoryProductsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.search.SearchResultsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.PaymentSuccessActivity"
+            android:exported="false" />
+        <activity
             android:name=".features.shopping.CartActivity"
             android:exported="false" />
         <activity

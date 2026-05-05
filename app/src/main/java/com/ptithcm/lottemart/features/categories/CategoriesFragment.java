@@ -1,6 +1,7 @@
 package com.ptithcm.lottemart.features.categories;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +45,12 @@ public class CategoriesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         
         rvCategories = view.findViewById(R.id.rvCategoriesAll);
-        adapter = new CategoryAdapter(getContext(), new ArrayList<>());
+        adapter = new CategoryAdapter(getContext(), new ArrayList<>(), category -> {
+            Intent intent = new Intent(getActivity(), CategoryProductsActivity.class);
+            intent.putExtra("CATEGORY_ID", category.getId());
+            intent.putExtra("CATEGORY_NAME", category.getName());
+            startActivity(intent);
+        });
         rvCategories.setLayoutManager(new GridLayoutManager(getContext(), 3));
         rvCategories.setAdapter(adapter);
 
