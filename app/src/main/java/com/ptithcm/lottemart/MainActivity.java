@@ -1,5 +1,6 @@
 package com.ptithcm.lottemart;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,11 +30,13 @@ public class MainActivity extends AppCompatActivity {
                 loadFragment(new HomeFragment());
                 return true;
             } else if (itemId == R.id.nav_categories) {
-                // Sẽ nạp CategoriesFragment sau
+                loadFragment(new com.ptithcm.lottemart.features.categories.CategoriesFragment());
                 return true;
             } else if (itemId == R.id.nav_lpoint) {
+                loadFragment(new com.ptithcm.lottemart.features.loyalty.LPointFragment());
                 return true;
             } else if (itemId == R.id.nav_cart) {
+                loadFragment(new com.ptithcm.lottemart.features.shopping.CartFragment());
                 return true;
             } else if (itemId == R.id.nav_profile) {
                 loadFragment(new com.ptithcm.lottemart.features.home.ProfileFragment());

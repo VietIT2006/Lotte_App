@@ -1,16 +1,16 @@
 package com.ptithcm.lottemart.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.ptithcm.lottemart.R;
 import com.ptithcm.lottemart.data.models.Category;
-import android.graphics.drawable.ColorDrawable;
 import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
@@ -31,25 +31,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(16, 16, 16, 16);
-        layout.setLayoutParams(new LinearLayout.LayoutParams(250, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        ImageView image = new ImageView(context);
-        image.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
-        image.setBackgroundColor(Color.LTGRAY);
-        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-        TextView name = new TextView(context);
-        name.setTextSize(12);
-        name.setGravity(android.view.Gravity.CENTER);
-        name.setPadding(0, 8, 0, 0);
-
-        layout.addView(image);
-        layout.addView(name);
-
-        return new ViewHolder(layout, image, name);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_category, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -60,10 +43,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         if (category.getImageUrl() != null && !category.getImageUrl().isEmpty()) {
             Glide.with(context)
                     .load(category.getImageUrl())
-                    .placeholder(new ColorDrawable(Color.LTGRAY))
+                    .placeholder(android.R.drawable.ic_menu_gallery)
                     .into(holder.image);
-        } else {
-            holder.image.setBackgroundColor(Color.LTGRAY);
         }
     }
 
@@ -75,10 +56,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
         TextView name;
-        public ViewHolder(@NonNull LinearLayout itemView, ImageView image, TextView name) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.image = image;
-            this.name = name;
+            image = itemView.findViewById(R.id.ivCategoryImage);
+            name = itemView.findViewById(R.id.tvCategoryName);
         }
     }
 }

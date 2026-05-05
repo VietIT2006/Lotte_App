@@ -1,14 +1,15 @@
 package com.ptithcm.lottemart.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
+import com.ptithcm.lottemart.R;
 import com.ptithcm.lottemart.data.models.CartItem;
 import java.util.List;
 
@@ -25,59 +26,23 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-        layout.setPadding(32, 32, 32, 32);
-        layout.setBackgroundColor(Color.WHITE);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0, 0, 0, 16);
-        layout.setLayoutParams(params);
-        layout.setGravity(Gravity.CENTER_VERTICAL);
-
-        ImageView image = new ImageView(context);
-        image.setLayoutParams(new LinearLayout.LayoutParams(150, 150));
-        image.setBackgroundColor(Color.LTGRAY);
-
-        LinearLayout textLayout = new LinearLayout(context);
-        textLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
-            0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f
-        );
-        textParams.setMargins(32, 0, 0, 0);
-        textLayout.setLayoutParams(textParams);
-
-        TextView name = new TextView(context);
-        name.setTextSize(16);
-        name.setTextColor(Color.BLACK);
-
-        TextView price = new TextView(context);
-        price.setTextSize(14);
-        price.setTextColor(Color.parseColor("#E1251B"));
-        
-        textLayout.addView(name);
-        textLayout.addView(price);
-
-        TextView quantity = new TextView(context);
-        quantity.setTextSize(16);
-        quantity.setTextColor(Color.BLACK);
-        quantity.setPadding(32, 0, 0, 0);
-
-        layout.addView(image);
-        layout.addView(textLayout);
-        layout.addView(quantity);
-
-        return new ViewHolder(layout, image, name, price, quantity);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_cart, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CartItem item = cartItems.get(position);
-        holder.name.setText(item.getProduct().getName());
-        holder.price.setText(String.format("%,.0f đ", item.getProduct().getPrice()));
-        holder.quantity.setText("x" + item.getQuantity());
+        holder.tvName.setText(item.getProduct().getName());
+        holder.tvPrice.setText(String.format("%,.0f đ", item.getProduct().getPrice()));
+        holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
+
+        if (item.getProduct().getImageUrl() != null && !item.getProduct().getImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(item.getProduct().getImageUrl())
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .into(holder.ivProduct);
+        }
     }
 
     @Override
@@ -91,12 +56,15 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name, price, quantity;
-        public ViewHolder(@NonNull LinearLayout itemView, ImageView image, TextView name, TextView price, TextView quantity) {
+        ImageView ivProduct;
+        TextView tvName, tvPrice, tvQuantity;
+
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.name = name;
-            this.price = price;
-            this.quantity = quantity;
+            ivProduct = itemView.findViewById(R.id.ivProductImage);
+            tvName = itemView.findViewById(R.id.tvProductName);
+            tvPrice = itemView.findViewById(R.id.tvProductPrice);
+            tvQuantity = itemView.findViewById(R.id.tvQuantity);
         }
     }
 }
