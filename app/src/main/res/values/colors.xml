@@ -15,10 +15,14 @@
     <!-- Accent Colors -->
     <color name="tertiary">#005DA3</color>
     <color name="outline_variant">#E7BDB7</color>
+
+    <color name="lotte_red">#E60012</color>
+    <color name="peach_bg">#FFF0ED</color>
+    <color name="grey_border">#DDDDDD</color>
     
     <!-- Utility -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey_text">#5D3F3B</color>
     <color name="error">#BA1A1A</color>
-</resources>
+</resources>

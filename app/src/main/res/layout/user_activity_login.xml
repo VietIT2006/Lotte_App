@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -96,11 +97,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tilPassword" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <!-- Sử dụng MaterialButton để tránh lỗi ClassCastException -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
+            android:backgroundTint="@null"
             android:background="@drawable/bg_button_gradient"
             android:text="Đăng nhập"
             android:textAllCaps="false"
@@ -163,4 +166,3 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
-
