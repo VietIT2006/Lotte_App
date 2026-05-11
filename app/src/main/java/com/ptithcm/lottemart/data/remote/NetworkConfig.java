@@ -10,8 +10,9 @@ public class NetworkConfig {
     public static final String ENDPOINT_REGISTER = BASE_URL + "auth/register";
     public static final String ENDPOINT_FORGOT_PASSWORD = BASE_URL + "auth/forgot-password";
 
-    // Catalog & Search Endpoints (Dựa trên kế hoạch Day 2)
-    public static final String ENDPOINT_PRODUCTS = BASE_URL + "products";
-    public static final String ENDPOINT_PRODUCT_CATEGORIES = BASE_URL + "categories";
-    public static final String ENDPOINT_SEARCH = BASE_URL + "catalog/search";
+    // Catalog & Search Endpoints
+    public static final String ENDPOINT_PRODUCTS = BASE_URL + "catalog/products";
+    public static final String ENDPOINT_PRODUCT_CATEGORIES = BASE_URL + "catalog/categories";
+    public static final String ENDPOINT_PRODUCT_DETAIL = BASE_URL + "catalog/products/";
+
 }

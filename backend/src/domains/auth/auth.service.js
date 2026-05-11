@@ -5,14 +5,14 @@ const db = require('../../core/db');
 class AuthService {
     async register(userData) {
         const { username, email, phone, password, full_name } = userData;
+        const usersCollection = db.collection('users');
 
         // Check if user exists
-        const checkUser = await db.query(
-            'SELECT * FROM users WHERE email = $1 OR username = $2',
-            [email, username]
-        );
+        const existingUser = await usersCollection.findOne({
+            $or: [{ email }, { username }]
+        });
 
-        if (checkUser.rows.length > 0) {
+        if (existingUser) {
             const err = new Error('Username or email already exists');
             err.statusCode = 400;
             throw err;
@@ -22,25 +22,33 @@ class AuthService {
         const passwordHash = await bcrypt.hash(password, 10);
 
         // Insert new user
-        const result = await db.query(
-            `INSERT INTO users (username, email, phone, password_hash, full_name) 
-             VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, full_name, role_key`,
-            [username, email, phone, passwordHash, full_name]
-        );
+        const newUser = {
+            username,
+            email,
+            phone,
+            password_hash: passwordHash,
+            full_name,
+            role_key: 'user', // Default role
+            created_at: new Date(),
+            updated_at: new Date()
+        };
 
-        return result.rows[0];
+        const result = await usersCollection.insertOne(newUser);
+        
+        // Trả về user (không kèm password_hash)
+        const savedUser = { _id: result.insertedId, ...newUser };
+        delete savedUser.password_hash;
+        
+        return savedUser;
     }
 
     async login(loginData) {
         const { email, password } = loginData;
+        const usersCollection = db.collection('users');
 
         // Find user
-        const result = await db.query(
-            'SELECT * FROM users WHERE email = $1',
-            [email]
-        );
+        const user = await usersCollection.findOne({ email });
 
-        const user = result.rows[0];
         if (!user) {
             const err = new Error('Invalid email or password');
             err.statusCode = 401;
@@ -57,16 +65,18 @@ class AuthService {
 
         // Generate JWT
         const token = jwt.sign(
-            { id: user.id, username: user.username, role: user.role_key },
+            { id: user._id, username: user.username, role: user.role_key },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
         // Remove password hash from response
-        delete user.password_hash;
+        const userResponse = { ...user };
+        delete userResponse.password_hash;
 
-        return { user, token };
+        return { user: userResponse, token };
     }
 }
 
 module.exports = new AuthService();
+

@@ -3,6 +3,8 @@ const catalogController = require('./catalog.controller');
 
 const router = express.Router();
 
-// Example: router.get('/', catalogController.getAll);
+router.get('/categories', catalogController.getCategories);
+router.get('/products', catalogController.getProducts);
+router.get('/products/:id', catalogController.getProductDetail);
 
-module.exports = router;
+module.exports = router;
