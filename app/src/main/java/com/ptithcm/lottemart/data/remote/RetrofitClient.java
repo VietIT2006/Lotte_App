@@ -85,13 +85,19 @@ public class RetrofitClient {
         }
 
         private void handleUnauthorized() {
+            if (mContext == null) return;
+            
             new Handler(Looper.getMainLooper()).post(() -> {
+                // Chỉ hiện thông báo một lần
                 Toast.makeText(mContext, "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
                 
                 SessionManager sessionManager = new SessionManager(mContext);
                 sessionManager.logout();
 
-                // Đẩy người dùng về màn hình Login
+                // Reset Retrofit để các request tiếp theo không gửi token cũ
+                reset();
+
+                // Đẩy người dùng về màn hình Login và xóa toàn bộ stack trước đó
                 Intent intent = new Intent(mContext, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 mContext.startActivity(intent);
