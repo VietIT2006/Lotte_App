@@ -40,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        com.ptithcm.lottemart.data.remote.RetrofitClient.init(this);
         
         sessionManager = new SessionManager(this);
         authApiService = RetrofitClient.getClient().create(AuthApiService.class);
@@ -129,6 +130,10 @@ public class LoginActivity extends AppCompatActivity {
                             data.getUser().getFullName(),
                             data.getUser().getEmail()
                     );
+                    
+                    // CẬP NHẬT TOKEN VÀO HỆ THỐNG MẠNG NGAY LẬP TỨC
+                    com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
+                    
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     navigateToMain();
                 } else {

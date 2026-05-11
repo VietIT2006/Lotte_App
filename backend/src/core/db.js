@@ -1,18 +1,31 @@
-const { Pool } = require('pg');
+const { MongoClient } = require('mongodb');
+require('dotenv').config();
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false // Cần thiết cho Supabase nếu không có cert
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
+
+let dbInstance = null;
+
+async function connectDB() {
+    if (dbInstance) return dbInstance;
+    
+    try {
+        await client.connect();
+        console.log('✅ Connected to MongoDB');
+        dbInstance = client.db();
+        return dbInstance;
+    } catch (error) {
+        console.error('❌ MongoDB Connection Error:', error);
+        process.exit(1);
     }
-});
-
-pool.on('error', (err, client) => {
-    console.error('Unexpected error on idle pg client', err);
-    process.exit(-1);
-});
+}
 
 module.exports = {
-    query: (text, params) => pool.query(text, params),
-    getClient: () => pool.connect(),
+    connectDB,
+    getDb: () => dbInstance,
+    collection: (name) => dbInstance.collection(name),
+    // Helper để giả lập interface cũ nếu cần (tùy chọn)
+    query: async (text, params) => {
+        console.warn('⚠️ Cảnh báo: Bạn đang gọi hàm query (SQL) trên MongoDB. Vui lòng cập nhật code Service.');
+    }
 };

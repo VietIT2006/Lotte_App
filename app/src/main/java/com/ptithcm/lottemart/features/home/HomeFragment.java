@@ -61,6 +61,13 @@ public class HomeFragment extends Fragment {
         rvCategories = view.findViewById(R.id.rvCategories);
         rvFeatured = view.findViewById(R.id.rvFeatured);
         View searchContainer = view.findViewById(R.id.searchContainer);
+        View btnNotification = view.findViewById(R.id.btnNotification);
+
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v -> {
+                Toast.makeText(getContext(), "Tính năng thông báo đang được phát triển", Toast.LENGTH_SHORT).show();
+            });
+        }
 
         searchContainer.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.search.SearchActivity.class);

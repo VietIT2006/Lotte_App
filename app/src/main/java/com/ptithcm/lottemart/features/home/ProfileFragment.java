@@ -19,7 +19,7 @@ import com.ptithcm.lottemart.features.auth.LoginActivity;
 public class ProfileFragment extends Fragment {
 
     private TextView tvUserName, tvUserEmail;
-    private MaterialButton btnLogout;
+    private android.widget.Button btnLogout;
     private SessionManager sessionManager;
 
     @Nullable
@@ -53,6 +53,9 @@ public class ProfileFragment extends Fragment {
     private void setupListeners() {
         btnLogout.setOnClickListener(v -> {
             sessionManager.logout();
+            
+            // XÓA TOKEN KHỎI HỆ THỐNG MẠNG
+            com.ptithcm.lottemart.data.remote.RetrofitClient.init(requireContext());
             
             // Quay lại màn hình đăng nhập
             Intent intent = new Intent(getActivity(), LoginActivity.class);

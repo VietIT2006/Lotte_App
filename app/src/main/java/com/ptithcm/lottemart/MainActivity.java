@@ -17,9 +17,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        com.ptithcm.lottemart.data.remote.RetrofitClient.init(this);
         setContentView(R.layout.user_activity_main);
 
         bottomNav = findViewById(R.id.bottom_navigation);
+        com.ptithcm.lottemart.data.local.SessionManager sessionManager = new com.ptithcm.lottemart.data.local.SessionManager(this);
         
         // Mặc định nạp HomeFragment khi vừa vào MainActivity
         if (savedInstanceState == null) {
@@ -28,13 +30,25 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+            
+            // Trang chủ và Danh mục cho phép xem không cần đăng nhập
             if (itemId == R.id.nav_home) {
                 loadFragment(new HomeFragment());
                 return true;
             } else if (itemId == R.id.nav_categories) {
                 loadFragment(new com.ptithcm.lottemart.features.categories.CategoriesFragment());
                 return true;
-            } else if (itemId == R.id.nav_lpoint) {
+            } 
+            
+            // CÁC TRANG CẦN ĐĂNG NHẬP
+            if (!sessionManager.isLoggedIn()) {
+                android.widget.Toast.makeText(this, "Vui lòng đăng nhập để sử dụng tính năng này", android.widget.Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, com.ptithcm.lottemart.features.auth.LoginActivity.class);
+                startActivity(intent);
+                return false; // Không chuyển tab nếu chưa đăng nhập
+            }
+
+            if (itemId == R.id.nav_lpoint) {
                 loadFragment(new com.ptithcm.lottemart.features.loyalty.LPointFragment());
                 return true;
             } else if (itemId == R.id.nav_cart) {

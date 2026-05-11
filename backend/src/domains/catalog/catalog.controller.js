@@ -69,6 +69,31 @@ class CatalogController {
             next(error);
         }
     }
+
+    async getBranches(req, res, next) {
+        try {
+            const branches = await catalogService.getBranches();
+            res.status(200).json({
+                success: true,
+                data: branches
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getProductReviews(req, res, next) {
+        try {
+            const { id } = req.params;
+            const reviews = await catalogService.getProductReviews(id);
+            res.status(200).json({
+                success: true,
+                data: reviews
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new CatalogController();

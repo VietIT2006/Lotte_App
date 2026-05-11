@@ -38,6 +38,7 @@ public class CartFragment extends Fragment {
     private ProductApiService apiService;
     private TextView tvTotalAmount;
     private View emptyCartContainer, cartContent, bottomBar;
+    private List<CartItem> currentCartItems = new ArrayList<>();
 
     @Nullable
     @Override
@@ -52,9 +53,11 @@ public class CartFragment extends Fragment {
         rvCart = view.findViewById(R.id.rvCartItems);
         tvTotalAmount = view.findViewById(R.id.tvTotalAmount);
         emptyCartContainer = view.findViewById(R.id.emptyCartContainer);
-        cartContent = view.findViewById(R.id.cartContent); // I need to wrap the scrollview content or just hide the scrollview
+        cartContent = view.findViewById(R.id.cartContent);
         bottomBar = view.findViewById(R.id.bottomBar);
         
+        setupRecyclerView();
+
         view.findViewById(R.id.btnBackToHome).setOnClickListener(v -> {
             ((com.ptithcm.lottemart.MainActivity)getActivity()).navigateToHome();
         });
@@ -65,6 +68,10 @@ public class CartFragment extends Fragment {
         Button btnCheckout = view.findViewById(R.id.btnCheckout);
         if (btnCheckout != null) {
             btnCheckout.setOnClickListener(v -> {
+                if (currentCartItems.isEmpty()) {
+                    Toast.makeText(getContext(), "Giỏ hàng rỗng!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Intent intent = new Intent(getActivity(), PaymentSuccessActivity.class);
                 intent.putExtra("ORDER_ID", String.valueOf((int)(Math.random() * 10000)));
                 intent.putExtra("TOTAL_AMOUNT", tvTotalAmount.getText().toString());
@@ -73,35 +80,68 @@ public class CartFragment extends Fragment {
         }
     }
 
+    private void setupRecyclerView() {
+        adapter = new CartItemAdapter(getContext(), currentCartItems);
+        adapter.setOnCartItemChangeListener(new CartItemAdapter.OnCartItemChangeListener() {
+            @Override
+            public void onQuantityChanged(int position, int newQuantity) {
+                updateTotalAmount();
+            }
+
+            @Override
+            public void onItemDeleted(int position) {
+                currentCartItems.remove(position);
+                adapter.notifyItemRemoved(position);
+                adapter.notifyItemRangeChanged(position, currentCartItems.size());
+                updateTotalAmount();
+                checkEmptyState();
+            }
+        });
+        rvCart.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvCart.setAdapter(adapter);
+    }
+
+    private void checkEmptyState() {
+        if (currentCartItems.isEmpty()) {
+            emptyCartContainer.setVisibility(View.VISIBLE);
+            cartContent.setVisibility(View.GONE);
+            bottomBar.setVisibility(View.GONE);
+        } else {
+            emptyCartContainer.setVisibility(View.GONE);
+            cartContent.setVisibility(View.VISIBLE);
+            bottomBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateTotalAmount() {
+        double total = 0;
+        for (CartItem item : currentCartItems) {
+            total += (item.getProduct().getPrice() * item.getQuantity());
+        }
+        tvTotalAmount.setText(String.format("%,.0f đ", total));
+    }
+
     private void fetchCartItems() {
         apiService.getFeaturedProducts().enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Product> products = response.body().getData();
-                    List<CartItem> cartItems = new ArrayList<>();
-                    double total = 0;
+                    currentCartItems.clear();
                     
-                    if (products == null || products.isEmpty()) {
-                        emptyCartContainer.setVisibility(View.VISIBLE);
-                        cartContent.setVisibility(View.GONE);
-                        bottomBar.setVisibility(View.GONE);
-                    } else {
-                        emptyCartContainer.setVisibility(View.GONE);
-                        cartContent.setVisibility(View.VISIBLE);
-                        bottomBar.setVisibility(View.VISIBLE);
-                        
+                    if (products != null && !products.isEmpty()) {
                         for (int i = 0; i < products.size(); i++) {
                             Product p = products.get(i);
-                            cartItems.add(new CartItem(String.valueOf(i + 1), p, 1));
-                            total += p.getPrice();
+                            currentCartItems.add(new CartItem(String.valueOf(i + 1), p, 1));
                         }
                     }
                     
-                    adapter.setItems(cartItems);
-                    tvTotalAmount.setText(String.format("%,.0f đ", total));
+                    adapter.notifyDataSetChanged();
+                    updateTotalAmount();
+                    checkEmptyState();
                 } else {
                     Log.e(TAG, "Failed to fetch cart items: " + response.message());
+                    checkEmptyState();
                 }
             }
 
@@ -109,6 +149,7 @@ public class CartFragment extends Fragment {
             public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable t) {
                 Log.e(TAG, "Error fetching cart items", t);
                 Toast.makeText(getContext(), "Không thể kết nối đến server", Toast.LENGTH_SHORT).show();
+                checkEmptyState();
             }
         });
     }

@@ -47,14 +47,33 @@ public class ProductDetailActivity extends AppCompatActivity {
         tvPrice = findViewById(R.id.tvPrice);
         tvDescription = findViewById(R.id.tvDescription);
 
-        ImageView btnBack = findViewById(R.id.btnBack);
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> finish());
         }
 
+        // XỬ LÝ CHỌN SỐ LƯỢNG
+        TextView tvQty = findViewById(R.id.tvQuantityDetail);
+        findViewById(R.id.btnPlusDetail).setOnClickListener(v -> {
+            int q = Integer.parseInt(tvQty.getText().toString());
+            tvQty.setText(String.valueOf(q + 1));
+        });
+        findViewById(R.id.btnMinusDetail).setOnClickListener(v -> {
+            int q = Integer.parseInt(tvQty.getText().toString());
+            if (q > 1) tvQty.setText(String.valueOf(q - 1));
+        });
+
         findViewById(R.id.btnAddToCart).setOnClickListener(v -> {
-            Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
-            startActivity(intent);
+            com.ptithcm.lottemart.data.local.SessionManager sessionManager = new com.ptithcm.lottemart.data.local.SessionManager(this);
+            if (!sessionManager.isLoggedIn()) {
+                Toast.makeText(this, "Vui lòng đăng nhập để thực hiện mua hàng", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, com.ptithcm.lottemart.features.auth.LoginActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Đã thêm " + tvQty.getText().toString() + " sản phẩm vào giỏ", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
+                startActivity(intent);
+            }
         });
     }
 
