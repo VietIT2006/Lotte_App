@@ -1,74 +1,77 @@
 package com.ptithcm.lottemart.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
+import com.ptithcm.lottemart.R;
 import com.ptithcm.lottemart.data.models.Category;
 import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
+    public interface OnCategoryClickListener {
+        void onCategoryClick(Category category);
+    }
+
     private List<Category> categories;
     private Context context;
+    private OnCategoryClickListener listener;
 
-    public CategoryAdapter(Context context, List<Category> categories) {
+    public CategoryAdapter(Context context, List<Category> categories, OnCategoryClickListener listener) {
         this.context = context;
         this.categories = categories;
+        this.listener = listener;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Creating layout programmatically for mock to avoid missing xml
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER);
-        layout.setPadding(16, 16, 16, 16);
-        layout.setLayoutParams(new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        ));
-
-        ImageView icon = new ImageView(context);
-        icon.setLayoutParams(new LinearLayout.LayoutParams(120, 120));
-        icon.setBackgroundColor(Color.LTGRAY); // Mock placeholder
-
-        TextView title = new TextView(context);
-        title.setTextSize(12);
-        title.setTextColor(Color.DKGRAY);
-        title.setGravity(Gravity.CENTER);
-        title.setPadding(0, 8, 0, 0);
-
-        layout.addView(icon);
-        layout.addView(title);
-
-        return new ViewHolder(layout, icon, title);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_category, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Category cat = categories.get(position);
-        holder.title.setText(cat.getName());
+        Category category = categories.get(position);
+        holder.name.setText(category.getName());
+
+        if (category.getImageUrl() != null && !category.getImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(category.getImageUrl())
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .into(holder.image);
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onCategoryClick(category);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return categories.size();
+        return categories != null ? categories.size() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView icon;
-        TextView title;
-        public ViewHolder(@NonNull LinearLayout itemView, ImageView icon, TextView title) {
+        ImageView image;
+        TextView name;
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.icon = icon;
-            this.title = title;
+            image = itemView.findViewById(R.id.ivCategoryImage);
+            name = itemView.findViewById(R.id.tvCategoryName);
         }
     }
 }

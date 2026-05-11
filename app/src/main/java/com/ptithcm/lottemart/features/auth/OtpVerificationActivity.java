@@ -14,7 +14,7 @@ public class OtpVerificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_activity_otp_verification);
 
-        Button btnVerify = findViewById(R.id.btnVerifyOtp);
+        Button btnVerify = findViewById(R.id.btnVerify);
         if (btnVerify != null) {
             btnVerify.setOnClickListener(v -> {
                 // Mock verification success -> Go to Main

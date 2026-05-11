@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,23 +14,36 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.ptithcm.lottemart.R;
+import com.ptithcm.lottemart.data.api.ApiResponse;
+import com.ptithcm.lottemart.data.api.AuthApiService;
+import com.ptithcm.lottemart.data.api.AuthResponseData;
+import com.ptithcm.lottemart.data.api.LoginRequest;
 import com.ptithcm.lottemart.data.local.SessionManager;
+import com.ptithcm.lottemart.data.remote.RetrofitClient;
 import com.ptithcm.lottemart.features.fogotPassword.ForgotPasswordActivity;
 import com.ptithcm.lottemart.utils.Validator;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TAG = "LoginActivity";
     private TextInputLayout tilEmail, tilPassword;
     private TextInputEditText etEmail, etPassword;
-    private MaterialButton btnLogin;
+    private android.widget.Button btnLogin;
     private TextView tvForgotPassword, tvSignUp;
     private SessionManager sessionManager;
+    private AuthApiService authApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        com.ptithcm.lottemart.data.remote.RetrofitClient.init(this);
         
         sessionManager = new SessionManager(this);
+        authApiService = RetrofitClient.getClient().create(AuthApiService.class);
         
         // Kiểm tra Tự động đăng nhập
         if (sessionManager.isLoggedIn()) {
@@ -66,7 +80,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Xóa lỗi khi người dùng thay đổi dữ liệu
         etEmail.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -89,36 +102,57 @@ public class LoginActivity extends AppCompatActivity {
         boolean isValid = true;
 
         if (email.isEmpty()) {
-            tilEmail.setError("Vui lòng nhập Email hoặc Số điện thoại");
-            isValid = false;
-        } else if (!Validator.isEmailOrPhone(email)) {
-            tilEmail.setError("Định dạng Email hoặc Số điện thoại không hợp lệ");
+            tilEmail.setError("Vui lòng nhập Email của bạn");
             isValid = false;
         }
 
         if (password.isEmpty()) {
             tilPassword.setError("Vui lòng nhập mật khẩu");
             isValid = false;
-        } else if (!Validator.isValidPassword(password)) {
-            tilPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
-            isValid = false;
         }
 
         if (!isValid) return;
 
-        // Kiểm tra đăng nhập với Dynamic Mock Data
-        if (sessionManager.validateMockLogin(email, password)) {
-            // Lấy tên người dùng tương ứng (admin hoặc tài khoản mock vừa tạo)
-            String name = sessionManager.getMockName(email);
-            
-            // Lưu Session và chuyển hướng
-            sessionManager.saveAuthToken("mock_token_123456", name, email);
-            
-            Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-            navigateToMain();
-        } else {
-            Toast.makeText(this, "Thông tin không chính xác hoặc tài khoản không tồn tại", Toast.LENGTH_LONG).show();
-        }
+        btnLogin.setEnabled(false);
+        btnLogin.setText("Đang đăng nhập...");
+
+        LoginRequest loginRequest = new LoginRequest(email, password);
+        authApiService.login(loginRequest).enqueue(new Callback<ApiResponse<AuthResponseData>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<AuthResponseData>> call, Response<ApiResponse<AuthResponseData>> response) {
+                btnLogin.setEnabled(true);
+                btnLogin.setText("Đăng nhập");
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    AuthResponseData data = response.body().getData();
+                    sessionManager.saveAuthToken(
+                            data.getToken(),
+                            data.getUser().getFullName(),
+                            data.getUser().getEmail()
+                    );
+                    
+                    // CẬP NHẬT TOKEN VÀO HỆ THỐNG MẠNG NGAY LẬP TỨC
+                    com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
+                    
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    navigateToMain();
+                } else {
+                    String errorMsg = "Email hoặc mật khẩu không hợp lệ";
+                    if (response.body() != null && response.body().getMessage() != null) {
+                        errorMsg = response.body().getMessage();
+                    }
+                    Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<AuthResponseData>> call, Throwable t) {
+                btnLogin.setEnabled(true);
+                btnLogin.setText("Đăng nhập");
+                Log.e(TAG, "Login failure", t);
+                Toast.makeText(LoginActivity.this, "Lỗi kết nối máy chủ", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void navigateToMain() {

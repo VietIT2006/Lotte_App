@@ -24,9 +24,8 @@ module.exports = {
     connectDB,
     getDb: () => dbInstance,
     collection: (name) => dbInstance.collection(name),
-    // Helper để tương thích ngược (nếu cần)
+    // Helper để giả lập interface cũ nếu cần (tùy chọn)
     query: async (text, params) => {
         console.warn('⚠️ Cảnh báo: Bạn đang gọi hàm query (SQL) trên MongoDB. Vui lòng cập nhật code Service.');
-        return { rows: [] };
     }
-};
+};

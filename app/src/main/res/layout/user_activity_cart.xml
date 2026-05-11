@@ -101,12 +101,14 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
                 
-                <LinearLayout
+                <RadioGroup
+                    android:id="@+id/rgPaymentMethod"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
                     
                     <RadioButton
+                        android:id="@+id/rbCod"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:text="Thanh toán khi nhận hàng (Tiền mặt)"
@@ -114,11 +116,12 @@
                         android:checked="true"/>
                         
                     <RadioButton
+                        android:id="@+id/rbCard"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:text="Thẻ tín dụng / Ghi nợ"
                         android:padding="16dp"/>
-                </LinearLayout>
+                </RadioGroup>
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
