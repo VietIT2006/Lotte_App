@@ -1,18 +1,26 @@
-const { Pool } = require('pg');
+const mysql = require('mysql2/promise');
+require('dotenv').config();
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false // Cần thiết cho Supabase nếu không có cert
-    }
+// Tạo kết nối Pool tới MySQL
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'lotte_app',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-pool.on('error', (err, client) => {
-    console.error('Unexpected error on idle pg client', err);
-    process.exit(-1);
-});
-
+// Xuất ra một đối tượng có hàm query tương tự như cũ để bạn không phải sửa quá nhiều ở các Service
 module.exports = {
-    query: (text, params) => pool.query(text, params),
-    getClient: () => pool.connect(),
+    /**
+     * Thực thi truy vấn SQL
+     * Lưu ý: MySQL dùng dấu "?" thay vì "$1, $2" cho tham số
+     */
+    query: async (sql, params) => {
+        const [results] = await pool.execute(sql, params);
+        return { rows: results }; // Trả về định dạng { rows: [] } để khớp với logic cũ của bạn
+    },
+    pool: pool
 };
