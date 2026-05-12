@@ -27,6 +27,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import java.util.Arrays;
+import com.ptithcm.lottemart.data.api.SocialLoginRequest;
+
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
@@ -36,6 +50,11 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvForgotPassword, tvSignUp;
     private SessionManager sessionManager;
     private AuthApiService authApiService;
+    
+    // Social Login
+    private GoogleSignInClient mGoogleSignInClient;
+    private CallbackManager mCallbackManager;
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +74,36 @@ public class LoginActivity extends AppCompatActivity {
 
         initViews();
         setupListeners();
+        setupSocialLogin();
+    }
+
+    private void setupSocialLogin() {
+        // Configure Google Sign-In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // Configure Facebook Login
+        mCallbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // Ở đây thường sẽ gọi Graph API để lấy email, nhưng để đơn giản 
+                // tôi giả định bạn sẽ xử lý việc lấy profile sau
+                Toast.makeText(LoginActivity.this, "Facebook login success", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "Facebook login cancel");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.e(TAG, "Facebook login error", error);
+            }
+        });
     }
 
     private void initViews() {
@@ -79,6 +128,12 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
+
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        
+        findViewById(R.id.btnGoogle).setOnClickListener(v -> signInWithGoogle());
+            
+        findViewById(R.id.btnFacebook).setOnClickListener(v -> signInWithFacebook());
 
         etEmail.addTextChangedListener(new SimpleTextWatcher() {
             @Override
@@ -151,6 +206,72 @@ public class LoginActivity extends AppCompatActivity {
                 btnLogin.setText("Đăng nhập");
                 Log.e(TAG, "Login failure", t);
                 Toast.makeText(LoginActivity.this, "Lỗi kết nối máy chủ", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void signInWithGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void signInWithFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mCallbackManager.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleGoogleSignInResult(task);
+        }
+    }
+
+    private void handleGoogleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            if (account != null) {
+                performSocialLogin(
+                    account.getEmail(),
+                    account.getDisplayName(),
+                    account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : ""
+                );
+            }
+        } catch (ApiException e) {
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            Toast.makeText(this, "Đăng nhập Google thất bại", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void performSocialLogin(String email, String name, String avatar) {
+        btnLogin.setEnabled(false);
+        SocialLoginRequest request = new SocialLoginRequest(email, name, avatar, "google", "");
+        
+        authApiService.socialLogin(request).enqueue(new Callback<ApiResponse<AuthResponseData>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<AuthResponseData>> call, Response<ApiResponse<AuthResponseData>> response) {
+                btnLogin.setEnabled(true);
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    AuthResponseData data = response.body().getData();
+                    sessionManager.saveAuthToken(
+                            data.getToken(),
+                            data.getUser().getFullName(),
+                            data.getUser().getEmail()
+                    );
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    navigateToMain();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Lỗi đăng nhập mạng xã hội", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<AuthResponseData>> call, Throwable t) {
+                btnLogin.setEnabled(true);
+                Toast.makeText(LoginActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
             }
         });
     }

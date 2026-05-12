@@ -1,89 +1,165 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface"
+    android:background="@color/white"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/login_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="24dp">
 
+        <!-- Back Button -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_revert"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
+
+        <!-- Title -->
         <TextView
-            android:id="@+id/tvLoginTitle"
+            android:id="@+id/tvBrandName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
-            android:text="Chào mừng bạn!"
+            android:text="The Editorial Grocer"
+            android:textColor="@color/primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/btnBack"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/btnBack" />
+
+        <!-- Circular Image Container -->
+        <FrameLayout
+            android:id="@+id/imageContainer"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvBrandName">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivLoginBanner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="2dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/avatar_login_page"
+                app:shapeAppearanceOverlay="@style/CircleImage"
+                app:strokeColor="@color/outline_variant"
+                app:strokeWidth="1dp" />
+
+            <!-- Small Tag Icon Overlay -->
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_search_circle"
+                android:padding="6dp"
+                android:src="@drawable/ic_voucher"
+                app:tint="@color/white" />
+        </FrameLayout>
+
+        <!-- Welcome Text -->
+        <TextView
+            android:id="@+id/tvWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Welcome Back"
             android:textColor="@color/on_surface"
-            android:textSize="32sp"
+            android:textSize="28sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/imageContainer" />
 
         <TextView
-            android:id="@+id/tvLoginDesc"
-            android:layout_width="0dp"
+            android:id="@+id/tvSubWelcome"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="Đăng nhập để trải nghiệm mua sắm cao cấp tại Lotte Mart"
+            android:layout_marginTop="8dp"
+            android:text="Sign in to your Lotte Mart"
             android:textColor="@color/grey_text"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvLoginTitle" />
+            app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
 
-        <!-- Email/Phone Input -->
+        <!-- Input Section -->
+        <TextView
+            android:id="@+id/labelEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="EMAIL OR PHONE"
+            android:textColor="@color/grey_text"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubWelcome" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilEmail"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:hint="Email hoặc Số điện thoại"
-            app:boxBackgroundColor="@color/surface_container_lowest"
-            app:boxCornerRadiusBottomEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxStrokeWidth="0dp"
-            app:boxStrokeWidthFocused="1dp"
-            app:layout_constraintTop_toBottomOf="@id/tvLoginDesc">
+            android:layout_marginTop="8dp"
+            app:boxBackgroundMode="none"
+            app:hintEnabled="false"
+            app:layout_constraintTop_toBottomOf="@id/labelEmail">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress" />
+                android:layout_height="56dp"
+                android:background="@drawable/bg_peach_input"
+                android:hint="Enter your credentials"
+                android:inputType="textEmailAddress"
+                android:paddingHorizontal="16dp"
+                android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Password Input -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilPassword"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/labelPassword"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Mật khẩu"
-            app:boxBackgroundColor="@color/surface_container_lowest"
-            app:boxCornerRadiusBottomEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxStrokeWidth="0dp"
-            app:boxStrokeWidthFocused="1dp"
+            android:text="PASSWORD"
+            android:textColor="@color/grey_text"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tilEmail" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:boxBackgroundMode="none"
+            app:hintEnabled="false"
             app:passwordToggleEnabled="true"
-            app:layout_constraintTop_toBottomOf="@id/tilEmail">
+            app:layout_constraintTop_toBottomOf="@id/labelPassword">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword" />
+                android:layout_height="56dp"
+                android:background="@drawable/bg_peach_input"
+                android:hint="********"
+                android:inputType="textPassword"
+                android:paddingHorizontal="16dp"
+                android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -91,78 +167,120 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Quên mật khẩu?"
+            android:text="Forgot Password?"
             android:textColor="@color/primary"
+            android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tilPassword" />
 
-        <!-- Sử dụng MaterialButton để tránh lỗi ClassCastException -->
+        <!-- Sign In Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_marginTop="32dp"
-            android:backgroundTint="@null"
-            android:background="@drawable/bg_button_gradient"
-            android:text="Đăng nhập"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/primary"
+            android:text="Sign in with L.Point"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
+            app:cornerRadius="30dp"
+            app:icon="@drawable/ic_voucher"
+            app:iconGravity="textStart"
             app:layout_constraintTop_toBottomOf="@id/tvForgotPassword" />
 
-        <TextView
-            android:id="@+id/tvOr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Hoặc tiếp tục với"
-            android:textColor="@color/grey_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnLogin" />
-
+        <!-- Divider -->
         <LinearLayout
-            android:id="@+id/socialButtons"
-            android:layout_width="wrap_content"
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
             android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvOr">
+            app:layout_constraintTop_toBottomOf="@id/btnLogin">
 
-            <ImageButton
-                android:id="@+id/btnFacebook"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/bg_social_button"
-                android:src="@android:drawable/ic_menu_agenda"
-                android:padding="12dp"
-                android:scaleType="fitCenter"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/outline_variant" />
 
-            <ImageButton
-                android:id="@+id/btnGoogle"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:background="@drawable/bg_social_button"
-                android:src="@android:drawable/ic_menu_compass"
-                android:padding="12dp"
-                android:scaleType="fitCenter"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:text="OR CONTINUE WITH"
+                android:textColor="@color/outline_variant"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/outline_variant" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvSignUp"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoogle"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:text="Continue with Google"
+            android:textAllCaps="false"
+            android:textColor="@color/on_surface"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/google_color"
+            app:iconTint="@null"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            app:strokeColor="@color/outline_variant" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFacebook"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:text="Continue with Facebook"
+            android:textAllCaps="false"
+            android:textColor="@color/on_surface"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/facebook_logo"
+            app:iconTint="@null"
+            app:layout_constraintTop_toBottomOf="@id/btnGoogle"
+            app:strokeColor="@color/outline_variant" />
+
+        <!-- Footer -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Chưa có tài khoản? Đăng ký ngay"
-            android:textColor="@color/grey_text"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/socialButtons" />
+            app:layout_constraintTop_toBottomOf="@id/btnFacebook">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Don't have an account? "
+                android:textColor="@color/grey_text"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvSignUp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Join The Club"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

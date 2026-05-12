@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.user_activity_main);
 
         bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setItemActiveIndicatorEnabled(false);
         com.ptithcm.lottemart.data.local.SessionManager sessionManager = new com.ptithcm.lottemart.data.local.SessionManager(this);
         
         // Mặc định nạp HomeFragment khi vừa vào MainActivity
@@ -38,7 +39,10 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_categories) {
                 loadFragment(new com.ptithcm.lottemart.features.categories.CategoriesFragment());
                 return true;
-            } 
+            } else if (itemId == R.id.nav_voucher) {
+                loadFragment(new com.ptithcm.lottemart.features.loyalty.LPointFragment());
+                return true;
+            }
             
             // CÁC TRANG CẦN ĐĂNG NHẬP
             if (!sessionManager.isLoggedIn()) {
@@ -48,10 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 return false; // Không chuyển tab nếu chưa đăng nhập
             }
 
-            if (itemId == R.id.nav_lpoint) {
-                loadFragment(new com.ptithcm.lottemart.features.loyalty.LPointFragment());
-                return true;
-            } else if (itemId == R.id.nav_cart) {
+            if (itemId == R.id.nav_cart) {
                 loadFragment(new com.ptithcm.lottemart.features.shopping.CartFragment());
                 return true;
             } else if (itemId == R.id.nav_profile) {

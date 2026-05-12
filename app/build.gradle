@@ -66,6 +66,10 @@ dependencies {
     // Image Loading
     implementation libs.glide
 
+    // Social Login
+    implementation libs.play.services.auth
+    implementation libs.facebook.login
+
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
