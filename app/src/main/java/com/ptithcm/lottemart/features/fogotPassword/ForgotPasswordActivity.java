@@ -15,7 +15,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         setContentView(R.layout.user_activity_forgot_password);
 
         TextInputEditText edtInput = findViewById(R.id.edtEmailPhone);
-        MaterialButton btnSend = findViewById(R.id.btnSendCode);
+        android.widget.Button btnSend = findViewById(R.id.btnSendCode);
         final String HARDCODED_EMAIL = "admin@lottemart.vn";
 
         btnSend.setOnClickListener(v -> {

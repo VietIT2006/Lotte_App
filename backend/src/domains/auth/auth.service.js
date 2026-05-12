@@ -3,51 +3,66 @@ const jwt = require('jsonwebtoken');
 const db = require('../../core/db');
 
 class AuthService {
+    transformUser(user) {
+        if (!user) return null;
+        return {
+            id: user._id ? user._id.toString() : "",
+            username: user.username || "",
+            email: user.email || "",
+            full_name: user.full_name || "",
+            phone: user.phone || "",
+            avatar: user.avatar || "",
+            role_key: user.role_key || (user.role_id === 1 ? "admin" : "customer"),
+            lotte_points: Number(user.lotte_points) || 0,
+            membership_level: user.membership_level || "Thành viên"
+        };
+    }
+
     async register(userData) {
         const { username, email, phone, password, full_name } = userData;
 
-        // Check if user exists
-        const checkUser = await db.query(
-            'SELECT * FROM users WHERE email = $1 OR username = $2',
-            [email, username]
-        );
+        const checkUser = await db.collection('users').findOne({
+            $or: [{ email: email }, { username: username }]
+        });
 
-        if (checkUser.rows.length > 0) {
+        if (checkUser) {
             const err = new Error('Username or email already exists');
             err.statusCode = 400;
             throw err;
         }
 
-        // Hash password
         const passwordHash = await bcrypt.hash(password, 10);
 
-        // Insert new user
-        const result = await db.query(
-            `INSERT INTO users (username, email, phone, password_hash, full_name) 
-             VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email, full_name, role_key`,
-            [username, email, phone, passwordHash, full_name]
-        );
+        const newUser = {
+            username,
+            email,
+            phone,
+            password_hash: passwordHash,
+            full_name,
+            role_id: 2,
+            status: 'ACTIVE',
+            is_active: true,
+            lotte_points: 0,
+            membership_level: 'Bạc',
+            created_at: new Date(),
+            updated_at: new Date()
+        };
 
-        return result.rows[0];
+        const result = await db.collection('users').insertOne(newUser);
+        return this.transformUser({ ...newUser, _id: result.insertedId });
     }
 
     async login(loginData) {
         const { email, password } = loginData;
 
-        // Find user
-        const result = await db.query(
-            'SELECT * FROM users WHERE email = $1',
-            [email]
-        );
+        const user = await db.collection('users').findOne({ email: email });
 
-        const user = result.rows[0];
         if (!user) {
             const err = new Error('Invalid email or password');
             err.statusCode = 401;
             throw err;
         }
 
-        // Check password
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
             const err = new Error('Invalid email or password');
@@ -55,17 +70,13 @@ class AuthService {
             throw err;
         }
 
-        // Generate JWT
         const token = jwt.sign(
-            { id: user.id, username: user.username, role: user.role_key },
+            { id: user._id, username: user.username, role: user.role_id },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
-        // Remove password hash from response
-        delete user.password_hash;
-
-        return { user, token };
+        return { user: this.transformUser(user), token };
     }
 }
 

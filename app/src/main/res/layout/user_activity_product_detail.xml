@@ -16,6 +16,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
+                android:id="@+id/ivProductImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
@@ -23,6 +24,7 @@
                 android:background="@color/surface_container_low" />
 
             <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
@@ -90,11 +92,12 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:lineSpacingExtra="4dp"
-                android:text="Nho Shine Muscat được nhập khẩu trực tiếp từ các nông trang hữu cơ. Trái nho to, tròn, da căng bóng, có vị ngọt thanh và mùi hương đặc trưng của hoa mẫu đơn. Sản phẩm được đóng gói kỹ lưỡng, đảm bảo độ tươi ngon khi đến tay khách hàng."
+                android:text="Đang tải mô tả..."
                 android:textColor="@color/grey_text"
                 android:textSize="14sp" />
 
@@ -127,6 +130,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/btnMinusDetail"
                     android:layout_width="?attr/actionBarSize"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -134,6 +138,7 @@
                     android:textSize="20sp" />
 
                 <TextView
+                    android:id="@+id/tvQuantityDetail"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -142,6 +147,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/btnPlusDetail"
                     android:layout_width="?attr/actionBarSize"
                     android:layout_height="match_parent"
                     android:gravity="center"

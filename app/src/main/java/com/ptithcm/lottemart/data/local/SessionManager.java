@@ -46,6 +46,13 @@ public class SessionManager {
     }
 
     /**
+     * Lấy email người dùng
+     */
+    public String getUserEmail() {
+        return pref.getString(KEY_USER_EMAIL, "");
+    }
+
+    /**
      * Kiểm tra trạng thái đăng nhập
      */
     public boolean isLoggedIn() {

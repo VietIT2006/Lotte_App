@@ -138,27 +138,63 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="64dp"
                 android:gravity="center_vertical"
                 android:text="Đơn hàng của tôi"
                 android:textColor="@color/on_surface"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:drawableStart="@android:drawable/ic_menu_agenda"
+                android:drawablePadding="16dp"
+                android:drawableTint="@color/grey_text"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true" />
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="64dp"
                 android:gravity="center_vertical"
                 android:text="Sổ địa chỉ"
                 android:textColor="@color/on_surface"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:drawableStart="@android:drawable/ic_menu_directions"
+                android:drawablePadding="16dp"
+                android:drawableTint="@color/grey_text"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true" />
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="64dp"
                 android:gravity="center_vertical"
                 android:text="Cài đặt thông báo"
                 android:textColor="@color/on_surface"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:drawableStart="@android:drawable/ic_popup_reminder"
+                android:drawablePadding="16dp"
+                android:drawableTint="@color/grey_text"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:gravity="center_vertical"
+                android:text="Trợ giúp &amp; Phản hồi"
+                android:textColor="@color/on_surface"
+                android:textSize="16sp"
+                android:drawableStart="@android:drawable/ic_menu_help"
+                android:drawablePadding="16dp"
+                android:drawableTint="@color/grey_text"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_menu_item"
+                android:clickable="true"
+                android:focusable="true" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnLogout"

@@ -3,6 +3,7 @@ const promotionsController = require('./promotions.controller');
 
 const router = express.Router();
 
-// Example: router.get('/', promotionsController.getAll);
+router.get('/', promotionsController.getPromotions);
+router.get('/coupons', promotionsController.getCoupons);
 
 module.exports = router;

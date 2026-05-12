@@ -4,9 +4,7 @@ plugins {
 
 android {
     namespace 'com.ptithcm.lottemart'
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.ptithcm.lottemart"
@@ -30,11 +28,44 @@ android {
     }
 }
 
+// Tự động chạy Backend khi nhấn nút Run trong Android Studio
+task startBackend {
+    doLast {
+        println "--- 🚀 Đang kiểm tra trạng thái Backend ---"
+        try {
+            // Kiểm tra xem port 3000 đã chạy chưa với timeout 500ms
+            java.net.Socket socket = new java.net.Socket()
+            socket.connect(new java.net.InetSocketAddress("127.0.0.1", 3000), 500)
+            socket.close()
+            println "✅ Backend đang sẵn sàng."
+        } catch (Exception e) {
+            println "⚠️ Backend chưa chạy hoặc không phản hồi. Đang khởi động..."
+            exec {
+                workingDir '../backend'
+                commandLine 'cmd', '/c', 'start "Lotte Mart Backend" node server.js'
+            }
+            println "🚀 Đã kích hoạt khởi động Backend độc lập."
+        }
+    }
+}
+
+// Yêu cầu quá trình preBuild phải chạy task startBackend trước
+// preBuild.dependsOn startBackend
+
 dependencies {
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
+
+    // Networking
+    implementation libs.retrofit
+    implementation libs.converter.gson
+    implementation libs.logging.interceptor
+
+    // Image Loading
+    implementation libs.glide
+
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

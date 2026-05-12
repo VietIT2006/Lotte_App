@@ -1,26 +1,35 @@
-const mysql = require('mysql2/promise');
+const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
-// Tạo kết nối Pool tới MySQL
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'lotte_app',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
 
-// Xuất ra một đối tượng có hàm query tương tự như cũ để bạn không phải sửa quá nhiều ở các Service
+let dbInstance = null;
+
+async function connectDB() {
+    if (dbInstance) return dbInstance;
+    
+    try {
+        await client.connect();
+        console.log('✅ Connected to MongoDB');
+        dbInstance = client.db();
+        return dbInstance;
+    } catch (error) {
+        console.error('❌ MongoDB Connection Error:', error);
+        process.exit(1);
+    }
+}
+
 module.exports = {
-    /**
-     * Thực thi truy vấn SQL
-     * Lưu ý: MySQL dùng dấu "?" thay vì "$1, $2" cho tham số
-     */
-    query: async (sql, params) => {
-        const [results] = await pool.execute(sql, params);
-        return { rows: results }; // Trả về định dạng { rows: [] } để khớp với logic cũ của bạn
+    connectDB,
+    getDb: () => dbInstance,
+    collection: (name) => dbInstance.collection(name),
+    toId: (id) => {
+        if (!id) return null;
+        try { return new MongoClient.ObjectId(id); } catch (e) { 
+            const { ObjectId } = require('mongodb');
+            return new ObjectId(id);
+        }
     },
-    pool: pool
+    ObjectId: require('mongodb').ObjectId
 };

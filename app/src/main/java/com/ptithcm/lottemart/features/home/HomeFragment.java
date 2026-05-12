@@ -1,63 +1,132 @@
 package com.ptithcm.lottemart.features.home;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ptithcm.lottemart.R;
+import com.ptithcm.lottemart.data.api.ApiResponse;
+import com.ptithcm.lottemart.data.api.ProductApiService;
+import com.ptithcm.lottemart.data.models.Category;
+import com.ptithcm.lottemart.data.models.Product;
+import com.ptithcm.lottemart.data.remote.RetrofitClient;
+import com.ptithcm.lottemart.features.shopping.ProductDetailActivity;
+import com.ptithcm.lottemart.ui.adapters.CategoryAdapter;
+import com.ptithcm.lottemart.ui.adapters.ProductAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
+
+    private static final String TAG = "HomeFragment";
+    private RecyclerView rvCategories, rvFeatured;
+    private CategoryAdapter categoryAdapter;
+    private ProductAdapter productAdapter;
+    private ProductApiService apiService;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.user_fragment_home, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Khởi tạo các thành phần giao diện và dữ liệu ở đây
-        setupMockData();
+        
+        initViews(view);
+        apiService = RetrofitClient.getClient().create(ProductApiService.class);
+        
+        fetchCategories();
+        fetchFeaturedProducts();
     }
 
-    private void setupMockData() {
-        // Setup Categories
-        androidx.recyclerview.widget.RecyclerView rvCategories = getView().findViewById(R.id.rvCategories);
-        if (rvCategories != null) {
-            java.util.List<com.ptithcm.lottemart.data.models.Category> categories = new java.util.ArrayList<>();
-            categories.add(new com.ptithcm.lottemart.data.models.Category("1", "Rau Rủ", ""));
-            categories.add(new com.ptithcm.lottemart.data.models.Category("2", "Thịt cá", ""));
-            categories.add(new com.ptithcm.lottemart.data.models.Category("3", "Sữa", ""));
-            categories.add(new com.ptithcm.lottemart.data.models.Category("4", "Trái cây", ""));
-            
-            com.ptithcm.lottemart.ui.adapters.CategoryAdapter categoryAdapter = new com.ptithcm.lottemart.ui.adapters.CategoryAdapter(getContext(), categories);
-            rvCategories.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext(), androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false));
-            rvCategories.setAdapter(categoryAdapter);
-        }
+    private void initViews(View view) {
+        rvCategories = view.findViewById(R.id.rvCategories);
+        rvFeatured = view.findViewById(R.id.rvFeatured);
+        View searchContainer = view.findViewById(R.id.searchContainer);
+        View btnNotification = view.findViewById(R.id.btnNotification);
 
-        // Setup Featured Products
-        androidx.recyclerview.widget.RecyclerView rvFeatured = getView().findViewById(R.id.rvFeatured);
-        if (rvFeatured != null) {
-            java.util.List<com.ptithcm.lottemart.data.models.Product> products = new java.util.ArrayList<>();
-            products.add(new com.ptithcm.lottemart.data.models.Product("p1", "Thịt bò Kobe (1kg)", 1500000, 2000000, ""));
-            products.add(new com.ptithcm.lottemart.data.models.Product("p2", "Sữa tươi Đà Lạt Latte", 45000, 50000, ""));
-            products.add(new com.ptithcm.lottemart.data.models.Product("p3", "Dưa lưới giòn", 75000, 85000, ""));
-            products.add(new com.ptithcm.lottemart.data.models.Product("p4", "Cá hồi tươi", 350000, 420000, ""));
-
-            com.ptithcm.lottemart.ui.adapters.ProductAdapter productAdapter = new com.ptithcm.lottemart.ui.adapters.ProductAdapter(getContext(), products, product -> {
-                // Navigate to Product Detail
-                android.content.Intent intent = new android.content.Intent(getActivity(), com.ptithcm.lottemart.features.shopping.ProductDetailActivity.class);
-                startActivity(intent);
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v -> {
+                Toast.makeText(getContext(), "Tính năng thông báo đang được phát triển", Toast.LENGTH_SHORT).show();
             });
-            rvFeatured.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(getContext(), 2));
-            rvFeatured.setAdapter(productAdapter);
         }
+
+        searchContainer.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.search.SearchActivity.class);
+            startActivity(intent);
+        });
+
+        categoryAdapter = new CategoryAdapter(getContext(), new ArrayList<>(), category -> {
+            Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.categories.CategoryProductsActivity.class);
+            intent.putExtra("CATEGORY_ID", category.getId());
+            intent.putExtra("CATEGORY_NAME", category.getName());
+            startActivity(intent);
+        });
+        rvCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        rvCategories.setAdapter(categoryAdapter);
+
+        productAdapter = new ProductAdapter(getContext(), new ArrayList<>(), product -> {
+            Intent intent = new Intent(getActivity(), ProductDetailActivity.class);
+            intent.putExtra("PRODUCT_ID", product.getId());
+            startActivity(intent);
+        });
+        rvFeatured.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        rvFeatured.setAdapter(productAdapter);
+    }
+
+    private void fetchCategories() {
+        apiService.getCategories().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    categoryAdapter.setCategories(response.body().getData());
+                } else {
+                    Log.e(TAG, "Failed to fetch categories: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> call, Throwable t) {
+                Log.e(TAG, "Error fetching categories", t);
+                Toast.makeText(getContext(), "Không thể tải danh mục", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchFeaturedProducts() {
+        apiService.getFeaturedProducts().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    productAdapter.setProducts(response.body().getData());
+                } else {
+                    Log.e(TAG, "Failed to fetch featured products: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, Throwable t) {
+                Log.e(TAG, "Error fetching featured products", t);
+                Toast.makeText(getContext(), "Không thể tải sản phẩm nổi bật", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

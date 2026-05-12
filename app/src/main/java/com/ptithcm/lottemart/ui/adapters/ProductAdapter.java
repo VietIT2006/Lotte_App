@@ -8,7 +8,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 import com.ptithcm.lottemart.data.models.Product;
+import android.graphics.drawable.ColorDrawable;
 import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
@@ -27,6 +29,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         this.listener = listener;
     }
 
+    public void setProducts(List<Product> products) {
+        this.products = products;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -34,18 +41,20 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(16, 16, 16, 16);
         layout.setBackgroundColor(Color.WHITE);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(400, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(16, 16, 16, 16);
         layout.setLayoutParams(params);
 
         ImageView image = new ImageView(context);
         image.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300));
         image.setBackgroundColor(Color.LTGRAY);
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         TextView name = new TextView(context);
         name.setTextSize(14);
         name.setTextColor(Color.DKGRAY);
         name.setPadding(0, 16, 0, 8);
+        name.setMaxLines(2);
 
         TextView price = new TextView(context);
         price.setTextSize(16);
@@ -63,6 +72,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         Product product = products.get(position);
         holder.name.setText(product.getName());
         holder.price.setText(String.format("%,.0f đ", product.getPrice()));
+
+        if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(product.getImageUrl())
+                    .placeholder(new ColorDrawable(Color.LTGRAY))
+                    .into(holder.image);
+        } else {
+            holder.image.setBackgroundColor(Color.LTGRAY);
+        }
         
         holder.itemView.setOnClickListener(v -> {
             if(listener != null) listener.onItemClick(product);
@@ -71,7 +89,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return products.size();
+        return products != null ? products.size() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
