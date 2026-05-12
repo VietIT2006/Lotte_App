@@ -124,6 +124,8 @@ class CatalogService {
             const products = await db.collection('products').find(filter).limit(20).toArray();
             return products.map(p => this.transformProduct(p));
         }) || [];
+    }
+
     async getBranches() {
         return await this.wrapAction(async () => {
             return await db.collection('branches').find({ is_active: true }).toArray();
