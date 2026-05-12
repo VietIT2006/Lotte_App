@@ -80,6 +80,14 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        
+        findViewById(R.id.btnGoogle).setOnClickListener(v -> 
+            android.widget.Toast.makeText(this, "Tính năng đăng nhập Google đang được phát triển", android.widget.Toast.LENGTH_SHORT).show());
+            
+        findViewById(R.id.btnFacebook).setOnClickListener(v -> 
+            android.widget.Toast.makeText(this, "Tính năng đăng nhập Facebook đang được phát triển", android.widget.Toast.LENGTH_SHORT).show());
+
         etEmail.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
