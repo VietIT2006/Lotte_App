@@ -27,6 +27,19 @@ class AuthController {
         }
     }
 
+    async socialLogin(req, res, next) {
+        try {
+            const { user, token } = await authService.socialLogin(req.body);
+            res.status(200).json({
+                success: true,
+                message: 'Social login successful',
+                data: { user, token }
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async verifyOtp(req, res, next) {
         try {
             // Mock OTP verification since SMS is generally external

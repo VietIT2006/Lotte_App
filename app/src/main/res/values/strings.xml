@@ -15,4 +15,9 @@
     <string name="link_forgot_password">Quên mật khẩu?</string>
     <string name="link_register">Chưa có tài khoản? Đăng ký ngay</string>
     <string name="link_login">Đã có tài khoản? Đăng nhập</string>
+
+    <!-- Social Login Config (Replace with your actual IDs) -->
+    <string name="facebook_app_id">YOUR_FB_APP_ID</string>
+    <string name="fb_login_protocol_scheme">fbYOUR_FB_APP_ID</string>
+    <string name="facebook_client_token">YOUR_CLIENT_TOKEN</string>
 </resources>

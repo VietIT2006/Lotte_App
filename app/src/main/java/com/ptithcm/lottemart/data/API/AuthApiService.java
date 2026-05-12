@@ -11,4 +11,7 @@ public interface AuthApiService {
 
     @POST("auth/register")
     Call<ApiResponse<User>> register(@Body RegisterRequest request);
+
+    @POST("auth/social-login")
+    Call<ApiResponse<AuthResponseData>> socialLogin(@Body SocialLoginRequest request);
 }

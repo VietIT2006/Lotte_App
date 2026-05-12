@@ -52,15 +52,22 @@ public class ProfileFragment extends Fragment {
 
     private void setupListeners() {
         btnLogout.setOnClickListener(v -> {
-            sessionManager.logout();
-            
-            // XÓA TOKEN KHỎI HỆ THỐNG MẠNG
-            com.ptithcm.lottemart.data.remote.RetrofitClient.init(requireContext());
-            
-            // Quay lại màn hình đăng nhập
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Đăng xuất")
+                .setMessage("Bạn có chắc chắn muốn đăng xuất khỏi Lotte Mart không?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                    sessionManager.logout();
+                    
+                    // XÓA TOKEN KHỎI HỆ THỐNG MẠNG
+                    com.ptithcm.lottemart.data.remote.RetrofitClient.init(requireContext());
+                    
+                    // Quay lại màn hình đăng nhập
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
         });
     }
 }
