@@ -4,22 +4,35 @@ Tài liệu này bao gồm hướng dẫn kiểm tra trạng thái Backend và d
 
 ---
 
-## PHẦN 1: KIỂM TRA TRẠNG THÁI BACKEND (API)
+## PHẦN 1: HƯỚNG DẪN CÀI ĐẶT & CHẠY DỰ ÁN (QUICK START)
 
-Trước khi chạy ứng dụng Android, bạn cần đảm bảo Backend Node.js đang hoạt động bình thường.
+Dành cho thành viên mới hoặc sau khi `git pull` code mới về.
 
-### 1. Khởi động Backend
-Mở Terminal / Command Prompt tại thư mục backend (`C:\LapTrinhHuongDichVu\lotte-mart-backend`) và chạy lệnh:
-```bash
-npm run dev
-```
-*(Yêu cầu: Màn hình hiển thị `Server is running on port 3000` và `Connected to Supabase successfully`)*
+### 1. Cấu hình Backend (Node.js)
+Mở Terminal tại thư mục `backend` và chạy các lệnh sau:
+1.  **Cài đặt thư viện:** `npm install`
+2.  **Khởi tạo môi trường (.env):** `npm run setup` 
+    *(Lệnh này tự động tạo file .env từ cấu hình chuẩn đã có sẵn MongoDB Atlas)*
+3.  **Chạy server:** `npm run dev`
+    *(Kết quả mong đợi: `✅ Server is running...` và `✅ Connected to MongoDB`)*
 
-### 2. Kiểm tra nhanh API bằng Trình duyệt
-Mở Google Chrome và truy cập lần lượt các đường dẫn sau:
-- **Trạng thái Server:** `http://localhost:3000` -> (Phải hiện chữ "Welcome..." hoặc "API is running")
-- **API Danh mục:** `http://localhost:3000/api/v1/products/categories` -> (Phải hiện danh sách JSON danh mục)
-- **API Sản phẩm nổi bật:** `http://localhost:3000/api/v1/products/featured` -> (Phải hiện danh sách JSON sản phẩm)
+### 2. Cấu hình Android (Lotte Mart App)
+Mở Project bằng Android Studio. Cấu hình IP trong file `NetworkConfig.java` như sau:
+
+*   **TRƯỜNG HỢP 1: Dùng Máy ảo (Emulator) - Mặc định**
+    *   Giữ nguyên `BASE_URL = "http://10.0.2.2:3000/api/v1/"`.
+    *   Nhấn Run và trải nghiệm.
+
+*   **TRƯỜNG HỢP 2: Dùng Máy thật (Physical Device)**
+    1.  Cắm cáp USB vào máy tính (Bật USB Debugging).
+    2.  Trong `NetworkConfig.java`: Đổi `10.0.2.2` thành `127.0.0.1`.
+    3.  Click đúp vào file **`chay_may_that.bat`** ở thư mục gốc.
+    4.  Nhấn Run từ Android Studio.
+
+### 3. Kiểm tra kết nối API (Dùng trình duyệt)
+Sau khi chạy backend, hãy truy cập các link sau để đảm bảo dữ liệu đã thông:
+- **API Danh mục:** `http://localhost:3000/api/v1/catalog/categories`
+- **API Sản phẩm:** `http://localhost:3000/api/v1/catalog/products`
 
 Nếu các đường dẫn trên trả về dữ liệu thành công, Backend đã sẵn sàng!
 
