@@ -58,6 +58,9 @@
         <activity
             android:name=".features.shopping.OrderTrackingActivity"
             android:exported="false" />
+        <activity
+            android:name=".features.notifications.NotificationActivity"
+            android:exported="false" />
 
         <!-- Facebook Config -->
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>

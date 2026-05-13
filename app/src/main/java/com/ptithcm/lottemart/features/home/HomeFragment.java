@@ -65,7 +65,8 @@ public class HomeFragment extends Fragment {
 
         if (btnNotification != null) {
             btnNotification.setOnClickListener(v -> {
-                Toast.makeText(getContext(), "Tính năng thông báo đang được phát triển", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.notifications.NotificationActivity.class);
+                startActivity(intent);
             });
         }
 
