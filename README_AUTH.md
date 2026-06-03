@@ -1,3 +1,4 @@
+
 # Cơ chế Xác thực (Authentication) - Lotte Mart App
 
 Tài liệu này giải thích cấu trúc và cách vận hành của hệ thống đăng nhập, đăng ký và quản lý phiên làm việc trong dự án Lotte Mart Android.

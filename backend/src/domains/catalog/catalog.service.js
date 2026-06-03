@@ -37,7 +37,12 @@ class CatalogService {
         if (!item) return null;
         
         const name = item.name || "Sản phẩm Lotte";
-        const finalImage = this.getSmartFallback(name, 'product');
+        let finalImage = item.thumbnail || item.image;
+        
+        // Nếu là ảnh thật nhưng chứa domain ảo (dummy data), thì lấy ảnh mock để tránh lỗi hiển thị trên app
+        if (!finalImage || finalImage.includes('example.com') || finalImage.includes('lottemart.vn')) {
+            finalImage = this.getSmartFallback(name, 'product');
+        }
 
         return {
             id: item._id ? item._id.toString() : "",
@@ -53,10 +58,16 @@ class CatalogService {
     transformCategory(item) {
         if (!item) return null;
         const name = item.name || "Danh mục";
+        let image = item.image || item.thumbnail;
+        
+        if (!image || image.includes('example.com') || image.includes('lottemart.vn')) {
+            image = this.getSmartFallback(name, 'category');
+        }
+
         return {
             id: item._id ? item._id.toString() : "",
             name: name,
-            image: this.getSmartFallback(name, 'category') // LUÔN TRẢ VỀ ẢNH SỐNG
+            image: image
         };
     }
 
@@ -128,7 +139,11 @@ class CatalogService {
 
     async getBranches() {
         return await this.wrapAction(async () => {
-            return await db.collection('branches').find({ is_active: true }).toArray();
+            const branches = await db.collection('branches').find({ is_active: true }).toArray();
+            return branches.map(b => ({
+                ...b,
+                id: b._id ? b._id.toString() : ""
+            }));
         }) || [];
     }
 
@@ -136,6 +151,139 @@ class CatalogService {
         return await this.wrapAction(async () => {
             return await db.collection('reviews').find({ product_id: this.toId(productId) }).toArray();
         }) || [];
+    }
+
+    // --- ADMIN MODULE: PRODUCT CRUD ---
+
+    async createProduct(productData) {
+        return await this.wrapAction(async () => {
+            productData.created_at = new Date();
+            productData.is_active = true;
+            if (productData.category_id) {
+                productData.category_id = this.toId(productData.category_id);
+            }
+            const result = await db.collection('products').insertOne(productData);
+            productData._id = result.insertedId;
+            return this.transformProduct(productData);
+        });
+    }
+
+    async updateProduct(id, updateData) {
+        return await this.wrapAction(async () => {
+            updateData.updated_at = new Date();
+            if (updateData.category_id) {
+                updateData.category_id = this.toId(updateData.category_id);
+            }
+            // Loại bỏ _id nếu có để tránh lỗi MongoDB
+            delete updateData._id;
+
+            const result = await db.collection('products').findOneAndUpdate(
+                { _id: this.toId(id) },
+                { $set: updateData },
+                { returnDocument: 'after' }
+            );
+            return this.transformProduct(result.value || result);
+        });
+    }
+
+    async deleteProduct(id) {
+        return await this.wrapAction(async () => {
+            // Soft delete
+            const result = await db.collection('products').findOneAndUpdate(
+                { _id: this.toId(id) },
+                { $set: { is_active: false, updated_at: new Date() } },
+                { returnDocument: 'after' }
+            );
+            return result.ok === 1 || result.lastErrorObject?.updatedExisting;
+        });
+    }
+
+    async uploadImage(file) {
+        return await this.wrapAction(async () => {
+            // Mock upload - in a real app this would upload to S3/Cloudinary
+            return {
+                url: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=500&q=80"
+            };
+        });
+    }
+
+    // --- ADMIN MODULE: CATEGORY CRUD ---
+
+    async createCategory(catData) {
+        return await this.wrapAction(async () => {
+            catData.is_active = true;
+            catData.created_at = new Date();
+            const result = await db.collection('categories').insertOne(catData);
+            catData._id = result.insertedId;
+            return this.transformCategory(catData);
+        });
+    }
+
+    async updateCategory(id, updateData) {
+        return await this.wrapAction(async () => {
+            updateData.updated_at = new Date();
+            delete updateData._id;
+            const result = await db.collection('categories').findOneAndUpdate(
+                { _id: this.toId(id) },
+                { $set: updateData },
+                { returnDocument: 'after' }
+            );
+            return this.transformCategory(result.value || result);
+        });
+    }
+
+    async deleteCategory(id) {
+        return await this.wrapAction(async () => {
+            const result = await db.collection('categories').findOneAndUpdate(
+                { _id: this.toId(id) },
+                { $set: { is_active: false, updated_at: new Date() } },
+                { returnDocument: 'after' }
+            );
+            return result.ok === 1 || result.lastErrorObject?.updatedExisting;
+        });
+    }
+
+    // --- ADMIN MODULE: BRANCH CRUD ---
+
+    async createBranch(branchData) {
+        return await this.wrapAction(async () => {
+            branchData.is_active = true;
+            branchData.createdAt = new Date();
+            const result = await db.collection('branches').insertOne(branchData);
+            branchData._id = result.insertedId;
+            return {
+                ...branchData,
+                id: branchData._id.toString()
+            };
+        });
+    }
+
+    async updateBranch(id, updateData) {
+        return await this.wrapAction(async () => {
+            updateData.updatedAt = new Date();
+            delete updateData._id;
+            const result = await db.collection('branches').findOneAndUpdate(
+                { _id: this.toId(id) },
+                { $set: updateData },
+                { returnDocument: 'after' }
+            );
+            const branch = result.value || result;
+            if(branch) {
+                branch.id = branch._id ? branch._id.toString() : "";
+            }
+            return branch;
+        });
+    }
+
+    async deleteBranch(id) {
+        return await this.wrapAction(async () => {
+            const result = await db.collection('branches').findOneAndUpdate(
+                { _id: this.toId(id) },
+                { $set: { is_active: false, updatedAt: new Date() } },
+                { returnDocument: 'after' }
+            );
+            return result.ok === 1 || result.lastErrorObject?.updatedExisting;
+        });
     }
 }
 

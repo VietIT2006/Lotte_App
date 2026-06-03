@@ -11,4 +11,18 @@ router.get('/products/:id', catalogController.getProductById);
 router.get('/products/:id/reviews', catalogController.getProductReviews);
 router.get('/branches', catalogController.getBranches);
 
+// --- ADMIN ROUTES ---
+router.post('/products', catalogController.createProduct);
+router.put('/products/:id', catalogController.updateProduct);
+router.delete('/products/:id', catalogController.deleteProduct);
+router.post('/upload', catalogController.uploadImage);
+
+router.post('/categories', catalogController.createCategory);
+router.put('/categories/:id', catalogController.updateCategory);
+router.delete('/categories/:id', catalogController.deleteCategory);
+
+router.post('/branches', catalogController.createBranch);
+router.put('/branches/:id', catalogController.updateBranch);
+router.delete('/branches/:id', catalogController.deleteBranch);
+
 module.exports = router;

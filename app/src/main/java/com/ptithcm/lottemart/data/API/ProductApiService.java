@@ -1,5 +1,6 @@
 package com.ptithcm.lottemart.data.api;
 
+import com.ptithcm.lottemart.data.models.Branch;
 import com.ptithcm.lottemart.data.models.Category;
 import com.ptithcm.lottemart.data.models.Product;
 import java.util.List;
@@ -11,6 +12,9 @@ import retrofit2.http.Query;
 public interface ProductApiService {
     @GET("catalog/categories")
     Call<ApiResponse<List<Category>>> getCategories();
+
+    @GET("catalog/branches")
+    Call<ApiResponse<List<Branch>>> getBranches();
 
     @GET("catalog/products")
     Call<ApiResponse<List<Product>>> getProducts(@Query("category_id") String categoryId);

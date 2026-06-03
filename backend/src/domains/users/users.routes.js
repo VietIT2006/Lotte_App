@@ -8,5 +8,6 @@ router.use(authMiddleware);
 
 router.get('/profile', usersController.getProfile);
 router.put('/profile', usersController.updateProfile);
+router.get('/', usersController.getUsers);
 
 module.exports = router;

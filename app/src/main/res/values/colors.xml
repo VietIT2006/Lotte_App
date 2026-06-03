@@ -26,4 +26,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="grey_text">#5D3F3B</color>
     <color name="error">#BA1A1A</color>
+    
+    <!-- Admin UI Colors -->
+    <color name="admin_bg">#F8F9FA</color>
+    <color name="admin_primary">#D32F2F</color>
+    <color name="admin_text_title">#212121</color>
+    <color name="admin_text_desc">#757575</color>
+    <color name="admin_card_bg">#FFFFFF</color>
 </resources>

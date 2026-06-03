@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FBF9F8">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btnSubmitLayout"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirm Delivery"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:textColor="#303333"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Photo Proof Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PHOTO PROOF"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#5D5F60"
+                android:layout_marginBottom="12dp"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="#E1E3E3"
+                android:layout_marginBottom="24dp">
+                
+                <!-- Placeholder for Camera Viewfinder -->
+                <ImageView
+                    android:id="@+id/ivCapturedPhoto"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/ic_menu_camera"
+                    app:tint="#666666"/>
+                    
+                <Button
+                    android:id="@+id/btnCapturePhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:text="Capture"
+                    android:textColor="@color/white"
+                    android:backgroundTint="#C00004"/>
+            </FrameLayout>
+
+            <!-- Add Notes Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ADD NOTES"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#5D5F60"
+                android:layout_marginBottom="12dp"/>
+
+            <EditText
+                android:id="@+id/etDeliveryNotes"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:gravity="top|start"
+                android:hint="e.g. Left behind the pillar, gate code..."
+                android:padding="12dp"
+                android:background="@drawable/rounded_edittext_bg"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Quick Tags -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+                <Button
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Front Door"
+                    android:textColor="#303333"
+                    android:layout_marginEnd="8dp"/>
+                <Button
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Handed to Customer"
+                    android:textColor="#303333"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Button -->
+    <LinearLayout
+        android:id="@+id/btnSubmitLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="16dp"
+        android:background="@color/white"
+        android:elevation="8dp">
+        <Button
+            android:id="@+id/btnSubmitDelivery"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="COMPLETE ORDER"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:backgroundTint="#C00004"
+            app:cornerRadius="8dp"/>
+    </LinearLayout>
+
+</RelativeLayout>

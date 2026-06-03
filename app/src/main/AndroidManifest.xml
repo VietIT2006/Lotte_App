@@ -5,6 +5,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -34,6 +36,51 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
+            android:name=".features.admin.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminUserManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminProductManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminCategoryManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminCategoryFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminProductFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminBranchManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminOrdersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminPromotionsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminSuppliersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminImportOrdersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminReceiptsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminBatchesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminTransfersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminRolesActivity"
+            android:exported="false" />
+        <activity
             android:name=".features.auth.OtpVerificationActivity"
             android:exported="false" />
         <activity
@@ -61,6 +108,23 @@
         <activity
             android:name=".features.notifications.NotificationActivity"
             android:exported="false" />
+        <activity
+            android:name=".features.shipper.ShipperDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shipper.ShipperOrdersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shipper.ShipperDeliveryDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shipper.ShipperProofOfDeliveryActivity"
+            android:exported="false" />
+            
+        <!-- Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
 
         <!-- Facebook Config -->
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>

@@ -49,6 +49,18 @@ class UsersService {
 
         return this.getProfile(userId);
     }
+
+    async getAllUsers(requestRole) {
+        let query = {};
+        if (requestRole === 'admin') {
+            // Admin thường chỉ thấy khách hàng
+            query = { role_id: 2 }; 
+        }
+        // SuperAdmin (hoặc các role khác có quyền) sẽ lấy hết vì query rỗng
+        
+        const users = await db.collection('users').find(query).toArray();
+        return users.map(user => this.transformUser(user));
+    }
 }
 
 module.exports = new UsersService();

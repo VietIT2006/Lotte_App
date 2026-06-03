@@ -20,6 +20,15 @@ public class User {
     
     @SerializedName("role_key")
     private String role;
+    
+    @SerializedName("avatar")
+    private String avatar;
+    
+    @SerializedName("lotte_points")
+    private int lottePoints;
+    
+    @SerializedName("membership_level")
+    private String membershipLevel;
 
     public String getId() { return id; }
     public String getUsername() { return username; }
@@ -27,4 +36,7 @@ public class User {
     public String getEmail() { return email; }
     public String getPhone() { return phone; }
     public String getRole() { return role; }
+    public String getAvatar() { return avatar; }
+    public int getLottePoints() { return lottePoints; }
+    public String getMembershipLevel() { return membershipLevel; }
 }

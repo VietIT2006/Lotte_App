@@ -12,6 +12,7 @@ const loyaltyRoutes = require('./domains/loyalty/loyalty.routes');
 const purchasingRoutes = require('./domains/purchasing/purchasing.routes');
 const customerServiceRoutes = require('./domains/customer_service/customer_service.routes');
 const notificationsRoutes = require('./domains/notifications/notifications.routes');
+const deliveryRoutes = require('./domains/delivery/delivery.routes');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/v1/loyalty', loyaltyRoutes);
 app.use('/api/v1/purchasing', purchasingRoutes);
 app.use('/api/v1/customer-service', customerServiceRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
+app.use('/api/v1/delivery', deliveryRoutes);
 
 // 404 Not Found Handle
 app.use((req, res, next) => {
