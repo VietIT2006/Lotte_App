@@ -18,12 +18,16 @@ public class SocialLoginRequest {
     @SerializedName("provider_id")
     private String providerId;
 
-    public SocialLoginRequest(String email, String fullName, String avatar, String provider, String providerId) {
+    @SerializedName("id_token")
+    private String idToken;
+
+    public SocialLoginRequest(String email, String fullName, String avatar, String provider, String providerId, String idToken) {
         this.email = email;
         this.fullName = fullName;
         this.avatar = avatar;
         this.provider = provider;
         this.providerId = providerId;
+        this.idToken = idToken;
     }
 
     // Getters and Setters
@@ -37,4 +41,6 @@ public class SocialLoginRequest {
     public void setProvider(String provider) { this.provider = provider; }
     public String getProviderId() { return providerId; }
     public void setProviderId(String providerId) { this.providerId = providerId; }
+    public String getIdToken() { return idToken; }
+    public void setIdToken(String idToken) { this.idToken = idToken; }
 }

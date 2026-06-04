@@ -17,4 +17,8 @@ router.get('/history', orderingController.getOrders);
 router.get('/:id', orderingController.getOrderById);
 router.post('/checkout', orderingController.createOrder);
 
+// Admin Orders
+router.get('/admin/orders', orderingController.getAdminOrders);
+router.put('/admin/orders/:id/status', orderingController.updateOrderStatus);
+
 module.exports = router;

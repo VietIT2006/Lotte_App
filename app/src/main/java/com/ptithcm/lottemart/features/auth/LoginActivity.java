@@ -33,13 +33,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import org.json.JSONObject;
+import com.ptithcm.lottemart.data.api.SocialLoginRequest;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import java.util.Arrays;
-import com.ptithcm.lottemart.data.api.SocialLoginRequest;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -66,7 +69,11 @@ public class LoginActivity extends AppCompatActivity {
         
         // Kiểm tra Tự động đăng nhập
         if (sessionManager.isLoggedIn()) {
-            navigateToMain();
+            if ("admin".equals(sessionManager.getUserRole()) || "superAdmin".equals(sessionManager.getUserRole())) {
+                navigateToAdminMain();
+            } else {
+                navigateToMain();
+            }
             return;
         }
 
@@ -80,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
     private void setupSocialLogin() {
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.google_web_client_id))
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -89,9 +97,8 @@ public class LoginActivity extends AppCompatActivity {
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // Ở đây thường sẽ gọi Graph API để lấy email, nhưng để đơn giản 
-                // tôi giả định bạn sẽ xử lý việc lấy profile sau
-                Toast.makeText(LoginActivity.this, "Facebook login success", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Facebook login success");
+                fetchFacebookUserProfile(loginResult);
             }
 
             @Override
@@ -102,8 +109,32 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onError(FacebookException error) {
                 Log.e(TAG, "Facebook login error", error);
+                Toast.makeText(LoginActivity.this, "Đăng nhập Facebook thất bại", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void fetchFacebookUserProfile(LoginResult loginResult) {
+        GraphRequest request = GraphRequest.newMeRequest(
+                loginResult.getAccessToken(),
+                (object, response) -> {
+                    try {
+                        String email = object.getString("email");
+                        String name = object.getString("name");
+                        String id = object.getString("id");
+                        String avatar = "https://graph.facebook.com/" + id + "/picture?type=large";
+                        
+                        performSocialLogin(email, name, avatar, "facebook", id, null);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error fetching Facebook profile", e);
+                        Toast.makeText(LoginActivity.this, "Không thể lấy thông tin Facebook", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,email,picture");
+        request.setParameters(parameters);
+        request.executeAsync();
     }
 
     private void initViews() {
@@ -183,14 +214,20 @@ public class LoginActivity extends AppCompatActivity {
                     sessionManager.saveAuthToken(
                             data.getToken(),
                             data.getUser().getFullName(),
-                            data.getUser().getEmail()
+                            data.getUser().getEmail(),
+                            data.getUser().getRole()
                     );
                     
                     // CẬP NHẬT TOKEN VÀO HỆ THỐNG MẠNG NGAY LẬP TỨC
                     com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
                     
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    navigateToMain();
+                    
+                    if ("admin".equals(data.getUser().getRole()) || "superAdmin".equals(data.getUser().getRole())) {
+                        navigateToAdminMain();
+                    } else {
+                        navigateToMain();
+                    }
                 } else {
                     String errorMsg = "Email hoặc mật khẩu không hợp lệ";
                     if (response.body() != null && response.body().getMessage() != null) {
@@ -237,7 +274,10 @@ public class LoginActivity extends AppCompatActivity {
                 performSocialLogin(
                     account.getEmail(),
                     account.getDisplayName(),
-                    account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : ""
+                    account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : "",
+                    "google",
+                    account.getId(),
+                    account.getIdToken()
                 );
             }
         } catch (ApiException e) {
@@ -246,9 +286,14 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void performSocialLogin(String email, String name, String avatar) {
+    private void performSocialLogin(String email, String name, String avatar, String provider, String providerId, String idToken) {
+        if (email == null || email.isEmpty()) {
+            Toast.makeText(this, "Không tìm thấy email từ tài khoản mạng xã hội", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         btnLogin.setEnabled(false);
-        SocialLoginRequest request = new SocialLoginRequest(email, name, avatar, "google", "");
+        SocialLoginRequest request = new SocialLoginRequest(email, name, avatar, provider, providerId, idToken);
         
         authApiService.socialLogin(request).enqueue(new Callback<ApiResponse<AuthResponseData>>() {
             @Override
@@ -259,25 +304,45 @@ public class LoginActivity extends AppCompatActivity {
                     sessionManager.saveAuthToken(
                             data.getToken(),
                             data.getUser().getFullName(),
-                            data.getUser().getEmail()
+                            data.getUser().getEmail(),
+                            data.getUser().getRole()
                     );
+                    
+                    // Cập nhật Retrofit với token mới
+                    com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
+                    
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    navigateToMain();
+                    if ("admin".equals(data.getUser().getRole()) || "superAdmin".equals(data.getUser().getRole())) {
+                        navigateToAdminMain();
+                    } else {
+                        navigateToMain();
+                    }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Lỗi đăng nhập mạng xã hội", Toast.LENGTH_SHORT).show();
+                    String errorMsg = "Lỗi đăng nhập mạng xã hội";
+                    if (response.body() != null && response.body().getMessage() != null) {
+                        errorMsg = response.body().getMessage();
+                    }
+                    Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<AuthResponseData>> call, Throwable t) {
                 btnLogin.setEnabled(true);
-                Toast.makeText(LoginActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Social login failure", t);
+                Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void navigateToMain() {
         Intent intent = new Intent(LoginActivity.this, com.ptithcm.lottemart.MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void navigateToAdminMain() {
+        Intent intent = new Intent(LoginActivity.this, com.ptithcm.lottemart.features.admin.AdminDashboardActivity.class);
         startActivity(intent);
         finish();
     }

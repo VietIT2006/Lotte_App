@@ -3,6 +3,83 @@ const jwt = require('jsonwebtoken');
 const db = require('../../core/db');
 
 class AuthService {
+    getDefaultUserFields() {
+        return {
+            avatar: null,
+            role_id: 2,
+            role_key: "customer",
+            permissions: [],
+            branch_id: null,
+            lotte_points: 0,
+            membership_level: "Bạc",
+            signup_method: "email",
+            login_provider: "local",
+            authProviders: ["local"],
+            googleId: null,
+            facebookId: null,
+            facebook_id: null,
+            social_links: { facebook: null, google: null },
+            status: "ACTIVE",
+            is_active: true,
+            profile_completed: false,
+            wallet_balance: 0,
+            default_payment_method: null,
+            email_verified: false,
+            email_verification_code: null,
+            email_verification_expires_at: null,
+            email_verification_attempts: 0,
+            email_otp_last_sent_at: null,
+            dob: null,
+            gender: null,
+            address: null,
+            bio: null,
+            note: "",
+            tags: [],
+            preferences: {
+                newsletter: true,
+                sms_alerts: true,
+                language: "vi",
+                receive_promotions: true,
+                eco_prefer: false,
+                favorite_categories: [],
+                preferred_store: null,
+                notification_email_promo: true,
+                notification_sms_order: true,
+                notification_push_order: true,
+                notification_promo: true,
+                notification_system: true
+            },
+            password_changed_at: null,
+            security: {
+                two_factor_enabled: false,
+                two_factor_method: null,
+                totp_secret: null,
+                backup_codes: [],
+                last_login_device: "",
+                last_login_ip: "",
+                last_login_at: null
+            },
+            settings: {
+                language: "vi",
+                dark_mode: false,
+                privacy_profile_visible: true,
+                marketing_opt_in: true,
+                sms_opt_in: true
+            },
+            last_login_at: null,
+            refresh_token: null,
+            is_deleted: false,
+            force_password_change: false,
+            employee_info: {
+                employee_code: null,
+                department: null,
+                work_type: "FULL_TIME",
+                notes: ""
+            },
+            social_providers: []
+        };
+    }
+
     transformUser(user) {
         if (!user) return null;
         return {
@@ -34,16 +111,12 @@ class AuthService {
         const passwordHash = await bcrypt.hash(password, 10);
 
         const newUser = {
+            ...this.getDefaultUserFields(),
             username,
             email,
-            phone,
+            phone: phone || "",
             password_hash: passwordHash,
             full_name,
-            role_id: 2,
-            status: 'ACTIVE',
-            is_active: true,
-            lotte_points: 0,
-            membership_level: 'Bạc',
             created_at: new Date(),
             updated_at: new Date()
         };
@@ -88,17 +161,17 @@ class AuthService {
         if (!user) {
             // Nếu chưa có user, tạo mới dựa trên các trường hiện có
             const newUser = {
+                ...this.getDefaultUserFields(),
                 username: email.split('@')[0] + '_' + Math.floor(Math.random() * 1000),
                 email,
-                phone: "", // Để trống hoặc yêu cầu cập nhật sau
-                password_hash: await bcrypt.hash(Math.random().toString(36), 10), // Tạo hash ngẫu nhiên để giữ cấu trúc
+                phone: "",
+                password_hash: await bcrypt.hash(Math.random().toString(36), 10),
                 full_name,
-                avatar: avatar || "",
-                role_id: 2,
-                status: 'ACTIVE',
-                is_active: true,
-                lotte_points: 0,
-                membership_level: 'Bạc',
+                avatar: avatar || null,
+                signup_method: "social",
+                login_provider: "social",
+                authProviders: ["social"],
+                social_providers: ["social"],
                 created_at: new Date(),
                 updated_at: new Date()
             };

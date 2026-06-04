@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header: Order ID and Tag -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+            
+            <TextView
+                android:id="@+id/tvOrderId"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="ZLD-8824-01"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#303333"/>
+                
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NEW"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#C00004"
+                android:background="#FFDAD5"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"/>
+        </LinearLayout>
+
+        <!-- Route: Origin to Destination -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+            
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_marginEnd="12dp">
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@android:drawable/presence_online"
+                    app:tint="#C00004"/>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="24dp"
+                    android:background="#E1E3E3"
+                    android:layout_marginVertical="2dp"/>
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@android:drawable/presence_offline"
+                    app:tint="#5D5F60"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lotte Quận 7"
+                    android:textStyle="bold"
+                    android:textColor="#303333"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="469 Nguyễn Hữu Thọ, Tân Hưng"
+                    android:textSize="12sp"
+                    android:textColor="#5D5F60"
+                    android:layout_marginBottom="8dp"/>
+                    
+                <TextView
+                    android:id="@+id/tvOrderAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12/4 Hoàng Diệu"
+                    android:textStyle="bold"
+                    android:textColor="#303333"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phường 10, Quận 4, HCMC"
+                    android:textSize="12sp"
+                    android:textColor="#5D5F60"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Footer: COD and View Details Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="COD AMOUNT"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="#5D5F60"/>
+                <TextView
+                    android:id="@+id/tvOrderPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="650,000đ"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#C00004"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnUpdateStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View Details >"
+                android:textColor="@color/white"
+                android:backgroundTint="#C00004"
+                android:textAllCaps="false"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

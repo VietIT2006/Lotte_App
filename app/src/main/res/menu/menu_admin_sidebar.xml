@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="MASTER ADMIN PORTAL">
+        <menu>
+            <item
+                android:id="@+id/nav_dashboard"
+                android:icon="@android:drawable/ic_menu_sort_by_size"
+                android:title="Bảng điều khiển" />
+            <item
+                android:id="@+id/nav_inventory"
+                android:icon="@android:drawable/ic_menu_gallery"
+                android:title="Quản lý kho" />
+            <item
+                android:id="@+id/nav_categories"
+                android:icon="@android:drawable/ic_menu_agenda"
+                android:title="Quản lý Danh mục" />
+            <item
+                android:id="@+id/nav_stores"
+                android:icon="@android:drawable/ic_menu_mapmode"
+                android:title="Quản lý Chi nhánh" />
+            <item
+                android:id="@+id/nav_orders"
+                android:icon="@android:drawable/ic_menu_agenda"
+                android:title="Đơn hàng" />
+            <item
+                android:id="@+id/nav_customers"
+                android:icon="@android:drawable/ic_menu_myplaces"
+                android:title="Khách hàng" />
+            <item
+                android:id="@+id/nav_promotions"
+                android:icon="@android:drawable/btn_star"
+                android:title="Khuyến mãi &amp; Coupon" />
+            <item
+                android:id="@+id/nav_reviews"
+                android:icon="@android:drawable/ic_menu_edit"
+                android:title="Quản lý Đánh giá" />
+        </menu>
+    </item>
+
+    <item android:title="ENTERPRISE INVENTORY">
+        <menu>
+            <item
+                android:id="@+id/nav_suppliers"
+                android:icon="@android:drawable/ic_menu_preferences"
+                android:title="Nhà cung cấp" />
+            <item
+                android:id="@+id/nav_import_orders"
+                android:icon="@android:drawable/ic_menu_manage"
+                android:title="Đơn nhập hàng" />
+            <item
+                android:id="@+id/nav_receipts"
+                android:icon="@android:drawable/ic_menu_save"
+                android:title="Phiếu nhận hàng" />
+            <item
+                android:id="@+id/nav_batches"
+                android:icon="@android:drawable/ic_menu_today"
+                android:title="Batch &amp; Hạn dùng" />
+            <item
+                android:id="@+id/nav_transfers"
+                android:icon="@android:drawable/ic_menu_revert"
+                android:title="Luân chuyển tồn kho" />
+            <item
+                android:id="@+id/nav_roles"
+                android:icon="@android:drawable/ic_menu_info_details"
+                android:title="Vai trò &amp; Quyền" />
+        </menu>
+    </item>
+
+</menu>

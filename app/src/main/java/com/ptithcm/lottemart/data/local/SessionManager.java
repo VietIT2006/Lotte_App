@@ -8,6 +8,7 @@ public class SessionManager {
     private static final String KEY_TOKEN = "auth_token";
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_USER_EMAIL = "user_email";
+    private static final String KEY_USER_ROLE = "user_role";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
 
     private SharedPreferences pref;
@@ -23,10 +24,11 @@ public class SessionManager {
     /**
      * Lưu Token đăng nhập và trạng thái
      */
-    public void saveAuthToken(String token, String name, String email) {
+    public void saveAuthToken(String token, String name, String email, String role) {
         editor.putString(KEY_TOKEN, token);
         editor.putString(KEY_USER_NAME, name);
         editor.putString(KEY_USER_EMAIL, email);
+        editor.putString(KEY_USER_ROLE, role);
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.apply();
     }
@@ -53,6 +55,13 @@ public class SessionManager {
     }
 
     /**
+     * Lấy role người dùng
+     */
+    public String getUserRole() {
+        return pref.getString(KEY_USER_ROLE, "user");
+    }
+
+    /**
      * Kiểm tra trạng thái đăng nhập
      */
     public boolean isLoggedIn() {
@@ -66,6 +75,7 @@ public class SessionManager {
         editor.remove(KEY_TOKEN);
         editor.remove(KEY_USER_NAME);
         editor.remove(KEY_USER_EMAIL);
+        editor.remove(KEY_USER_ROLE);
         editor.putBoolean(KEY_IS_LOGGED_IN, false);
         editor.apply();
     }

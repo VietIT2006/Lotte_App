@@ -216,6 +216,11 @@ applied_coupon JSONB,
   email_notification_status TEXT,
   email_notification_sent_at TIMESTAMPTZ,
   email_notification_error TEXT,
+  shipper_id UUID REFERENCES users(id),
+  delivery_evidence TEXT[],
+  delivery_notes TEXT,
+  pickup_time TIMESTAMPTZ,
+  delivered_time TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -595,3 +600,24 @@ CREATE TABLE stock_movements (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE shipper_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id),
+  vehicle_type TEXT,
+  license_plate TEXT,
+  current_location JSONB,                -- {lat, lng}
+  status TEXT DEFAULT 'offline',         -- online, offline, busy
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
+CREATE TABLE delivery_histories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID NOT NULL REFERENCES orders(id),
+  shipper_id UUID NOT NULL REFERENCES users(id),
+  status TEXT NOT NULL,                  -- assigned, picked_up, delivering, delivered, failed
+  location JSONB,                        -- {lat, lng}
+  note TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
