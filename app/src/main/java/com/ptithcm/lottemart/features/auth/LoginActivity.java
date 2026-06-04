@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         
         // Kiểm tra Tự động đăng nhập
         if (sessionManager.isLoggedIn()) {
-            if ("admin".equals(sessionManager.getUserRole()) || "superAdmin".equals(sessionManager.getUserRole())) {
+            if ("admin".equals(sessionManager.getUserRole()) || "super_admin".equals(sessionManager.getUserRole())) {
                 navigateToAdminMain();
             } else {
                 navigateToMain();
@@ -223,7 +223,7 @@ public class LoginActivity extends AppCompatActivity {
                     
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     
-                    if ("admin".equals(data.getUser().getRole()) || "superAdmin".equals(data.getUser().getRole())) {
+                    if ("admin".equals(data.getUser().getRole()) || "super_admin".equals(data.getUser().getRole())) {
                         navigateToAdminMain();
                     } else {
                         navigateToMain();
@@ -312,7 +312,7 @@ public class LoginActivity extends AppCompatActivity {
                     com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
                     
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    if ("admin".equals(data.getUser().getRole()) || "superAdmin".equals(data.getUser().getRole())) {
+                    if ("admin".equals(data.getUser().getRole()) || "super_admin".equals(data.getUser().getRole())) {
                         navigateToAdminMain();
                     } else {
                         navigateToMain();

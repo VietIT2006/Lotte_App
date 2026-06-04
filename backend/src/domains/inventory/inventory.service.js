@@ -56,6 +56,29 @@ class InventoryService {
             };
         });
     }
+    async getAdminStockMovements() {
+        const movements = await db.collection('stockmovements')
+            .find({})
+            .sort({ created_at: -1 })
+            .toArray();
+        
+        return movements.map(m => {
+            return {
+                id: m._id ? m._id.toString() : "",
+                branch_id: m.branch_id ? m.branch_id.toString() : "",
+                branch_name: m.branch_name || "",
+                product_id: m.product_id ? m.product_id.toString() : "",
+                product_name: m.product_name || "Sản phẩm",
+                batch_code: m.batch_code || "",
+                movement_type: m.movement_type || "",
+                quantity: Number(m.quantity) || 0,
+                before_stock: Number(m.before_stock) || 0,
+                after_stock: Number(m.after_stock) || 0,
+                note: m.note || "",
+                created_at: m.created_at || new Date()
+            };
+        });
+    }
 }
 
 module.exports = new InventoryService();

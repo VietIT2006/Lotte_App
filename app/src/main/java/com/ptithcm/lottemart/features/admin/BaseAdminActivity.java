@@ -156,11 +156,22 @@ public abstract class BaseAdminActivity extends AppCompatActivity {
     }
 
     private void handleLogout() {
-        sessionManager.logout();
-        Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Đăng xuất")
+            .setMessage("Bạn có chắc chắn muốn đăng xuất không?")
+            .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                sessionManager.logout();
+                
+                // XÓA TOKEN KHỎI HỆ THỐNG MẠNG
+                com.ptithcm.lottemart.data.remote.RetrofitClient.init(this);
+                
+                Toast.makeText(this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
     }
 }

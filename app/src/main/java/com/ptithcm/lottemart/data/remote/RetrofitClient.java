@@ -77,7 +77,7 @@ public class RetrofitClient {
             Response response = chain.proceed(builder.build());
 
             // 2. Bắt lỗi 401 - Token hết hạn hoặc sai
-            if (response.code() == 401 && mContext != null) {
+            if (response.code() == 401 && mContext != null && !isAuthPath) {
                 handleUnauthorized();
             }
 
