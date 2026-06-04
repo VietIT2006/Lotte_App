@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AdminBranchManagementActivity extends AppCompatActivity {
+public class AdminBranchManagementActivity extends BaseAdminActivity {
 
     private FloatingActionButton fabAddBranch;
     private RecyclerView rvAdminBranches;
@@ -37,13 +37,8 @@ public class AdminBranchManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_branch_management);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-        toolbar.setNavigationOnClickListener(v -> finish());
+        setHeaderTitle("Quản lý Chi nhánh");
+        
 
         fabAddBranch = findViewById(R.id.fabAddBranch);
         rvAdminBranches = findViewById(R.id.rvAdminBranches);
@@ -103,5 +98,5 @@ public class AdminBranchManagementActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
-    }
+        }
 }

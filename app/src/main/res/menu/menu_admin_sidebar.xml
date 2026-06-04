@@ -12,6 +12,14 @@
                 android:icon="@android:drawable/ic_menu_gallery"
                 android:title="Quản lý kho" />
             <item
+                android:id="@+id/nav_categories"
+                android:icon="@android:drawable/ic_menu_agenda"
+                android:title="Quản lý Danh mục" />
+            <item
+                android:id="@+id/nav_stores"
+                android:icon="@android:drawable/ic_menu_mapmode"
+                android:title="Quản lý Chi nhánh" />
+            <item
                 android:id="@+id/nav_orders"
                 android:icon="@android:drawable/ic_menu_agenda"
                 android:title="Đơn hàng" />
@@ -23,6 +31,10 @@
                 android:id="@+id/nav_promotions"
                 android:icon="@android:drawable/btn_star"
                 android:title="Khuyến mãi &amp; Coupon" />
+            <item
+                android:id="@+id/nav_reviews"
+                android:icon="@android:drawable/ic_menu_edit"
+                android:title="Quản lý Đánh giá" />
         </menu>
     </item>
 

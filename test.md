@@ -86,3 +86,38 @@ Nếu các đường dẫn trên trả về dữ liệu thành công, Backend đ
 |---|---|---|---|---|
 | TC_SYS_01 | Tự động đăng nhập | Đang ở Trang chủ. Đóng hoàn toàn App. Mở lại App | App nhảy thẳng vào Trang chủ mà không yêu cầu Đăng nhập lại. | |
 | TC_SYS_02 | Đăng xuất | Chuyển sang Tab Tài khoản (Profile). Bấm "Đăng xuất" | Trạng thái bị xóa, App đẩy về màn hình Đăng nhập. Thử mở lại App vẫn ở màn hình Đăng nhập. | |
+
+## PHẦN 3: DANH SÁCH TÀI KHOẢN KIỂM THỬ
+
+Tất cả các tài khoản dưới đây đều sử dụng chung một mật khẩu là: **`123456`**
+
+### 1. Tài khoản Khách hàng (Customer)
+Dùng để kiểm thử các tính năng ở góc độ người dùng thông thường như: đăng nhập, xem sản phẩm, thêm vào giỏ hàng, đặt hàng, xem điểm thành viên, v.v.
+- **Email:** `customer@lotte.com`
+- **Số điện thoại:** `0900000003`
+- **Vai trò:** Customer (Khách hàng)
+- **Mật khẩu:** `123456`
+
+### 2. Tài khoản Giao hàng (Shipper)
+Dùng để kiểm thử luồng giao nhận, xem danh sách đơn hàng được phân công, cập nhật trạng thái giao hàng, v.v.
+- **Email:** `shipper@lotte.com`
+- **Số điện thoại:** `0900000004`
+- **Vai trò:** Shipper (Người giao hàng)
+- **Mật khẩu:** `123456`
+
+### 3. Tài khoản Quản trị viên (Admin)
+Dùng để kiểm thử các chức năng dành cho ban quản trị, ví dụ: quản lý sản phẩm, đơn hàng, duyệt đánh giá.
+- **Email:** `admin@lotte.com`
+- **Số điện thoại:** `0900000002`
+- **Vai trò:** Admin (Admin thường)
+- **Mật khẩu:** `123456`
+
+### 4. Tài khoản Siêu quản trị (Super Admin)
+Dùng để kiểm thử các quyền cao nhất trong hệ thống, bao gồm cấu hình cửa hàng, quản lý nhân viên, phân quyền.
+- **Email:** `superadmin@lotte.com`
+- **Số điện thoại:** `0900000001`
+- **Vai trò:** Super Admin (Quản trị viên cấp cao)
+- **Mật khẩu:** `123456`
+
+---
+*Lưu ý (Chế độ Mock App):* Nếu ứng dụng Android đang chạy ở chế độ giao diện giả lập (chưa gọi API), có thể dùng tài khoản `admin@lottemart.com` / `123456` để đăng nhập.

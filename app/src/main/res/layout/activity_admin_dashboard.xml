@@ -1,71 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <RelativeLayout
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#F8F9FA">
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNavigation">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-
-            <!-- Header -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="24dp">
-                
-                <ImageView
-                    android:id="@+id/btnMenu"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@android:drawable/ic_menu_sort_by_size"
-                    app:tint="#111111"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:layout_marginEnd="16dp"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Daily Pulse"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:textColor="#111111"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tuesday, 14 Nov"
-                        android:textSize="14sp"
-                        android:textColor="#666666"/>
-                </LinearLayout>
-                
-                <ImageView
-                    android:id="@+id/btnLogout"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@android:drawable/ic_lock_power_off"
-                    app:tint="#D32F2F"
-                    android:background="?attr/selectableItemBackgroundBorderless"/>
-            </LinearLayout>
 
             <!-- Critical Alerts -->
             <TextView
@@ -274,27 +218,3 @@
 
         </LinearLayout>
     </ScrollView>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white"
-        app:itemIconTint="@color/admin_primary"
-        app:itemTextColor="@color/admin_primary"
-        app:menu="@menu/admin_bottom_nav_menu" />
-</RelativeLayout>
-
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="#0f172a"
-        app:itemTextColor="@color/nav_item_colors"
-        app:itemIconTint="@color/nav_item_colors"
-        app:itemBackground="@drawable/nav_item_bg"
-        app:menu="@menu/menu_admin_sidebar" />
-
-</androidx.drawerlayout.widget.DrawerLayout>

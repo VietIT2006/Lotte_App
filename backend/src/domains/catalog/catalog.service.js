@@ -285,6 +285,53 @@ class CatalogService {
             return result.ok === 1 || result.lastErrorObject?.updatedExisting;
         });
     }
+
+    // --- ADMIN MODULE: REVIEWS CRUD ---
+    async getAllReviews() {
+        return await this.wrapAction(async () => {
+            const reviews = await db.collection('reviews')
+                .aggregate([
+                    { $sort: { created_at: -1 } },
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'user_id',
+                            foreignField: '_id',
+                            as: 'user'
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'products',
+                            localField: 'product_id',
+                            foreignField: '_id',
+                            as: 'product'
+                        }
+                    },
+                    { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+                    { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } }
+                ])
+                .toArray();
+            
+            return reviews.map(r => ({
+                id: r._id ? r._id.toString() : "",
+                user_id: r.user_id ? r.user_id.toString() : "",
+                user_name: r.user ? (r.user.full_name || r.user.username) : "Ẩn danh",
+                product_id: r.product_id ? r.product_id.toString() : "",
+                product_name: r.product ? r.product.name : "Sản phẩm không rõ",
+                rating: Number(r.rating) || 5,
+                comment: r.comment || "",
+                created_at: r.created_at || new Date()
+            }));
+        }) || [];
+    }
+
+    async deleteReview(id) {
+        return await this.wrapAction(async () => {
+            await db.collection('reviews').deleteOne({ _id: this.toId(id) });
+            return true;
+        });
+    }
 }
 
 module.exports = new CatalogService();

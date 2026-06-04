@@ -31,8 +31,7 @@ class UsersController {
     async getUsers(req, res, next) {
         try {
             // Lấy role của user đang request (được gán từ middleware sau khi verify token)
-            // Trong auth.service.js có lưu role_key trong token. Giả sử req.user có role
-            const userRole = req.user.role || (req.user.role_id === 1 ? 'admin' : 'customer');
+            const userRole = req.user.roleStr || 'customer';
             
             // Nếu là admin hoặc superAdmin
             if (userRole === 'admin' || userRole === 'superAdmin') {
@@ -47,6 +46,33 @@ class UsersController {
                     message: "Forbidden: You don't have permission to access this resource"
                 });
             }
+        } catch (error) {
+            next(error);
+        }
+    }
+    async updateUserRole(req, res, next) {
+        try {
+            const userRole = req.user.roleStr || 'customer';
+            if (userRole !== 'superAdmin') {
+                return res.status(403).json({
+                    success: false,
+                    message: "Forbidden: Only SuperAdmin can change roles"
+                });
+            }
+            
+            const userId = req.params.id;
+            const newRole = req.body.role; // expects e.g., "customer", "admin", "shipper", "superAdmin"
+            
+            if (!newRole) {
+                return res.status(400).json({ success: false, message: "Missing role" });
+            }
+
+            const updatedUser = await usersService.updateUserRole(userId, newRole);
+            return res.status(200).json({
+                success: true,
+                message: "Role updated successfully",
+                data: updatedUser
+            });
         } catch (error) {
             next(error);
         }

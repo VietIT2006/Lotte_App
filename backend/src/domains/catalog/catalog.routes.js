@@ -25,4 +25,7 @@ router.post('/branches', catalogController.createBranch);
 router.put('/branches/:id', catalogController.updateBranch);
 router.delete('/branches/:id', catalogController.deleteBranch);
 
+router.get('/admin/reviews', catalogController.getAllReviews);
+router.delete('/admin/reviews/:id', catalogController.deleteReview);
+
 module.exports = router;

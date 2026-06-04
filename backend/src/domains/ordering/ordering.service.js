@@ -128,6 +128,35 @@ class OrderingService {
         const order = await db.collection('orders').findOne(query);
         return this.transformOrder(order);
     }
+
+    // --- ADMIN ---
+    async getAdminOrders() {
+        const orders = await db.collection('orders')
+            .find({})
+            .sort({ created_at: -1 })
+            .toArray();
+        return orders.map(o => {
+            const transformed = this.transformOrder(o);
+            transformed.user_id = o.user_id ? o.user_id.toString() : "";
+            // Có thể populate thông tin user nếu cần
+            return transformed;
+        });
+    }
+
+    async updateOrderStatus(orderId, status) {
+        const query = { $or: [{ _id: orderId }, { _id: this.toId(orderId) }] };
+        const result = await db.collection('orders').findOneAndUpdate(
+            query,
+            { 
+                $set: { 
+                    status: status,
+                    updated_at: new Date()
+                } 
+            },
+            { returnDocument: 'after' }
+        );
+        return this.transformOrder(result.value || result);
+    }
 }
 
 module.exports = new OrderingService();

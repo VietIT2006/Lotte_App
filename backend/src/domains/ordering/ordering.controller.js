@@ -89,6 +89,48 @@ class OrderingController {
             next(error);
         }
     }
+
+    // --- ADMIN ---
+    async getAdminOrders(req, res, next) {
+        try {
+            const userRole = req.user.roleStr || 'customer';
+            if (userRole !== 'admin' && userRole !== 'superAdmin') {
+                return res.status(403).json({ success: false, message: "Forbidden" });
+            }
+            const orders = await orderingService.getAdminOrders();
+            res.status(200).json({
+                success: true,
+                data: orders
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateOrderStatus(req, res, next) {
+        try {
+            const userRole = req.user.roleStr || 'customer';
+            if (userRole !== 'admin' && userRole !== 'superAdmin') {
+                return res.status(403).json({ success: false, message: "Forbidden" });
+            }
+            
+            const { id } = req.params;
+            const { status } = req.body;
+            
+            if (!status) {
+                return res.status(400).json({ success: false, message: 'Status is required' });
+            }
+
+            const updatedOrder = await orderingService.updateOrderStatus(id, status);
+            res.status(200).json({
+                success: true,
+                message: 'Order status updated successfully',
+                data: updatedOrder
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new OrderingController();

@@ -5,7 +5,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +25,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AdminUserManagementActivity extends AppCompatActivity {
+public class AdminUserManagementActivity extends BaseAdminActivity {
 
     private RecyclerView rvUsers;
     private AdminUserAdapter adapter;
@@ -40,6 +40,7 @@ public class AdminUserManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_user_management);
 
+        setHeaderTitle("Quản lý Người dùng");
         sessionManager = new SessionManager(this);
         isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
 
@@ -113,6 +114,8 @@ public class AdminUserManagementActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     allUsers = response.body().getData();
                     applyFilters(); // Hiển thị list sau khi apply filter
+                } else if (response.code() == 403 || response.code() == 401) {
+                    android.widget.Toast.makeText(AdminUserManagementActivity.this, "Bạn không có quyền xem mục này", android.widget.Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(AdminUserManagementActivity.this, "Lỗi lấy danh sách User", Toast.LENGTH_SHORT).show();
                 }
@@ -123,5 +126,5 @@ public class AdminUserManagementActivity extends AppCompatActivity {
                 Toast.makeText(AdminUserManagementActivity.this, "Network Error", Toast.LENGTH_SHORT).show();
             }
         });
-    }
+        }
 }

@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.textfield.TextInputEditText;
@@ -15,7 +15,7 @@ import com.ptithcm.lottemart.data.api.ProductApiService;
 import com.ptithcm.lottemart.data.models.Product;
 import com.ptithcm.lottemart.data.remote.RetrofitClient;
 
-public class AdminProductFormActivity extends AppCompatActivity {
+public class AdminProductFormActivity extends BaseAdminActivity {
 
     private TextInputEditText edtProductName, edtProductPrice, edtProductOriginalPrice, edtProductDesc;
     private ImageView ivProductPreview;
@@ -30,6 +30,7 @@ public class AdminProductFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_product_form);
 
+        setHeaderTitle("Biểu mẫu Sản phẩm");
         edtProductName = findViewById(R.id.edtProductName);
         edtProductPrice = findViewById(R.id.edtProductPrice);
         edtProductOriginalPrice = findViewById(R.id.edtProductOriginalPrice);
@@ -86,5 +87,5 @@ public class AdminProductFormActivity extends AppCompatActivity {
         // Mock save
         Toast.makeText(this, "Lưu thành công (Mock)!", Toast.LENGTH_SHORT).show();
         finish();
-    }
+        }
 }

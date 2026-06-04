@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.textfield.TextInputEditText;
@@ -20,7 +20,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AdminCategoryFormActivity extends AppCompatActivity {
+public class AdminCategoryFormActivity extends BaseAdminActivity {
 
     private TextInputEditText edtCategoryName;
     private ImageView ivCategoryPreview;
@@ -35,6 +35,7 @@ public class AdminCategoryFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_category_form);
 
+        setHeaderTitle("Biểu mẫu Danh mục");
         edtCategoryName = findViewById(R.id.edtCategoryName);
         ivCategoryPreview = findViewById(R.id.ivCategoryPreview);
         btnUploadImage = findViewById(R.id.btnUploadImage);
@@ -79,5 +80,5 @@ public class AdminCategoryFormActivity extends AppCompatActivity {
         // Vì mock nên chỉ đóng Activity lại
         Toast.makeText(this, "Lưu thành công (Mock)!", Toast.LENGTH_SHORT).show();
         finish();
-    }
+        }
 }

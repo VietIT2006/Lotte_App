@@ -8,6 +8,10 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.PUT;
+import retrofit2.http.DELETE;
+import retrofit2.http.Header;
+import retrofit2.http.Body;
 
 public interface ProductApiService {
     @GET("catalog/categories")
@@ -27,4 +31,17 @@ public interface ProductApiService {
 
     @GET("catalog/products/search")
     Call<ApiResponse<List<Product>>> searchProducts(@Query("q") String query, @Query("sort_by") String sortBy);
+
+    @PUT("/api/v1/catalog/branches/{id}")
+    Call<ApiResponse<Branch>> updateBranch(@Header("Authorization") String token, @Path("id") String id, @Body Branch branch);
+
+    @DELETE("/api/v1/catalog/branches/{id}")
+    Call<ApiResponse<Void>> deleteBranch(@Header("Authorization") String token, @Path("id") String id);
+
+    // --- REVIEWS ---
+    @GET("/api/v1/catalog/admin/reviews")
+    Call<ApiResponse<List<com.ptithcm.lottemart.data.models.Review>>> getAdminReviews(@Header("Authorization") String token);
+
+    @DELETE("/api/v1/catalog/admin/reviews/{id}")
+    Call<ApiResponse<Void>> deleteReview(@Header("Authorization") String token, @Path("id") String id);
 }

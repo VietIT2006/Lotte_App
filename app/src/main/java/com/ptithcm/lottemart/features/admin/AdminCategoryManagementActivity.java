@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AdminCategoryManagementActivity extends AppCompatActivity {
+public class AdminCategoryManagementActivity extends BaseAdminActivity {
 
     private FloatingActionButton fabAddCategory;
     private RecyclerView rvAdminCategories;
@@ -37,13 +37,8 @@ public class AdminCategoryManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_category_management);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-        toolbar.setNavigationOnClickListener(v -> finish());
+        setHeaderTitle("Quản lý Danh mục");
+        
 
         fabAddCategory = findViewById(R.id.fabAddCategory);
         rvAdminCategories = findViewById(R.id.rvAdminCategories);
@@ -104,5 +99,5 @@ public class AdminCategoryManagementActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
-    }
+        }
 }

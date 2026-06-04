@@ -195,7 +195,22 @@ class CatalogController {
     async deleteBranch(req, res, next) {
         try {
             await catalogService.deleteBranch(req.params.id);
-            res.status(200).json({ success: true, message: 'Deleted' });
+            res.status(200).json({ success: true, message: 'Deleted successfully' });
+        } catch (error) { next(error); }
+    }
+
+    // --- ADMIN MODULE: REVIEWS CRUD ---
+    async getAllReviews(req, res, next) {
+        try {
+            const reviews = await catalogService.getAllReviews();
+            res.status(200).json({ success: true, data: reviews });
+        } catch (error) { next(error); }
+    }
+
+    async deleteReview(req, res, next) {
+        try {
+            await catalogService.deleteReview(req.params.id);
+            res.status(200).json({ success: true, message: 'Review deleted successfully' });
         } catch (error) { next(error); }
     }
 }
