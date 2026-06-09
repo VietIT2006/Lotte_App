@@ -29,6 +29,20 @@ class OrderingController {
         }
     }
 
+    async updateCartItemQuantity(req, res, next) {
+        try {
+            const userId = req.user.id;
+            const { branch_product_id, quantity } = req.body;
+            const cart = await orderingService.updateCartItemQuantity(userId, branch_product_id, quantity);
+            res.status(200).json({
+                success: true,
+                data: cart
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async removeFromCart(req, res, next) {
         try {
             const userId = req.user.id;

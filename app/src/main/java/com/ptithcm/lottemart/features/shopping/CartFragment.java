@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ptithcm.lottemart.R;
 import com.ptithcm.lottemart.data.api.ApiResponse;
 import com.ptithcm.lottemart.data.api.ProductApiService;
+import com.ptithcm.lottemart.data.api.OrderApiService;
 import com.ptithcm.lottemart.data.models.CartItem;
 import com.ptithcm.lottemart.data.models.Product;
 import com.ptithcm.lottemart.data.remote.RetrofitClient;
@@ -36,9 +37,15 @@ public class CartFragment extends Fragment {
     private RecyclerView rvCart;
     private CartItemAdapter adapter;
     private ProductApiService apiService;
+    private com.ptithcm.lottemart.data.local.SessionManager sessionManager;
+    private com.ptithcm.lottemart.data.api.OrderApiService orderApiService;
     private TextView tvTotalAmount;
     private View emptyCartContainer, cartContent, bottomBar;
     private List<CartItem> currentCartItems = new ArrayList<>();
+
+    private static final int REQUEST_CODE_ADDRESS = 1001;
+    private TextView tvCartAddressTitle, tvCartAddressDetail;
+    private com.ptithcm.lottemart.data.models.Address selectedAddress;
 
     @Nullable
     @Override
@@ -55,6 +62,8 @@ public class CartFragment extends Fragment {
         emptyCartContainer = view.findViewById(R.id.emptyCartContainer);
         cartContent = view.findViewById(R.id.cartContent);
         bottomBar = view.findViewById(R.id.bottomBar);
+        tvCartAddressTitle = view.findViewById(R.id.tvCartAddressTitle);
+        tvCartAddressDetail = view.findViewById(R.id.tvCartAddressDetail);
         
         setupRecyclerView();
 
@@ -63,6 +72,19 @@ public class CartFragment extends Fragment {
         });
 
         apiService = RetrofitClient.getClient().create(ProductApiService.class);
+        sessionManager = new com.ptithcm.lottemart.data.local.SessionManager(getContext());
+        orderApiService = RetrofitClient.getClient().create(com.ptithcm.lottemart.data.api.OrderApiService.class);
+        
+        // Click to choose address
+        View cvAddress = view.findViewById(R.id.cvAddress);
+        if (cvAddress != null) {
+            cvAddress.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), AddressBookActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_ADDRESS);
+            });
+        }
+
+        loadProfileAddress();
         fetchCartItems();
 
         Button btnCheckout = view.findViewById(R.id.btnCheckout);
@@ -72,9 +94,11 @@ public class CartFragment extends Fragment {
                     Toast.makeText(getContext(), "Giỏ hàng rỗng!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Intent intent = new Intent(getActivity(), PaymentSuccessActivity.class);
-                intent.putExtra("ORDER_ID", String.valueOf((int)(Math.random() * 10000)));
-                intent.putExtra("TOTAL_AMOUNT", tvTotalAmount.getText().toString());
+                Intent intent = new Intent(getActivity(), CheckoutActivity.class);
+                intent.putExtra("cart_items", (java.io.Serializable) currentCartItems);
+                if (selectedAddress != null) {
+                    intent.putExtra("selected_address", selectedAddress);
+                }
                 startActivity(intent);
             });
         }
@@ -85,20 +109,86 @@ public class CartFragment extends Fragment {
         adapter.setOnCartItemChangeListener(new CartItemAdapter.OnCartItemChangeListener() {
             @Override
             public void onQuantityChanged(int position, int newQuantity) {
-                updateTotalAmount();
+                updateCartItemQuantity(currentCartItems.get(position), newQuantity);
             }
 
             @Override
             public void onItemDeleted(int position) {
-                currentCartItems.remove(position);
-                adapter.notifyItemRemoved(position);
-                adapter.notifyItemRangeChanged(position, currentCartItems.size());
-                updateTotalAmount();
-                checkEmptyState();
+                deleteCartItem(currentCartItems.get(position), position);
             }
         });
         rvCart.setLayoutManager(new LinearLayoutManager(getContext()));
         rvCart.setAdapter(adapter);
+    }
+
+    private void updateCartItemQuantity(CartItem item, int newQty) {
+        if (sessionManager == null || orderApiService == null || sessionManager.getAuthToken() == null) {
+            updateTotalAmount();
+            return;
+        }
+        String token = "Bearer " + sessionManager.getAuthToken();
+        OrderApiService.UpdateCartQtyRequest req = new OrderApiService.UpdateCartQtyRequest(
+            item.getProduct().getId(),
+            newQty
+        );
+        
+        orderApiService.updateCartQty(token, req).enqueue(new Callback<ApiResponse<OrderApiService.CartResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<OrderApiService.CartResponse>> call, Response<ApiResponse<OrderApiService.CartResponse>> response) {
+                if (response.isSuccessful()) {
+                    updateTotalAmount();
+                } else {
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Cập nhật số lượng thất bại!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<OrderApiService.CartResponse>> call, Throwable t) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void deleteCartItem(CartItem item, int position) {
+        if (sessionManager == null || orderApiService == null || sessionManager.getAuthToken() == null) {
+            currentCartItems.remove(position);
+            adapter.notifyItemRemoved(position);
+            adapter.notifyItemRangeChanged(position, currentCartItems.size());
+            updateTotalAmount();
+            checkEmptyState();
+            return;
+        }
+        String token = "Bearer " + sessionManager.getAuthToken();
+        orderApiService.removeFromCart(token, item.getProduct().getId()).enqueue(new Callback<ApiResponse<OrderApiService.CartResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<OrderApiService.CartResponse>> call, Response<ApiResponse<OrderApiService.CartResponse>> response) {
+                if (response.isSuccessful()) {
+                    currentCartItems.remove(position);
+                    adapter.notifyItemRemoved(position);
+                    adapter.notifyItemRangeChanged(position, currentCartItems.size());
+                    updateTotalAmount();
+                    checkEmptyState();
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Đã xóa sản phẩm khỏi giỏ hàng", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Xóa sản phẩm thất bại!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<OrderApiService.CartResponse>> call, Throwable t) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void checkEmptyState() {
@@ -122,6 +212,39 @@ public class CartFragment extends Fragment {
     }
 
     private void fetchCartItems() {
+        if (sessionManager == null || orderApiService == null || sessionManager.getAuthToken() == null) {
+            loadMockCartItems();
+            return;
+        }
+
+        String token = "Bearer " + sessionManager.getAuthToken();
+        orderApiService.getCart(token).enqueue(new Callback<ApiResponse<OrderApiService.CartResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<OrderApiService.CartResponse>> call, Response<ApiResponse<OrderApiService.CartResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    List<OrderApiService.CartItemResponse> items = response.body().getData().getItems();
+                    currentCartItems.clear();
+                    if (items != null && !items.isEmpty()) {
+                        for (OrderApiService.CartItemResponse item : items) {
+                            currentCartItems.add(item.toCartItem());
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    updateTotalAmount();
+                    checkEmptyState();
+                } else {
+                    loadMockCartItems();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<OrderApiService.CartResponse>> call, Throwable t) {
+                loadMockCartItems();
+            }
+        });
+    }
+
+    private void loadMockCartItems() {
         apiService.getFeaturedProducts().enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
@@ -152,5 +275,42 @@ public class CartFragment extends Fragment {
                 checkEmptyState();
             }
         });
+    }
+
+    private void loadProfileAddress() {
+        if (sessionManager == null || !sessionManager.isLoggedIn()) return;
+        String currentUserId = sessionManager.getUserId();
+        
+        // Mock default address from profile/session matching user ID logic in AddressBookActivity
+        if ("69c9daead9fb80416235e662".equals(currentUserId)) {
+            selectedAddress = new com.ptithcm.lottemart.data.models.Address("1", "Thành Phạm Công", "0846183771", "12 Lê Duẩn", "Bến Nghé", "Quận 1", "TP. HCM", true, "home");
+        } else if ("000000000000000000000001".equals(currentUserId)) {
+            selectedAddress = new com.ptithcm.lottemart.data.models.Address("1", "Admin Lotte", "0901234567", "469 Nguyễn Hữu Thọ", "Tân Hưng", "Quận 7", "TP. HCM", true, "home");
+        } else {
+            selectedAddress = new com.ptithcm.lottemart.data.models.Address("1", sessionManager.getUserName(), "0900000000", "Địa chỉ mẫu của bạn", "Phường Bến Thành", "Quận 1", "TP. HCM", true, "home");
+        }
+        updateAddressUI();
+    }
+
+    private void updateAddressUI() {
+        if (selectedAddress != null && tvCartAddressTitle != null && tvCartAddressDetail != null) {
+            tvCartAddressTitle.setText("Giao đến: " + selectedAddress.getName() + " | " + selectedAddress.getPhone());
+            tvCartAddressDetail.setText(selectedAddress.getFullAddress());
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == android.app.Activity.RESULT_OK && requestCode == REQUEST_CODE_ADDRESS && data != null) {
+            selectedAddress = (com.ptithcm.lottemart.data.models.Address) data.getSerializableExtra("selected_address");
+            updateAddressUI();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchCartItems();
     }
 }

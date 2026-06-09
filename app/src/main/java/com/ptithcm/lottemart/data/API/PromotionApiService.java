@@ -37,4 +37,7 @@ public interface PromotionApiService {
 
     @DELETE("/api/v1/promotions/admin/coupons/{id}")
     Call<ApiResponse<Void>> deleteCoupon(@Header("Authorization") String token, @Path("id") String id);
+
+    @GET("/api/v1/promotions/coupons")
+    Call<ApiResponse<List<Coupon>>> getCoupons();
 }

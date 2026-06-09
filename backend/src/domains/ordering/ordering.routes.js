@@ -10,6 +10,7 @@ router.use(authMiddleware);
 // Cart
 router.get('/cart', orderingController.getCart);
 router.post('/cart', orderingController.addToCart);
+router.put('/cart', orderingController.updateCartItemQuantity);
 router.delete('/cart/:branch_product_id', orderingController.removeFromCart);
 
 // Orders

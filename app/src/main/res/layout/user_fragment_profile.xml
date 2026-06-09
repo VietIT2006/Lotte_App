@@ -98,16 +98,17 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="L.POINT"
+                    android:text="L.POINT CỦA TÔI"
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvLPointBalance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="2,540 điểm"
+                    android:text="0 điểm"
                     android:textColor="@color/white"
                     android:textSize="28sp"
                     android:textStyle="bold" />
@@ -122,7 +123,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Sắp hết hạn: 120 điểm vào 31/05"
+                    android:text="Bấm vào để xem thẻ và đổi Voucher hot"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -132,15 +133,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="24dp"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/cvLPoint">
 
             <TextView
+                android:id="@+id/tvMenuOrders"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:gravity="center_vertical"
-                android:text="Đơn hàng của tôi"
+                android:text="Theo dõi đơn hàng"
                 android:textColor="@color/on_surface"
                 android:textSize="16sp"
                 android:drawableStart="@android:drawable/ic_menu_agenda"
@@ -152,6 +154,7 @@
                 android:focusable="true" />
 
             <TextView
+                android:id="@+id/tvMenuAddresses"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:gravity="center_vertical"
@@ -167,6 +170,7 @@
                 android:focusable="true" />
 
             <TextView
+                android:id="@+id/tvMenuNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:gravity="center_vertical"
@@ -182,6 +186,7 @@
                 android:focusable="true" />
 
             <TextView
+                android:id="@+id/tvMenuHelp"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:gravity="center_vertical"

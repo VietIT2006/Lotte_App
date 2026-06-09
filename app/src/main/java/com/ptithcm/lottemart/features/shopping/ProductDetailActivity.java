@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.ptithcm.lottemart.R;
 import com.ptithcm.lottemart.data.api.ApiResponse;
 import com.ptithcm.lottemart.data.api.ProductApiService;
+import com.ptithcm.lottemart.data.api.OrderApiService;
 import com.ptithcm.lottemart.data.models.Product;
 import com.ptithcm.lottemart.data.remote.RetrofitClient;
 
@@ -70,9 +71,45 @@ public class ProductDetailActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, com.ptithcm.lottemart.features.auth.LoginActivity.class);
                 startActivity(intent);
             } else {
-                Toast.makeText(this, "Đã thêm " + tvQty.getText().toString() + " sản phẩm vào giỏ", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
-                startActivity(intent);
+                int qty = Integer.parseInt(tvQty.getText().toString());
+                
+                // Gửi API addToCart lên backend
+                String token = "Bearer " + sessionManager.getAuthToken();
+                OrderApiService orderApiService = RetrofitClient.getClient().create(OrderApiService.class);
+                
+                // Ở đây productId lấy từ Intent, ta cần đảm bảo có đầy đủ dữ liệu khi API detail trả về
+                String pName = tvProductName.getText().toString();
+                double pPrice = Double.parseDouble(tvPrice.getText().toString().replaceAll("[^0-9]", ""));
+                
+                // Tìm link ảnh nếu có
+                String pImage = ""; 
+                
+                OrderApiService.AddToCartRequest req = new OrderApiService.AddToCartRequest(
+                    productId,
+                    pName,
+                    pImage,
+                    qty,
+                    pPrice
+                );
+                
+                orderApiService.addToCart(token, req).enqueue(new Callback<ApiResponse<OrderApiService.CartResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<OrderApiService.CartResponse>> call, Response<ApiResponse<OrderApiService.CartResponse>> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(ProductDetailActivity.this, "Đã thêm " + qty + " sản phẩm vào giỏ hàng thành công!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(ProductDetailActivity.this, "Không thể thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<OrderApiService.CartResponse>> call, Throwable t) {
+                        Toast.makeText(ProductDetailActivity.this, "Lỗi kết nối mạng, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }

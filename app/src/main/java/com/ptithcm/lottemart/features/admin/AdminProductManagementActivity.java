@@ -48,7 +48,7 @@ public class AdminProductManagementActivity extends BaseAdminActivity {
 
         FloatingActionButton fabAddProduct = findViewById(R.id.fabAddProduct);
         SessionManager sessionManager = new SessionManager(this);
-        boolean isSuperAdmin = "superAdmin".equals(sessionManager.getUserRole());
+        boolean isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
         
         fabAddProduct.setOnClickListener(v -> {
             if (isSuperAdmin) {

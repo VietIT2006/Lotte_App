@@ -5,9 +5,15 @@ const app = require('./src/app');
 const PORT = process.env.PORT || 3000;
 const { connectDB } = require('./src/core/db');
 
+const { initSocket } = require('./src/socket');
+
 async function startServer() {
     await connectDB();
     const server = http.createServer(app);
+    
+    // Khởi tạo Socket.io
+    initSocket(server);
+
     server.listen(PORT, '0.0.0.0', () => {
         console.log(`✅ Server is running on http://0.0.0.0:${PORT}`);
         console.log(`🚀 Thử truy cập từ thiết bị khác bằng IP máy tính của bạn.`);

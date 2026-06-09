@@ -30,6 +30,9 @@ public class User {
     @SerializedName("membership_level")
     private String membershipLevel;
 
+    @SerializedName("address")
+    private String address;
+
     public String getId() { return id; }
     public String getUsername() { return username; }
     public String getFullName() { return fullName; }
@@ -39,4 +42,5 @@ public class User {
     public String getAvatar() { return avatar; }
     public int getLottePoints() { return lottePoints; }
     public String getMembershipLevel() { return membershipLevel; }
+    public String getAddress() { return address; }
 }

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 public class SessionManager {
     private static final String PREF_NAME = "LotteMartSession";
     private static final String KEY_TOKEN = "auth_token";
+    private static final String KEY_USER_ID = "user_id";
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_USER_ROLE = "user_role";
@@ -24,8 +25,9 @@ public class SessionManager {
     /**
      * Lưu Token đăng nhập và trạng thái
      */
-    public void saveAuthToken(String token, String name, String email, String role) {
+    public void saveAuthToken(String token, String id, String name, String email, String role) {
         editor.putString(KEY_TOKEN, token);
+        editor.putString(KEY_USER_ID, id);
         editor.putString(KEY_USER_NAME, name);
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_ROLE, role);
@@ -38,6 +40,13 @@ public class SessionManager {
      */
     public String getAuthToken() {
         return pref.getString(KEY_TOKEN, null);
+    }
+
+    /**
+     * Lấy ID người dùng
+     */
+    public String getUserId() {
+        return pref.getString(KEY_USER_ID, "");
     }
 
     /**
@@ -73,6 +82,7 @@ public class SessionManager {
      */
     public void logout() {
         editor.remove(KEY_TOKEN);
+        editor.remove(KEY_USER_ID);
         editor.remove(KEY_USER_NAME);
         editor.remove(KEY_USER_EMAIL);
         editor.remove(KEY_USER_ROLE);
@@ -109,5 +119,23 @@ public class SessionManager {
     public String getMockName(String email) {
         if (email.equals("admin@lottemart.com")) return "Admin Lotte";
         return pref.getString("mock_name_" + email, "Người dùng");
+    }
+
+    /**
+     * Lấy số điểm L.POINT hiện tại của user đang đăng nhập
+     */
+    public int getLottePoints() {
+        // Lấy điểm theo email để phân biệt các tài khoản khác nhau
+        String email = getUserEmail();
+        return pref.getInt("lotte_points_" + email, 12450);
+    }
+
+    /**
+     * Lưu số điểm L.POINT của user đang đăng nhập
+     */
+    public void saveLottePoints(int points) {
+        String email = getUserEmail();
+        editor.putInt("lotte_points_" + email, points);
+        editor.apply();
     }
 }
