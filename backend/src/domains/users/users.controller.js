@@ -28,6 +28,24 @@ class UsersController {
         }
     }
 
+    async uploadAvatar(req, res, next) {
+        try {
+            if (!req.file) {
+                return res.status(400).json({ success: false, message: 'No file uploaded' });
+            }
+            const userId = req.user.id;
+            const avatarUrl = '/uploads/avatars/' + req.file.filename;
+            const user = await usersService.updateProfile(userId, { avatar: avatarUrl });
+            res.status(200).json({
+                success: true,
+                message: 'Avatar uploaded successfully',
+                data: user
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getUsers(req, res, next) {
         try {
             // Lấy role của user đang request (được gán từ middleware sau khi verify token)

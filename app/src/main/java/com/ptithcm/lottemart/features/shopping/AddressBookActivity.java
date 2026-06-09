@@ -16,6 +16,8 @@ import java.util.List;
 
 public class AddressBookActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_MAP_PICKER = 1003;
+    private static final String TAG = "AddressBookActivity";
+
     private com.google.android.material.textfield.TextInputEditText etStreetRef;
     private com.google.android.material.textfield.TextInputEditText etWardRef;
     private com.google.android.material.textfield.TextInputEditText etDistrictRef;
@@ -25,6 +27,7 @@ public class AddressBookActivity extends AppCompatActivity {
     private AddressAdapter adapter;
     private List<Address> addressList;
     private SessionManager sessionManager;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE_AUTO_FILL = 1004;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

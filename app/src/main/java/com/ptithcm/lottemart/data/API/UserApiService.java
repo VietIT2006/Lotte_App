@@ -8,6 +8,10 @@ import retrofit2.http.Header;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Body;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
+import retrofit2.http.Part;
+import okhttp3.MultipartBody;
 
 public interface UserApiService {
     @GET("/api/v1/users")
@@ -18,6 +22,10 @@ public interface UserApiService {
 
     @PUT("/api/v1/users/profile")
     Call<ApiResponse<User>> updateProfile(@Header("Authorization") String token, @Body UserProfileUpdateRequest request);
+
+    @Multipart
+    @POST("/api/v1/users/profile/avatar")
+    Call<ApiResponse<User>> uploadAvatar(@Header("Authorization") String token, @Part MultipartBody.Part avatar);
 
     class RoleUpdateRequest {
         private String role;

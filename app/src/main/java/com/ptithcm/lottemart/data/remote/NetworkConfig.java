@@ -16,14 +16,18 @@ import java.util.concurrent.TimeUnit;
 public class NetworkConfig {
     private static final String TAG = "NetworkConfig";
     
-    // Mặc định ban đầu dùng 10.0.2.2 cho máy ảo hoặc localhost cho máy thật kết nối adb reverse
+    // Mặc định ban đầu dùng 10.0.2.2 cho máy ảo hoặc IP LAN của máy tính cho máy thật
     public static String BASE_URL = isEmulator() 
             ? "http://10.0.2.2:3000/api/v1/" 
-            : "http://127.0.0.1:3000/api/v1/";
+            : "http://192.168.1.48:3000/api/v1/";
 
     // Timeout (ms)
     public static final int CONNECT_TIMEOUT = 30000;
     public static final int READ_TIMEOUT = 30000;
+
+    public static String getBaseDomain() {
+        return BASE_URL.replace("/api/v1/", "");
+    }
 
     public static boolean isEmulator() {
         return Build.FINGERPRINT.startsWith("generic")

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { errorHandler } = require('./core/error.handler');
 const authRoutes = require('./domains/auth/auth.routes');
 const usersRoutes = require('./domains/users/users.routes');
@@ -20,6 +21,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
  
 // Logger middleware
 app.use((req, res, next) => {

@@ -16,9 +16,9 @@
             style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="match_parent"
             android:layout_height="54dp"
-            android:text="TỰ ĐỘNG ĐỊNH VỊ BẰNG BẢN ĐỒ"
+            android:text="ĐỊNH VỊ BẰNG BẢN ĐỒ"
             android:textStyle="bold"
-            app:icon="@android:drawable/ic_menu_myplaces"
+            app:icon="@android:drawable/ic_dialog_map"
             android:layout_marginBottom="16dp"
             app:backgroundTint="@color/primary"
             app:cornerRadius="8dp" />

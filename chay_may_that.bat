@@ -1,6 +1,6 @@
 @echo off
 echo Dang thuc hien ket noi cong 3000 giua May tinh va Dien thoai...
-adb reverse tcp:3000 tcp:3000
+"%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe" reverse tcp:3000 tcp:3000
 if %ERRORLEVEL% EQU 0 (
     echo [OK] Da ket noi thanh cong! Bay gio ban co the chay App tren may that.
 ) else (

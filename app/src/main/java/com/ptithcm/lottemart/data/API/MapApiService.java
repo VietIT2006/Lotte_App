@@ -13,7 +13,7 @@ import retrofit2.http.Url;
 
 public interface MapApiService {
     // Gọi Nominatim để chuyển địa chỉ thành toạ độ
-    @Headers("User-Agent: LotteMartApp/1.0")
+    @Headers("User-Agent: LotteMartApp/1.0 (contact@lottemart.vn)")
     @GET
     Call<List<NominatimResponse>> geocodeAddress(
             @Url String url,
@@ -26,7 +26,7 @@ public interface MapApiService {
     Call<OsrmResponse> getRoute(@Url String url);
 
     // Gọi Nominatim để giải mã toạ độ thành địa chỉ (Reverse Geocoding)
-    @Headers("User-Agent: LotteMartApp/1.0")
+    @Headers("User-Agent: LotteMartApp/1.0 (contact@lottemart.vn)")
     @GET
     Call<NominatimResponse> reverseGeocode(
             @Url String url,

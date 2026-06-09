@@ -19,6 +19,7 @@ import com.ptithcm.lottemart.features.auth.LoginActivity;
 public class ProfileFragment extends Fragment {
 
     private TextView tvUserName, tvUserEmail, tvLPointBalance;
+    private android.widget.ImageView ivProfileAvatar;
     private androidx.cardview.widget.CardView cvLPoint;
     private android.widget.Button btnLogout;
     private SessionManager sessionManager;
@@ -50,8 +51,17 @@ public class ProfileFragment extends Fragment {
         tvUserName = view.findViewById(R.id.tvUserName);
         tvUserEmail = view.findViewById(R.id.tvUserEmail);
         tvLPointBalance = view.findViewById(R.id.tvLPointBalance);
+        ivProfileAvatar = view.findViewById(R.id.ivProfileAvatar);
         cvLPoint = view.findViewById(R.id.cvLPoint);
         btnLogout = view.findViewById(R.id.btnLogout);
+        
+        android.widget.ImageButton btnEditProfile = view.findViewById(R.id.btnEditProfile);
+        if (btnEditProfile != null) {
+            btnEditProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     private void displayUserInfo() {
@@ -74,6 +84,14 @@ public class ProfileFragment extends Fragment {
                     sessionManager.saveLottePoints(user.getLottePoints());
                     if (tvLPointBalance != null) {
                         tvLPointBalance.setText(String.format("%,d điểm", user.getLottePoints()));
+                    }
+                    if (ivProfileAvatar != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+                        String avatarUrl = user.getAvatar();
+                        if (avatarUrl.startsWith("/uploads")) {
+                            avatarUrl = com.ptithcm.lottemart.data.remote.NetworkConfig.getBaseDomain() + avatarUrl;
+                        }
+                        ivProfileAvatar.setImageTintList(null);
+                        com.bumptech.glide.Glide.with(ProfileFragment.this).load(avatarUrl).circleCrop().into(ivProfileAvatar);
                     }
                 }
             }

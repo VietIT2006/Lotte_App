@@ -11,6 +11,9 @@ public class SessionManager {
     private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_USER_ROLE = "user_role";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+    private static final String KEY_BRANCH_ID = "selected_branch_id";
+    private static final String KEY_BRANCH_NAME = "selected_branch_name";
+    private static final String KEY_BRANCH_ADDRESS = "selected_branch_address";
 
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -137,5 +140,27 @@ public class SessionManager {
         String email = getUserEmail();
         editor.putInt("lotte_points_" + email, points);
         editor.apply();
+    }
+
+    /**
+     * Lưu thông tin Chi nhánh (Branch) được chọn
+     */
+    public void saveSelectedBranch(String id, String name, String address) {
+        editor.putString(KEY_BRANCH_ID, id);
+        editor.putString(KEY_BRANCH_NAME, name);
+        editor.putString(KEY_BRANCH_ADDRESS, address);
+        editor.apply();
+    }
+
+    public String getSelectedBranchId() {
+        return pref.getString(KEY_BRANCH_ID, null);
+    }
+
+    public String getSelectedBranchName() {
+        return pref.getString(KEY_BRANCH_NAME, null);
+    }
+
+    public String getSelectedBranchAddress() {
+        return pref.getString(KEY_BRANCH_ADDRESS, null);
     }
 }

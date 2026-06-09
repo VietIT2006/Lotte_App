@@ -47,6 +47,9 @@ public class Address implements Serializable {
         this.city = city;
         this.isDefault = isDefault;
         this.label = label;
+        
+        // Ensure fullAddress is populated for JSON serialization
+        this.fullAddress = street + ", " + ward + ", " + district + ", " + city;
     }
 
     public String getId() { return id; }
