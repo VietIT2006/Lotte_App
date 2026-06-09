@@ -27,8 +27,12 @@
 
             <!-- Address Section -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cvAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/surface_container_low">
@@ -54,6 +58,7 @@
                         android:orientation="vertical">
                         
                         <TextView
+                            android:id="@+id/tvCartAddressTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Giao đến: Căn hộ 12.04, Block A"
@@ -61,6 +66,7 @@
                             android:textStyle="bold" />
                             
                         <TextView
+                            android:id="@+id/tvCartAddressDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Chung cư Sunrise City, Quận 7"
@@ -154,9 +160,10 @@
                     android:textSize="16sp" />
 
                 <TextView
+                    android:id="@+id/tvTotalAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="359.000đ"
+                    android:text="0đ"
                     android:textColor="@color/primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />

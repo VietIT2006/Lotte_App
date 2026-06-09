@@ -28,6 +28,17 @@ public class PaymentSuccessActivity extends AppCompatActivity {
         if (orderId != null) tvOrderId.setText("#" + orderId);
         if (total != null) tvTotal.setText(total);
 
+        Button btnTrackOrder = findViewById(R.id.btnTrackOrder); // Thêm vào XML nếu cần
+        if (btnTrackOrder != null) {
+            btnTrackOrder.setOnClickListener(v -> {
+                Intent intent = new Intent(this, OrderTrackingActivity.class);
+                intent.putExtra("ORDER_ID", orderId);
+                intent.putExtra("CUSTOMER_ADDRESS", getIntent().getStringExtra("CUSTOMER_ADDRESS"));
+                startActivity(intent);
+                finish();
+            });
+        }
+
         btnGoHome.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

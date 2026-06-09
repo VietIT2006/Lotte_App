@@ -32,7 +32,7 @@ public class AdminCategoryAdapter extends RecyclerView.Adapter<AdminCategoryAdap
         this.context = context;
         this.categoryList = categoryList;
         SessionManager sessionManager = new SessionManager(context);
-        this.isSuperAdmin = "superAdmin".equals(sessionManager.getUserRole());
+        this.isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
     }
 
     @NonNull

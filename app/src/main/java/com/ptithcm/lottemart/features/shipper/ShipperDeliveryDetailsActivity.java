@@ -36,6 +36,16 @@ public class ShipperDeliveryDetailsActivity extends AppCompatActivity implements
             Intent intent = new Intent(ShipperDeliveryDetailsActivity.this, ShipperProofOfDeliveryActivity.class);
             startActivity(intent);
         });
+
+        // Bắt sự kiện Bắt đầu giao -> chuyển sang bản đồ Tracking
+        Button btnStartDelivery = findViewById(R.id.btnStartDelivery);
+        btnStartDelivery.setOnClickListener(v -> {
+            Intent intent = new Intent(ShipperDeliveryDetailsActivity.this, ShipperTrackingActivity.class);
+            // Gửi dữ liệu giả để test
+            intent.putExtra("ORDER_ID", "1");
+            intent.putExtra("CUSTOMER_ADDRESS", "Quận 1, TP HCM");
+            startActivity(intent);
+        });
     }
 
     @Override

@@ -113,6 +113,24 @@
             android:name=".features.shopping.OrderTrackingActivity"
             android:exported="false" />
         <activity
+            android:name=".features.shopping.CheckoutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.PaymentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.PaymentFailureActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.AddressBookActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.CouponWalletActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointActivity"
+            android:exported="false" />
+        <activity
             android:name=".features.notifications.NotificationActivity"
             android:exported="false" />
         <activity
@@ -126,6 +144,12 @@
             android:exported="false" />
         <activity
             android:name=".features.shipper.ShipperProofOfDeliveryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shipper.ShipperTrackingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.admin.AdminUserMapActivity"
             android:exported="false" />
             
         <!-- Google Maps API Key -->

@@ -55,6 +55,27 @@ public class RetrofitClient {
         return retrofit;
     }
 
+    private static Retrofit mapRetrofit = null;
+    public static Retrofit getMapClient() {
+        if (mapRetrofit == null) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(logging)
+                    .connectTimeout(NetworkConfig.CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
+                    .readTimeout(NetworkConfig.READ_TIMEOUT, TimeUnit.MILLISECONDS)
+                    .build();
+
+            mapRetrofit = new Retrofit.Builder()
+                    .baseUrl("https://dummy.com/") // baseUrl bắt buộc phải có, nhưng sẽ bị ghi đè bởi @Url
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
+                    .build();
+        }
+        return mapRetrofit;
+    }
+
     // Bộ lọc tự động gắn Token và bắt lỗi 401 (Hết hạn)
     private static class AuthInterceptor implements Interceptor {
         @Override

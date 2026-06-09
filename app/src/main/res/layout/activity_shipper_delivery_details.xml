@@ -181,16 +181,38 @@
         android:padding="16dp"
         android:background="@color/white"
         android:elevation="8dp">
-        <Button
-            android:id="@+id/btnCompleteOrder"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="COMPLETE ORDER"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:backgroundTint="#C00004"
-            app:cornerRadius="8dp"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnStartDelivery"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="BẮT ĐẦU GIAO"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:backgroundTint="#008800"
+                app:cornerRadius="8dp"/>
+
+            <Button
+                android:id="@+id/btnCompleteOrder"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="HOÀN TẤT ĐƠN"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:backgroundTint="#C00004"
+                app:cornerRadius="8dp"/>
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

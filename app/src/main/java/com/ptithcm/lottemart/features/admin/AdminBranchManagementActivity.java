@@ -49,7 +49,7 @@ public class AdminBranchManagementActivity extends BaseAdminActivity {
         rvAdminBranches.setAdapter(adapter);
 
         SessionManager sessionManager = new SessionManager(this);
-        boolean isSuperAdmin = "superAdmin".equals(sessionManager.getUserRole());
+        boolean isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
 
         fabAddBranch.setOnClickListener(new View.OnClickListener() {
             @Override

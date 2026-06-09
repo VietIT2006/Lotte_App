@@ -1,6 +1,7 @@
 package com.ptithcm.lottemart.features.admin;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -106,6 +107,15 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         holder.btnMessage.setOnClickListener(v -> {
             Toast.makeText(context, "Nhắn tin cho " + user.getUsername(), Toast.LENGTH_SHORT).show();
         });
+
+        holder.btnMap.setOnClickListener(v -> {
+            Intent intent = new Intent(context, AdminUserMapActivity.class);
+            intent.putExtra("USER_ADDRESS", "Quận 1, TP HCM");
+            intent.putExtra("USER_NAME", user.getFullName() != null && !user.getFullName().isEmpty() ? user.getFullName() : user.getUsername());
+            intent.putExtra("USER_ROLE", role);
+            intent.putExtra("USER_PHONE", user.getPhone() != null ? user.getPhone() : "Chưa cập nhật SĐT");
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -117,7 +127,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         ImageView ivUserAvatar;
         TextView tvUserName, tvUserRole, tvStatLabel, tvStatValue;
         TextView tvTaskValue, tvMembershipValue;
-        MaterialButton btnMessage, btnPermissions;
+        MaterialButton btnMessage, btnPermissions, btnMap;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -130,6 +140,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
             tvMembershipValue = itemView.findViewById(R.id.tvMembershipValue);
             btnMessage = itemView.findViewById(R.id.btnMessage);
             btnPermissions = itemView.findViewById(R.id.btnPermissions);
+            btnMap = itemView.findViewById(R.id.btnMap);
         }
     }
 }

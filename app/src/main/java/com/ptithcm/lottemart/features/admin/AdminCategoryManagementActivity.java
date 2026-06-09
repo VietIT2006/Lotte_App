@@ -49,7 +49,7 @@ public class AdminCategoryManagementActivity extends BaseAdminActivity {
         rvAdminCategories.setAdapter(adapter);
 
         SessionManager sessionManager = new SessionManager(this);
-        boolean isSuperAdmin = "superAdmin".equals(sessionManager.getUserRole());
+        boolean isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
 
         fabAddCategory.setOnClickListener(new View.OnClickListener() {
             @Override

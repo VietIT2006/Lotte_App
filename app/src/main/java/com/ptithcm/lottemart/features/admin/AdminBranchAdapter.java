@@ -2,6 +2,7 @@ package com.ptithcm.lottemart.features.admin;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,7 @@ public class AdminBranchAdapter extends RecyclerView.Adapter<AdminBranchAdapter.
         this.context = context;
         this.branchList = branchList;
         SessionManager sessionManager = new SessionManager(context);
-        this.isSuperAdmin = "superAdmin".equals(sessionManager.getUserRole());
+        this.isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
     }
 
     @NonNull
@@ -62,6 +63,15 @@ public class AdminBranchAdapter extends RecyclerView.Adapter<AdminBranchAdapter.
                 showPermissionDialog();
             }
         });
+
+        holder.btnMapBranch.setOnClickListener(v -> {
+            Intent intent = new Intent(context, AdminUserMapActivity.class);
+            intent.putExtra("USER_ADDRESS", branch.getAddress());
+            intent.putExtra("USER_NAME", branch.getName());
+            intent.putExtra("USER_ROLE", "Chi nhánh");
+            intent.putExtra("USER_PHONE", "Hotline 1900");
+            context.startActivity(intent);
+        });
     }
 
     private void showPermissionDialog() {
@@ -87,7 +97,7 @@ public class AdminBranchAdapter extends RecyclerView.Adapter<AdminBranchAdapter.
 
     public static class BranchViewHolder extends RecyclerView.ViewHolder {
         TextView tvBranchName, tvBranchAddress;
-        ImageButton btnEditBranch, btnDeleteBranch;
+        ImageButton btnEditBranch, btnDeleteBranch, btnMapBranch;
 
         public BranchViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -95,6 +105,7 @@ public class AdminBranchAdapter extends RecyclerView.Adapter<AdminBranchAdapter.
             tvBranchAddress = itemView.findViewById(R.id.tvBranchAddress);
             btnEditBranch = itemView.findViewById(R.id.btnEditBranch);
             btnDeleteBranch = itemView.findViewById(R.id.btnDeleteBranch);
+            btnMapBranch = itemView.findViewById(R.id.btnMapBranch);
         }
     }
 }

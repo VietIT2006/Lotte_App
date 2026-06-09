@@ -80,6 +80,21 @@ class OrderingService {
         return this.getCart(userId);
     }
 
+    async updateCartItemQuantity(userId, branchProductId, quantity) {
+        const query = { $or: [{ user_id: userId }, { user_id: this.toId(userId) }] };
+        const cart = await db.collection('carts').findOne(query);
+        if (cart) {
+            const existingItemIndex = cart.items.findIndex(i => i.branch_product_id === branchProductId);
+            if (existingItemIndex > -1) {
+                cart.items[existingItemIndex].quantity = Number(quantity);
+                await db.collection('carts').updateOne({ _id: cart._id }, {
+                    $set: { items: cart.items, updated_at: new Date() }
+                });
+            }
+        }
+        return this.getCart(userId);
+    }
+
     async removeFromCart(userId, branchProductId) {
         const query = { $or: [{ user_id: userId }, { user_id: this.toId(userId) }] };
         await db.collection('carts').updateOne(

@@ -36,7 +36,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
         this.productList = productList;
         this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         SessionManager sessionManager = new SessionManager(context);
-        this.isSuperAdmin = "superAdmin".equals(sessionManager.getUserRole());
+        this.isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
     }
 
     @NonNull

@@ -1,9 +1,11 @@
 package com.ptithcm.lottemart.data.models;
 
+import java.io.Serializable;
+
 /**
  * Model class for items in the shopping cart.
  */
-public class CartItem {
+public class CartItem implements Serializable {
     private String id;
     private Product product;
     private int quantity;
@@ -23,3 +25,4 @@ public class CartItem {
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
 }
+

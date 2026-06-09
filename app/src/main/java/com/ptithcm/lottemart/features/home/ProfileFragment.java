@@ -18,7 +18,8 @@ import com.ptithcm.lottemart.features.auth.LoginActivity;
 
 public class ProfileFragment extends Fragment {
 
-    private TextView tvUserName, tvUserEmail;
+    private TextView tvUserName, tvUserEmail, tvLPointBalance;
+    private androidx.cardview.widget.CardView cvLPoint;
     private android.widget.Button btnLogout;
     private SessionManager sessionManager;
 
@@ -39,18 +40,98 @@ public class ProfileFragment extends Fragment {
         setupListeners();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        displayUserInfo();
+    }
+
     private void initViews(View view) {
         tvUserName = view.findViewById(R.id.tvUserName);
         tvUserEmail = view.findViewById(R.id.tvUserEmail);
+        tvLPointBalance = view.findViewById(R.id.tvLPointBalance);
+        cvLPoint = view.findViewById(R.id.cvLPoint);
         btnLogout = view.findViewById(R.id.btnLogout);
     }
 
     private void displayUserInfo() {
         tvUserName.setText(sessionManager.getUserName());
         tvUserEmail.setText(sessionManager.getUserEmail());
+        if (tvLPointBalance != null) {
+            tvLPointBalance.setText(String.format("%,d điểm", sessionManager.getLottePoints()));
+        }
+
+        // Tải thông tin Profile thực tế từ Backend để đồng bộ điểm
+        com.ptithcm.lottemart.data.api.UserApiService userApiService = 
+            com.ptithcm.lottemart.data.remote.RetrofitClient.getClient().create(com.ptithcm.lottemart.data.api.UserApiService.class);
+        
+        String token = "Bearer " + sessionManager.getAuthToken();
+        userApiService.getProfile(token).enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.User>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.User>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.User>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    com.ptithcm.lottemart.data.models.User user = response.body().getData();
+                    sessionManager.saveLottePoints(user.getLottePoints());
+                    if (tvLPointBalance != null) {
+                        tvLPointBalance.setText(String.format("%,d điểm", user.getLottePoints()));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.User>> call, Throwable t) {
+                // Lỗi mạng, sử dụng điểm offline đã có
+            }
+        });
     }
 
     private void setupListeners() {
+        if (cvLPoint != null) {
+            cvLPoint.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.loyalty.LPointActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        View view = getView();
+        if (view != null) {
+            TextView tvMenuOrders = view.findViewById(R.id.tvMenuOrders);
+            if (tvMenuOrders != null) {
+                tvMenuOrders.setOnClickListener(v -> {
+                    Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.shopping.OrderTrackingActivity.class);
+                    intent.putExtra("ORDER_ID", "default_order_id");
+                    String address = "469 Nguyễn Hữu Thọ, Tân Hưng, Quận 7, TP HCM"; // Mặc định cho admin
+                    if ("69c9daead9fb80416235e662".equals(sessionManager.getUserId())) {
+                        address = "12 Lê Duẩn, Bến Nghé, Quận 1, TP. HCM";
+                    }
+                    intent.putExtra("CUSTOMER_ADDRESS", address);
+                    startActivity(intent);
+                });
+            }
+
+            TextView tvMenuAddresses = view.findViewById(R.id.tvMenuAddresses);
+            if (tvMenuAddresses != null) {
+                tvMenuAddresses.setOnClickListener(v -> {
+                    Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.shopping.AddressBookActivity.class);
+                    startActivity(intent);
+                });
+            }
+
+            TextView tvMenuNotifications = view.findViewById(R.id.tvMenuNotifications);
+            if (tvMenuNotifications != null) {
+                tvMenuNotifications.setOnClickListener(v -> {
+                    android.widget.Toast.makeText(getActivity(), "Tính năng cài đặt thông báo đang được xây dựng!", android.widget.Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            TextView tvMenuHelp = view.findViewById(R.id.tvMenuHelp);
+            if (tvMenuHelp != null) {
+                tvMenuHelp.setOnClickListener(v -> {
+                    android.widget.Toast.makeText(getActivity(), "Tính năng Trợ giúp & Phản hồi đang được xây dựng!", android.widget.Toast.LENGTH_SHORT).show();
+                });
+            }
+        }
+
         btnLogout.setOnClickListener(v -> {
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Đăng xuất")

@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         
         // Kiểm tra Tự động đăng nhập
         if (sessionManager.isLoggedIn()) {
-            if ("admin".equals(sessionManager.getUserRole()) || "super_admin".equals(sessionManager.getUserRole())) {
+            if ("admin".equalsIgnoreCase(sessionManager.getUserRole()) || "superAdmin".equalsIgnoreCase(sessionManager.getUserRole())) {
                 navigateToAdminMain();
             } else {
                 navigateToMain();
@@ -213,6 +213,7 @@ public class LoginActivity extends AppCompatActivity {
                     AuthResponseData data = response.body().getData();
                     sessionManager.saveAuthToken(
                             data.getToken(),
+                            data.getUser().getId(),
                             data.getUser().getFullName(),
                             data.getUser().getEmail(),
                             data.getUser().getRole()
@@ -223,7 +224,7 @@ public class LoginActivity extends AppCompatActivity {
                     
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     
-                    if ("admin".equals(data.getUser().getRole()) || "super_admin".equals(data.getUser().getRole())) {
+                    if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
                         navigateToAdminMain();
                     } else {
                         navigateToMain();
@@ -303,6 +304,7 @@ public class LoginActivity extends AppCompatActivity {
                     AuthResponseData data = response.body().getData();
                     sessionManager.saveAuthToken(
                             data.getToken(),
+                            data.getUser().getId(),
                             data.getUser().getFullName(),
                             data.getUser().getEmail(),
                             data.getUser().getRole()
@@ -312,7 +314,7 @@ public class LoginActivity extends AppCompatActivity {
                     com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
                     
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    if ("admin".equals(data.getUser().getRole()) || "super_admin".equals(data.getUser().getRole())) {
+                    if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
                         navigateToAdminMain();
                     } else {
                         navigateToMain();
