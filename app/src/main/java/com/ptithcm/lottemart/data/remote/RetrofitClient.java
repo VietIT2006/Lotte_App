@@ -35,7 +35,7 @@ public class RetrofitClient {
     }
 
     public static Retrofit getClient() {
-        if (retrofit == null) {
+        if (retrofit == null || !retrofit.baseUrl().toString().equals(NetworkConfig.BASE_URL)) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 

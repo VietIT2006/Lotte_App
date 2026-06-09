@@ -15,6 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddressBookActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_MAP_PICKER = 1003;
+    private com.google.android.material.textfield.TextInputEditText etStreetRef;
+    private com.google.android.material.textfield.TextInputEditText etWardRef;
+    private com.google.android.material.textfield.TextInputEditText etDistrictRef;
+    private com.google.android.material.textfield.TextInputEditText etCityRef;
+
     private RecyclerView rvAddresses;
     private AddressAdapter adapter;
     private List<Address> addressList;
@@ -102,6 +108,19 @@ public class AddressBookActivity extends AppCompatActivity {
         android.widget.RadioGroup rgLabel = dialogView.findViewById(R.id.rgLabel);
         androidx.appcompat.widget.SwitchCompat swDefault = dialogView.findViewById(R.id.swDefault);
         com.google.android.material.button.MaterialButton btnVerifyOnMap = dialogView.findViewById(R.id.btnVerifyOnMap);
+        com.google.android.material.button.MaterialButton btnPickFromMap = dialogView.findViewById(R.id.btnPickFromMap);
+
+        if (btnPickFromMap != null) {
+            btnPickFromMap.setOnClickListener(v -> {
+                etStreetRef = etStreet;
+                etWardRef = etWard;
+                etDistrictRef = etDistrict;
+                etCityRef = etCity;
+
+                Intent intent = new Intent(AddressBookActivity.this, MapPickerActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_MAP_PICKER);
+            });
+        }
 
         // Click to verify map location using OpenStreetMap Nominatim and Google Maps
         if (btnVerifyOnMap != null) {
@@ -211,5 +230,25 @@ public class AddressBookActivity extends AppCompatActivity {
             Toast.makeText(this, "Đã thêm địa chỉ mới thành công!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && data != null) {
+            if (requestCode == REQUEST_CODE_MAP_PICKER) {
+                String street = data.getStringExtra("street");
+                String ward = data.getStringExtra("ward");
+                String district = data.getStringExtra("district");
+                String city = data.getStringExtra("city");
+
+                if (etStreetRef != null) etStreetRef.setText(street);
+                if (etWardRef != null) etWardRef.setText(ward);
+                if (etDistrictRef != null) etDistrictRef.setText(district);
+                if (etCityRef != null) etCityRef.setText(city);
+                
+                Toast.makeText(this, "Đã tự động định vị địa chỉ từ bản đồ!", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

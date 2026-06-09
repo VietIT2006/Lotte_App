@@ -9,6 +9,12 @@ public class CrashReportingApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // Tự động quét tìm IP của máy tính lập trình viên đang chạy Backend Node.js trong mạng LAN Wi-Fi
+        com.ptithcm.lottemart.data.remote.NetworkConfig.discoverBackendIP(this, () -> {
+            // Sau khi tìm thấy IP phù hợp, khởi tạo lại RetrofitClient Client để áp dụng IP mới
+            com.ptithcm.lottemart.data.remote.RetrofitClient.init(this);
+        });
+
         final Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {

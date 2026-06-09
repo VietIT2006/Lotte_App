@@ -10,6 +10,19 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Pick address from Map -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPickFromMap"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:text="TỰ ĐỘNG ĐỊNH VỊ BẰNG BẢN ĐỒ"
+            android:textStyle="bold"
+            app:icon="@android:drawable/ic_menu_myplaces"
+            android:layout_marginBottom="16dp"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="8dp" />
+
         <!-- Name -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilName"

@@ -24,4 +24,14 @@ public interface MapApiService {
     // Gọi OSRM để lấy đường vẽ
     @GET
     Call<OsrmResponse> getRoute(@Url String url);
+
+    // Gọi Nominatim để giải mã toạ độ thành địa chỉ (Reverse Geocoding)
+    @Headers("User-Agent: LotteMartApp/1.0")
+    @GET
+    Call<NominatimResponse> reverseGeocode(
+            @Url String url,
+            @Query("lat") String latitude,
+            @Query("lon") String longitude,
+            @Query("format") String format
+    );
 }

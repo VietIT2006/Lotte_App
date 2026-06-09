@@ -8,19 +8,29 @@ import java.net.URISyntaxException;
 public class SocketManager {
     private static Socket mSocket;
     
+    private static String lastSocketUrl = "";
+
     // Khởi tạo và trả về đối tượng Socket
     public static Socket getSocket() {
-        if (mSocket == null) {
+        String socketUrl = NetworkConfig.BASE_URL; 
+        if (socketUrl.endsWith("/api/v1/")) {
+            socketUrl = socketUrl.replace("/api/v1/", "");
+        } else if (socketUrl.endsWith("/api/v1")) {
+            socketUrl = socketUrl.replace("/api/v1", "");
+        } else if (socketUrl.endsWith("/api/")) {
+            socketUrl = socketUrl.replace("/api/", "");
+        } else if (socketUrl.endsWith("/api")) {
+            socketUrl = socketUrl.replace("/api", "");
+        }
+
+        if (mSocket == null || !socketUrl.equals(lastSocketUrl)) {
+            if (mSocket != null) {
+                try {
+                    mSocket.disconnect();
+                } catch (Exception ignored) {}
+            }
             try {
-                // Sửa thành URL backend thực tế hoặc NetworkConfig.BASE_URL
-                // Ở đây do BASE_URL có thể chứa "/api" nên ta cần lấy phần host chính
-                String socketUrl = NetworkConfig.BASE_URL; 
-                if (socketUrl.endsWith("/api/")) {
-                    socketUrl = socketUrl.replace("/api/", "");
-                } else if (socketUrl.endsWith("/api")) {
-                    socketUrl = socketUrl.replace("/api", "");
-                }
-                
+                lastSocketUrl = socketUrl;
                 mSocket = IO.socket(socketUrl);
             } catch (URISyntaxException e) {
                 Log.e("SocketManager", "URI Error", e);
