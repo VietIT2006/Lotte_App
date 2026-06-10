@@ -6,7 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +41,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView rvCategories, rvFeatured;
     private CategoryAdapter categoryAdapter;
     private ProductAdapter productAdapter;
+    private ImageView ivHeroBanner;
     private ProductApiService apiService;
     private android.widget.TextView tvLocationLabel;
     private android.widget.TextView tvLocation;
@@ -64,6 +68,7 @@ public class HomeFragment extends Fragment {
         fetchCategories();
         fetchFeaturedProducts();
         fetchBranchInfo();
+        fetchPromotions();
     }
 
     private void initViews(View view) {
@@ -93,6 +98,8 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.search.SearchActivity.class);
             startActivity(intent);
         });
+
+
 
         categoryAdapter = new CategoryAdapter(getContext(), new ArrayList<>(), category -> {
             Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.categories.CategoryProductsActivity.class);
@@ -181,6 +188,39 @@ public class HomeFragment extends Fragment {
             @Override
             public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Branch>>> call, Throwable t) {
                 Log.e(TAG, "Error fetching branches", t);
+            }
+        });
+    }
+
+    private void fetchPromotions() {
+        apiService.getPromotions().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
+                    List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion> promos = response.body().getData();
+                    List<com.ptithcm.lottemart.data.models.Banner> banners = new ArrayList<>();
+                    for (com.ptithcm.lottemart.data.api.ProductApiService.Promotion p : promos) {
+                        banners.add(new com.ptithcm.lottemart.data.models.Banner(p.getId(), p.getTitle(), p.getDescription(), p.getBannerImage()));
+                    }
+                    if (vpBanner != null) {
+                        com.ptithcm.lottemart.ui.adapters.BannerAdapter adapter = new com.ptithcm.lottemart.ui.adapters.BannerAdapter(getContext(), banners);
+                        vpBanner.setAdapter(adapter);
+                        
+                        View view = getView();
+                        if (view != null) {
+                            android.widget.LinearLayout layoutDots = view.findViewById(R.id.layoutDots);
+                            if (layoutDots != null) {
+                                setupIndicator(layoutDots, banners.size());
+                                setCurrentIndicator(layoutDots, 0);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> call, Throwable t) {
+                Log.e(TAG, "Error fetching promotions banner", t);
             }
         });
     }
@@ -301,4 +341,4 @@ public class HomeFragment extends Fragment {
             }
         }
     }
-}
+ }
