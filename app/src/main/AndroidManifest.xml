@@ -71,6 +71,9 @@
             android:name=".features.admin.AdminImportOrdersActivity"
             android:exported="false" />
         <activity
+            android:name=".features.admin.AdminCreateImportOrderActivity"
+            android:exported="false" />
+        <activity
             android:name=".features.admin.AdminReceiptsActivity"
             android:exported="false" />
         <activity

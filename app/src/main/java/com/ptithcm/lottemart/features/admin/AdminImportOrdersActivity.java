@@ -1,9 +1,11 @@
 package com.ptithcm.lottemart.features.admin;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ptithcm.lottemart.R;
 import com.ptithcm.lottemart.data.api.ApiResponse;
 import com.ptithcm.lottemart.data.api.PurchasingApiService;
@@ -42,6 +44,18 @@ public class AdminImportOrdersActivity extends BaseAdminActivity {
         });
         rvList.setAdapter(adapter);
 
+        FloatingActionButton fabAddImportOrder = findViewById(R.id.fabAddImportOrder);
+        if (fabAddImportOrder != null) {
+            fabAddImportOrder.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminImportOrdersActivity.this, AdminCreateImportOrderActivity.class);
+                startActivity(intent);
+            });
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadImportOrders();
     }
 
