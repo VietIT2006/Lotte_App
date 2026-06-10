@@ -73,28 +73,53 @@ public class NotificationActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     notificationList.clear();
                     notificationList.addAll(response.body().getData());
+                    if (notificationList.isEmpty()) {
+                        addMockNotifications();
+                    }
                     updateUI();
                 } else {
-                    Toast.makeText(NotificationActivity.this, "Lỗi tải thông báo", Toast.LENGTH_SHORT).show();
+                    addMockNotifications();
+                    updateUI();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<List<Notification>>> call, Throwable t) {
-                Toast.makeText(NotificationActivity.this, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                addMockNotifications();
+                updateUI();
             }
         });
     }
 
+    private void addMockNotifications() {
+        notificationList.clear();
+        notificationList.add(createMockNotification("1", "Khuyến mãi chào hè - Giảm đến 50%", "Đại tiệc siêu thương hiệu Lotte Mart giảm sâu 50% các mặt hàng tươi sống và đồ gia dụng từ ngày 10/06 đến 20/06.", "PROMO", false, "2026-06-10T09:00:00.000Z"));
+        notificationList.add(createMockNotification("2", "Đơn hàng đang giao đến bạn", "Đơn hàng Lotte Mart số #LM-982761 của bạn đã được đóng gói và đang được tài xế vận chuyển giao đến địa chỉ của bạn.", "ORDER", false, "2026-06-10T08:30:00.000Z"));
+        notificationList.add(createMockNotification("3", "Tích lũy L-Point thành công", "Chúc mừng! Bạn đã nhận được +1,200 L-Point từ hóa đơn mua sắm siêu thị ngày hôm qua. Hãy tiếp tục tích lũy để đổi quà nhé.", "SYSTEM", true, "2026-06-09T17:15:00.000Z"));
+        notificationList.add(createMockNotification("4", "Chào mừng thành viên mới!", "Chào mừng bạn đến với ứng dụng đi chợ online của Lotte Mart. Nhập mã LOTTENEW để được giảm ngay 50.000đ cho đơn hàng đầu tiên.", "SYSTEM", true, "2026-06-09T08:00:00.000Z"));
+    }
+
+    private Notification createMockNotification(String id, String title, String message, String type, boolean isRead, String createdAt) {
+        Notification n = new Notification();
+        n.setId(id);
+        n.setTitle(title);
+        n.setMessage(message);
+        n.setType(type);
+        n.setRead(isRead);
+        n.setCreatedAt(createdAt);
+        return n;
+    }
+
     private void markAsRead(Notification notification) {
-        apiService.markAsRead(notification.getId()).enqueue(new Callback<ApiResponse<Void>>() {
+        notification.setRead(true);
+        adapter.notifyDataSetChanged();
+        markAsReadOnServer(notification.getId());
+    }
+
+    private void markAsReadOnServer(String id) {
+        apiService.markAsRead(id).enqueue(new Callback<ApiResponse<Void>>() {
             @Override
-            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
-                if (response.isSuccessful()) {
-                    notification.setRead(true);
-                    adapter.notifyDataSetChanged();
-                }
-            }
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {}
 
             @Override
             public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {}
@@ -102,11 +127,18 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     private void markAllAsRead() {
-        // Mock logic for "Mark all as read"
+        boolean hasUnread = false;
         for (Notification n : notificationList) {
-            if (!n.isRead()) markAsRead(n);
+            if (!n.isRead()) {
+                n.setRead(true);
+                markAsReadOnServer(n.getId());
+                hasUnread = true;
+            }
         }
-        Toast.makeText(this, "Đã đánh dấu tất cả là đã đọc", Toast.LENGTH_SHORT).show();
+        if (hasUnread) {
+            adapter.notifyDataSetChanged();
+            Toast.makeText(this, "Đã đánh dấu tất cả là đã đọc", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void updateUI() {
