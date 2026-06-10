@@ -161,7 +161,7 @@ public class OrderDetailActivity extends AppCompatActivity {
                 itemView.findViewById(R.id.tvDefaultBadge).setVisibility(View.GONE);
 
                 tvLabel.setText("MÓN");
-                tvLabel.getBackground().setTint(Color.parseColor("#424242"));
+                tvLabel.setTextColor(Color.parseColor("#E53935"));
                 tvNamePhone.setText(item.getProductName());
                 tvAddressDetails.setText("Số lượng: " + item.getQuantity() + " | Đơn giá: " + String.format("%,.0f đ", item.getPrice()));
 
