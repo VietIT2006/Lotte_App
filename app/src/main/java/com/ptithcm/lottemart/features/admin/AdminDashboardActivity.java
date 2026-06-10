@@ -26,7 +26,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AdminDashboardActivity extends BaseAdminActivity {
-    private TextView tvKpi1Value, tvKpi2Value, tvKpi3Value, tvKpi4Value;
+    private TextView tvKpi1Value, tvKpi2Value, tvKpi3Value, tvKpi4Value, tvChartTotalRevenue;
     
     // Lists & Adapters
     private RecyclerView rvPendingOrders, rvPendingProducts, rvPendingCategories;
@@ -60,6 +60,7 @@ public class AdminDashboardActivity extends BaseAdminActivity {
         tvKpi2Value = findViewById(R.id.tvKpi2Value);
         tvKpi3Value = findViewById(R.id.tvKpi3Value);
         tvKpi4Value = findViewById(R.id.tvKpi4Value);
+        tvChartTotalRevenue = findViewById(R.id.tvChartTotalRevenue);
         
         rvPendingOrders = findViewById(R.id.rvPendingOrders);
         rvPendingProducts = findViewById(R.id.rvPendingProducts);
@@ -126,6 +127,7 @@ public class AdminDashboardActivity extends BaseAdminActivity {
                     }
 
                     tvKpi1Value.setText(String.format("%,.0f đ", totalRevenue));
+                    tvChartTotalRevenue.setText(String.format("%,.0f đ", totalRevenue));
                     tvKpi2Value.setText(String.valueOf(orderCount));
                     tvKpi4Value.setText(String.valueOf(pendingCount));
                     
