@@ -71,6 +71,9 @@
             android:name=".features.admin.AdminImportOrdersActivity"
             android:exported="false" />
         <activity
+            android:name=".features.admin.AdminCreateImportOrderActivity"
+            android:exported="false" />
+        <activity
             android:name=".features.admin.AdminReceiptsActivity"
             android:exported="false" />
         <activity
@@ -178,6 +181,21 @@
         </activity>
         <activity
             android:name=".features.home.EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointTransferActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointTopupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.OrderListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.OrderDetailActivity"
             android:exported="false" />
     </application>
 

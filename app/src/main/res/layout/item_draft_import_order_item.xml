@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="1dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvDraftProductName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên sản phẩm"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDraftProductDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SL: 10 x 50.000đ"
+                android:textColor="@color/grey_text"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvDraftProductTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="500.000đ"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            android:layout_marginEnd="12dp" />
+
+        <ImageButton
+            android:id="@+id/btnDeleteDraftItem"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_delete"
+            app:tint="@color/primary"
+            android:contentDescription="Xóa mặt hàng" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -158,7 +158,7 @@ class CatalogService {
     async createProduct(productData) {
         return await this.wrapAction(async () => {
             productData.created_at = new Date();
-            productData.is_active = true;
+            productData.is_active = productData.is_active !== undefined ? productData.is_active : true;
             if (productData.category_id) {
                 productData.category_id = this.toId(productData.category_id);
             }
@@ -211,7 +211,7 @@ class CatalogService {
 
     async createCategory(catData) {
         return await this.wrapAction(async () => {
-            catData.is_active = true;
+            catData.is_active = catData.is_active !== undefined ? catData.is_active : true;
             catData.created_at = new Date();
             const result = await db.collection('categories').insertOne(catData);
             catData._id = result.insertedId;
@@ -330,6 +330,42 @@ class CatalogService {
         return await this.wrapAction(async () => {
             await db.collection('reviews').deleteOne({ _id: this.toId(id) });
             return true;
+        });
+    }
+
+    async getPendingProducts() {
+        return await this.wrapAction(async () => {
+            const products = await db.collection('products').find({ is_active: false }).toArray();
+            return products.map(p => this.transformProduct(p));
+        }) || [];
+    }
+
+    async getPendingCategories() {
+        return await this.wrapAction(async () => {
+            const categories = await db.collection('categories').find({ is_active: false }).toArray();
+            return categories.map(c => this.transformCategory(c));
+        }) || [];
+    }
+
+    async approveProduct(id) {
+        return await this.wrapAction(async () => {
+            const result = await db.collection('products').findOneAndUpdate(
+                { _id: this.toId(id) },
+                { $set: { is_active: true, updated_at: new Date() } },
+                { returnDocument: 'after' }
+            );
+            return this.transformProduct(result.value || result);
+        });
+    }
+
+    async approveCategory(id) {
+        return await this.wrapAction(async () => {
+            const result = await db.collection('categories').findOneAndUpdate(
+                { _id: this.toId(id) },
+                { $set: { is_active: true, updated_at: new Date() } },
+                { returnDocument: 'after' }
+            );
+            return this.transformCategory(result.value || result);
         });
     }
 }

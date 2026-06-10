@@ -82,6 +82,60 @@ class LoyaltyService {
             message: 'Đổi điểm thành công! Voucher đã được lưu vào ví cá nhân.'
         };
     }
+
+    async transferPoints(senderId, recipientIdentifier, amount) {
+        const sender = await db.collection('users').findOne({ _id: db.toId(senderId) });
+        if (!sender) throw new Error('Không tìm thấy người gửi!');
+
+        const senderPoints = sender.lotte_points || 0;
+        if (senderPoints < amount) {
+            throw new Error('Số dư điểm L.POINT không đủ!');
+        }
+
+        const recipient = await db.collection('users').findOne({
+            $or: [
+                { email: recipientIdentifier },
+                { phone: recipientIdentifier },
+                { username: recipientIdentifier }
+            ]
+        });
+
+        if (!recipient) {
+            throw new Error('Không tìm thấy người nhận!');
+        }
+
+        if (recipient._id.toString() === sender._id.toString()) {
+            throw new Error('Không thể tự chuyển điểm cho chính mình!');
+        }
+
+        await db.collection('users').updateOne(
+            { _id: sender._id },
+            { $inc: { lotte_points: -amount } }
+        );
+
+        await db.collection('users').updateOne(
+            { _id: recipient._id },
+            { $inc: { lotte_points: amount } }
+        );
+
+        await db.collection('loyalty_transactions').insertOne({
+            user_id: sender._id,
+            amount: -amount,
+            type: 'TRANSFERRED_OUT',
+            reason: `Chuyển điểm đến ${recipient.full_name || recipient.email}`,
+            created_at: new Date()
+        });
+
+        await db.collection('loyalty_transactions').insertOne({
+            user_id: recipient._id,
+            amount: amount,
+            type: 'TRANSFERRED_IN',
+            reason: `Nhận điểm từ ${sender.full_name || sender.email}`,
+            created_at: new Date()
+        });
+
+        return senderPoints - amount;
+    }
 }
 
 module.exports = new LoyaltyService();

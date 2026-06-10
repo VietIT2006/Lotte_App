@@ -44,4 +44,32 @@ public interface ProductApiService {
 
     @DELETE("/api/v1/catalog/admin/reviews/{id}")
     Call<ApiResponse<Void>> deleteReview(@Header("Authorization") String token, @Path("id") String id);
+
+    @GET("/api/v1/catalog/admin/pending-products")
+    Call<ApiResponse<List<Product>>> getPendingProducts(@Header("Authorization") String token);
+
+    @GET("/api/v1/catalog/admin/pending-categories")
+    Call<ApiResponse<List<Category>>> getPendingCategories(@Header("Authorization") String token);
+
+    @PUT("/api/v1/catalog/admin/products/{id}/approve")
+    Call<ApiResponse<Product>> approveProduct(@Header("Authorization") String token, @Path("id") String id);
+
+    @PUT("/api/v1/catalog/admin/categories/{id}/approve")
+    Call<ApiResponse<Category>> approveCategory(@Header("Authorization") String token, @Path("id") String id);
+
+    // --- PROMOTIONS (BANNERS) ---
+    @GET("/api/v1/promotions")
+    Call<ApiResponse<List<Promotion>>> getPromotions();
+
+    class Promotion {
+        private String id;
+        private String title;
+        private String description;
+        private String banner_image;
+
+        public String getId() { return id; }
+        public String getTitle() { return title; }
+        public String getDescription() { return description; }
+        public String getBannerImage() { return banner_image; }
+    }
 }
