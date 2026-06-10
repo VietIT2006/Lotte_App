@@ -116,13 +116,7 @@ public class ProfileFragment extends Fragment {
             TextView tvMenuOrders = view.findViewById(R.id.tvMenuOrders);
             if (tvMenuOrders != null) {
                 tvMenuOrders.setOnClickListener(v -> {
-                    Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.shopping.OrderTrackingActivity.class);
-                    intent.putExtra("ORDER_ID", "default_order_id");
-                    String address = "469 Nguyễn Hữu Thọ, Tân Hưng, Quận 7, TP HCM"; // Mặc định cho admin
-                    if ("69c9daead9fb80416235e662".equals(sessionManager.getUserId())) {
-                        address = "12 Lê Duẩn, Bến Nghé, Quận 1, TP. HCM";
-                    }
-                    intent.putExtra("CUSTOMER_ADDRESS", address);
+                    Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.shopping.OrderListActivity.class);
                     startActivity(intent);
                 });
             }

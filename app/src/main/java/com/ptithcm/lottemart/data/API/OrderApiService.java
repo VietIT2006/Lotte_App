@@ -15,6 +15,9 @@ public interface OrderApiService {
     @GET("/api/v1/ordering/admin/orders")
     Call<ApiResponse<List<Order>>> getAdminOrders(@Header("Authorization") String token);
 
+    @GET("/api/v1/ordering/history")
+    Call<ApiResponse<List<Order>>> getMyOrders(@Header("Authorization") String token);
+
     @PUT("/api/v1/ordering/admin/orders/{id}/status")
     Call<ApiResponse<Order>> updateOrderStatus(
             @Header("Authorization") String token,

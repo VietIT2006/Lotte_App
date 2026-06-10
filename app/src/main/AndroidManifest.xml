@@ -188,6 +188,12 @@
         <activity
             android:name=".features.loyalty.LPointTopupActivity"
             android:exported="false" />
+        <activity
+            android:name=".features.shopping.OrderListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.OrderDetailActivity"
+            android:exported="false" />
     </application>
 
     <queries>

@@ -3,17 +3,12 @@ package com.ptithcm.lottemart.features.shopping;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.widget.Toolbar;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.appcompat.widget.Toolbar;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -27,19 +22,15 @@ import com.ptithcm.lottemart.data.api.MapApiService;
 import com.ptithcm.lottemart.data.models.NominatimResponse;
 import com.ptithcm.lottemart.data.remote.RetrofitClient;
 import com.ptithcm.lottemart.data.remote.SocketManager;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.List;
-
 import io.socket.client.Socket;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class OrderTrackingActivity extends AppCompatActivity implements OnMapReadyCallback {
-
     private GoogleMap mMap;
     private Socket mSocket;
     private Marker shipperMarker;
@@ -48,10 +39,9 @@ public class OrderTrackingActivity extends AppCompatActivity implements OnMapRea
     
     private TextView tvDriverName;
     private ImageButton btnCallDriver;
-    private Button btnRateOrder;
 
-    private String orderId = "1"; // Mock data, should get from Intent
-    private String customerAddress = "Quận 1, TP HCM"; // Mock data
+    private String orderId = "1";
+    private String customerAddress = "Quận 1, TP HCM";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,19 +61,13 @@ public class OrderTrackingActivity extends AppCompatActivity implements OnMapRea
         
         tvDriverName = findViewById(R.id.tvDriverName);
         btnCallDriver = findViewById(R.id.btnCallDriver);
-        btnRateOrder = findViewById(R.id.btnRateOrder);
 
-        // Giả lập thông tin shipper
         tvDriverName.setText("Nguyễn Văn A");
-        String shipperPhone = "0123456789";
+        String shipperPhone = "0912345678";
 
         btnCallDriver.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + shipperPhone));
             startActivity(intent);
-        });
-
-        btnRateOrder.setOnClickListener(v -> {
-            Toast.makeText(this, "Chuyển sang màn hình Đánh giá", Toast.LENGTH_SHORT).show();
         });
 
         // Initialize Map
@@ -147,14 +131,13 @@ public class OrderTrackingActivity extends AppCompatActivity implements OnMapRea
             public void onResponse(Call<List<NominatimResponse>> call, Response<List<NominatimResponse>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                     NominatimResponse loc = response.body().get(0);
-                    LatLng customerLatLng = new LatLng(Double.parseDouble(loc.getLat()), Double.parseDouble(loc.getLon()));
+                    customerLatLng = new LatLng(Double.parseDouble(loc.getLat()), Double.parseDouble(loc.getLon()));
                     
                     if (mMap != null) {
                         customerMarker = mMap.addMarker(new MarkerOptions()
                                 .position(customerLatLng)
                                 .title("Địa chỉ của bạn"));
                         
-                        // Nếu chưa có shipper marker, zoom vào khách
                         if (shipperMarker == null) {
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(customerLatLng, 14f));
                         }
@@ -164,7 +147,7 @@ public class OrderTrackingActivity extends AppCompatActivity implements OnMapRea
 
             @Override
             public void onFailure(Call<List<NominatimResponse>> call, Throwable t) {
-                Toast.makeText(OrderTrackingActivity.this, "Lỗi Geocoding địa chỉ khách", Toast.LENGTH_SHORT).show();
+                Toast.makeText(OrderTrackingActivity.this, "Lỗi định vị địa chỉ khách hàng", Toast.LENGTH_SHORT).show();
             }
         });
     }
