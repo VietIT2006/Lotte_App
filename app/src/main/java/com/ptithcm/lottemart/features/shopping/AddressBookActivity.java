@@ -27,6 +27,7 @@ public class AddressBookActivity extends AppCompatActivity {
     private AddressAdapter adapter;
     private List<Address> addressList;
     private SessionManager sessionManager;
+    private String currentUserId;
     private static final int LOCATION_PERMISSION_REQUEST_CODE_AUTO_FILL = 1004;
 
     @Override
@@ -42,7 +43,7 @@ public class AddressBookActivity extends AppCompatActivity {
         }
 
         // Khởi tạo danh sách địa chỉ và lọc theo tài khoản đăng nhập
-        String currentUserId = sessionManager.getUserId();
+        currentUserId = sessionManager.getUserId();
         addressList = sessionManager.getAddressList(currentUserId);
 
         if (addressList == null) {

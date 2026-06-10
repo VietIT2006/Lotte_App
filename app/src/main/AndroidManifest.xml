@@ -179,6 +179,15 @@
         <activity
             android:name=".features.home.EditProfileActivity"
             android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointTransferActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointTopupActivity"
+            android:exported="false" />
     </application>
 
     <queries>
