@@ -213,6 +213,34 @@ class CatalogController {
             res.status(200).json({ success: true, message: 'Review deleted successfully' });
         } catch (error) { next(error); }
     }
+
+    async getPendingProducts(req, res, next) {
+        try {
+            const products = await catalogService.getPendingProducts();
+            res.status(200).json({ success: true, data: products });
+        } catch (error) { next(error); }
+    }
+
+    async getPendingCategories(req, res, next) {
+        try {
+            const categories = await catalogService.getPendingCategories();
+            res.status(200).json({ success: true, data: categories });
+        } catch (error) { next(error); }
+    }
+
+    async approveProduct(req, res, next) {
+        try {
+            const approved = await catalogService.approveProduct(req.params.id);
+            res.status(200).json({ success: true, data: approved });
+        } catch (error) { next(error); }
+    }
+
+    async approveCategory(req, res, next) {
+        try {
+            const approved = await catalogService.approveCategory(req.params.id);
+            res.status(200).json({ success: true, data: approved });
+        } catch (error) { next(error); }
+    }
 }
 
 module.exports = new CatalogController();
