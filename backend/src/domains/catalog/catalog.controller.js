@@ -15,11 +15,17 @@ class CatalogController {
 
     async getProducts(req, res, next) {
         try {
-            const { category_id } = req.query;
-            const products = await catalogService.getProducts(category_id);
+            const { category_id, page, limit } = req.query;
+            const result = await catalogService.getProducts(category_id, page, limit);
             res.status(200).json({
                 success: true,
-                data: products
+                data: result.list,
+                pagination: {
+                    total: result.total,
+                    page: result.page,
+                    total_pages: result.total_pages,
+                    limit: result.limit
+                }
             });
         } catch (error) {
             next(error);
@@ -28,10 +34,17 @@ class CatalogController {
 
     async getFeaturedProducts(req, res, next) {
         try {
-            const products = await catalogService.getFeaturedProducts();
+            const { page, limit } = req.query;
+            const result = await catalogService.getFeaturedProducts(page, limit);
             res.status(200).json({
                 success: true,
-                data: products
+                data: result.list,
+                pagination: {
+                    total: result.total,
+                    page: result.page,
+                    total_pages: result.total_pages,
+                    limit: result.limit
+                }
             });
         } catch (error) {
             next(error);
@@ -59,11 +72,17 @@ class CatalogController {
 
     async searchProducts(req, res, next) {
         try {
-            const { q, sort_by } = req.query;
-            const products = await catalogService.searchProducts(q, sort_by);
+            const { q, sort_by, page, limit } = req.query;
+            const result = await catalogService.searchProducts(q, sort_by, page, limit);
             res.status(200).json({
                 success: true,
-                data: products
+                data: result.list,
+                pagination: {
+                    total: result.total,
+                    page: result.page,
+                    total_pages: result.total_pages,
+                    limit: result.limit
+                }
             });
         } catch (error) {
             next(error);

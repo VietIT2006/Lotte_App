@@ -37,7 +37,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
         holder.tvQuantity.setText("x" + item.getQuantity());
 
         Glide.with(context)
-                .load(item.getProduct().getImageUrl())
+                .load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(item.getProduct().getImageUrl()))
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .error(android.R.drawable.ic_menu_gallery)
                 .into(holder.ivProductImage);

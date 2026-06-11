@@ -52,7 +52,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
 
         if (item.getProduct().getImageUrl() != null && !item.getProduct().getImageUrl().isEmpty()) {
             Glide.with(context)
-                    .load(item.getProduct().getImageUrl())
+                    .load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(item.getProduct().getImageUrl()))
                     .placeholder(android.R.drawable.ic_menu_gallery)
                     .into(holder.ivProduct);
         }

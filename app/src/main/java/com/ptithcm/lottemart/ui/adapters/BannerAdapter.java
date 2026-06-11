@@ -36,7 +36,7 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.ViewHolder
         holder.tvBannerSubtitle.setText(banner.getSummary());
 
         Glide.with(context)
-            .load(banner.getImageUrl())
+            .load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(banner.getImageUrl()))
             .centerCrop()
             .into(holder.ivBannerImage);
     }

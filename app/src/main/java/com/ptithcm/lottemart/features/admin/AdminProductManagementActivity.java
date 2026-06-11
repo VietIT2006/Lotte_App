@@ -30,6 +30,11 @@ public class AdminProductManagementActivity extends BaseAdminActivity {
 
     private RecyclerView rvAdminProducts;
     private AdminProductAdapter adapter;
+    
+    private int currentPage = 1;
+    private int limit = 20;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,22 @@ public class AdminProductManagementActivity extends BaseAdminActivity {
         
         adapter = new AdminProductAdapter(this, new ArrayList<>());
         rvAdminProducts.setAdapter(adapter);
+        
+        rvAdminProducts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@androidx.annotation.NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy > 0) {
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                    if(layoutManager != null && layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItemCount() - 1) {
+                        if(!isLoading && !isLastPage) {
+                            currentPage++;
+                            fetchProducts();
+                        }
+                    }
+                }
+            }
+        });
 
         FloatingActionButton fabAddProduct = findViewById(R.id.fabAddProduct);
         SessionManager sessionManager = new SessionManager(this);
@@ -64,14 +85,28 @@ public class AdminProductManagementActivity extends BaseAdminActivity {
     }
 
     private void fetchProducts() {
+        isLoading = true;
         ProductApiService apiService = RetrofitClient.getClient().create(ProductApiService.class);
-        apiService.getProducts(null).enqueue(new Callback<ApiResponse<List<Product>>>() {
+        apiService.getProducts(null, currentPage, limit).enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
+                isLoading = false;
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isSuccess()) {
                         List<Product> products = response.body().getData();
-                        adapter.updateData(products);
+                        ApiResponse.PaginationMeta pagination = response.body().getPagination();
+                        
+                        if (currentPage == 1) {
+                            adapter.updateData(products);
+                        } else {
+                            adapter.addProducts(products);
+                        }
+                        
+                        if (pagination != null) {
+                            isLastPage = currentPage >= pagination.getTotalPages();
+                        } else {
+                            isLastPage = products == null || products.isEmpty();
+                        }
                     } else {
                         Toast.makeText(AdminProductManagementActivity.this, "Lỗi: " + response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -82,6 +117,7 @@ public class AdminProductManagementActivity extends BaseAdminActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable t) {
+                isLoading = false;
                 Toast.makeText(AdminProductManagementActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

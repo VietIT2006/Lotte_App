@@ -109,32 +109,62 @@ class CatalogService {
         }) || [];
     }
 
-    async getProducts(categoryId) {
+    async getProducts(categoryId, page = 1, limit = 20) {
         return await this.wrapAction(async () => {
             let filter = { is_active: true };
             if (categoryId) {
                 filter.$or = [{ category_id: categoryId }, { category_id: this.toId(categoryId) }];
             }
+            
+            page = Math.max(1, Number(page) || 1);
+            limit = Math.max(1, Number(limit) || 20);
+            const skip = (page - 1) * limit;
+            
+            const total = await db.collection('products').countDocuments(filter);
+            const total_pages = Math.ceil(total / limit);
+
             const products = await db.collection('products').aggregate([
                 { $match: filter },
                 { $sort: { created_at: -1 } },
-                { $limit: 20 },
+                { $skip: skip },
+                { $limit: limit },
                 { $lookup: { from: 'branchproducts', localField: '_id', foreignField: 'product_id', as: 'branch_info' } }
             ]).toArray();
-            return products.map(p => this.transformProduct(p));
-        }) || [];
+            
+            return {
+                list: products.map(p => this.transformProduct(p)),
+                total,
+                page,
+                total_pages,
+                limit
+            };
+        }) || { list: [], total: 0, page: 1, total_pages: 0, limit: 20 };
     }
 
-    async getFeaturedProducts() {
+    async getFeaturedProducts(page = 1, limit = 20) {
         return await this.wrapAction(async () => {
+            page = Math.max(1, Number(page) || 1);
+            limit = Math.max(1, Number(limit) || 20);
+            const skip = (page - 1) * limit;
+            
+            const total = await db.collection('products').countDocuments({ is_active: true });
+            const total_pages = Math.ceil(total / limit);
+
             const products = await db.collection('products').aggregate([
                 { $match: { is_active: true } },
                 { $sort: { created_at: -1 } },
-                { $limit: 20 },
+                { $skip: skip },
+                { $limit: limit },
                 { $lookup: { from: 'branchproducts', localField: '_id', foreignField: 'product_id', as: 'branch_info' } }
             ]).toArray();
-            return products.map(p => this.transformProduct(p));
-        }) || [];
+            return {
+                list: products.map(p => this.transformProduct(p)),
+                total,
+                page,
+                total_pages,
+                limit
+            };
+        }) || { list: [], total: 0, page: 1, total_pages: 0, limit: 20 };
     }
 
     async getProductById(id) {
@@ -148,19 +178,34 @@ class CatalogService {
         });
     }
 
-    async searchProducts(q, sortBy) {
+    async searchProducts(q, sortBy, page = 1, limit = 20) {
         return await this.wrapAction(async () => {
             let filter = { 
                 is_active: true, 
                 $or: [{ name: { $regex: q, $options: 'i' } }, { brand: { $regex: q, $options: 'i' } }]
             };
+            
+            page = Math.max(1, Number(page) || 1);
+            limit = Math.max(1, Number(limit) || 20);
+            const skip = (page - 1) * limit;
+            
+            const total = await db.collection('products').countDocuments(filter);
+            const total_pages = Math.ceil(total / limit);
+
             const products = await db.collection('products').aggregate([
                 { $match: filter },
-                { $limit: 20 },
+                { $skip: skip },
+                { $limit: limit },
                 { $lookup: { from: 'branchproducts', localField: '_id', foreignField: 'product_id', as: 'branch_info' } }
             ]).toArray();
-            return products.map(p => this.transformProduct(p));
-        }) || [];
+            return {
+                list: products.map(p => this.transformProduct(p)),
+                total,
+                page,
+                total_pages,
+                limit
+            };
+        }) || { list: [], total: 0, page: 1, total_pages: 0, limit: 20 };
     }
 
     async getBranches() {

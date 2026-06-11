@@ -49,7 +49,7 @@ public class AdminCategoryAdapter extends RecyclerView.Adapter<AdminCategoryAdap
 
         if (category.getImageUrl() != null && !category.getImageUrl().isEmpty()) {
             Glide.with(context)
-                    .load(category.getImageUrl())
+                    .load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(category.getImageUrl()))
                     .apply(RequestOptions.bitmapTransform(new RoundedCorners(16)))
                     .placeholder(R.mipmap.ic_launcher)
                     .into(holder.ivCategoryImage);

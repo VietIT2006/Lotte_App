@@ -29,6 +29,13 @@ public class NetworkConfig {
         return BASE_URL.replace("/api/v1/", "");
     }
 
+    public static String getFullImageUrl(String path) {
+        if (path == null || path.isEmpty()) return "";
+        if (path.startsWith("http")) return path;
+        if (path.startsWith("/")) return getBaseDomain() + path;
+        return getBaseDomain() + "/" + path;
+    }
+
     public static boolean isEmulator() {
         return Build.FINGERPRINT.startsWith("generic")
                 || Build.FINGERPRINT.startsWith("unknown")

@@ -55,7 +55,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
 
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
             Glide.with(context)
-                    .load(product.getImageUrl())
+                    .load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(product.getImageUrl()))
                     .apply(RequestOptions.bitmapTransform(new RoundedCorners(16)))
                     .placeholder(R.mipmap.ic_launcher)
                     .into(holder.ivProductImage);
@@ -99,6 +99,13 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
     public void updateData(List<Product> newList) {
         this.productList = newList;
         notifyDataSetChanged();
+    }
+
+    public void addProducts(List<Product> newProducts) {
+        if (newProducts == null || newProducts.isEmpty()) return;
+        int startPosition = this.productList.size();
+        this.productList.addAll(newProducts);
+        notifyItemRangeInserted(startPosition, newProducts.size());
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {

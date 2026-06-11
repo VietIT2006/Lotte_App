@@ -38,6 +38,11 @@ public class SearchResultsActivity extends AppCompatActivity {
     private ProductApiService apiService;
     private String currentQuery;
     private String currentSort = "latest";
+    
+    private int currentPage = 1;
+    private int limit = 20;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +74,22 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         rvResults.setLayoutManager(new GridLayoutManager(this, 2));
         rvResults.setAdapter(productAdapter);
+        
+        rvResults.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@androidx.annotation.NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy > 0) { // Scrolling down
+                    GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+                    if(layoutManager != null && layoutManager.findLastCompletelyVisibleItemPosition() == productAdapter.getItemCount() - 1) {
+                        if(!isLoading && !isLastPage) {
+                            currentPage++;
+                            performSearch();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void setupListeners() {
@@ -76,12 +97,16 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         btnSortDefault.setOnClickListener(v -> {
             currentSort = "latest";
+            currentPage = 1;
+            isLastPage = false;
             updateSortUI();
             performSearch();
         });
 
         btnSortPrice.setOnClickListener(v -> {
             currentSort = "price_asc";
+            currentPage = 1;
+            isLastPage = false;
             updateSortUI();
             performSearch();
         });
@@ -102,14 +127,28 @@ public class SearchResultsActivity extends AppCompatActivity {
     }
 
     private void performSearch() {
-        apiService.searchProducts(currentQuery, currentSort).enqueue(new Callback<ApiResponse<List<Product>>>() {
+        isLoading = true;
+        apiService.searchProducts(currentQuery, currentSort, currentPage, limit).enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
+                isLoading = false;
                 if (response.isSuccessful() && response.body() != null) {
                     List<Product> products = response.body().getData();
-                    productAdapter.setProducts(products);
-                    if (products.isEmpty()) {
-                        Toast.makeText(SearchResultsActivity.this, "Không tìm thấy sản phẩm nào", Toast.LENGTH_SHORT).show();
+                    ApiResponse.PaginationMeta pagination = response.body().getPagination();
+                    
+                    if (currentPage == 1) {
+                        productAdapter.setProducts(products);
+                        if (products.isEmpty()) {
+                            Toast.makeText(SearchResultsActivity.this, "Không tìm thấy sản phẩm nào", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        productAdapter.addProducts(products);
+                    }
+                    
+                    if (pagination != null) {
+                        isLastPage = currentPage >= pagination.getTotalPages();
+                    } else {
+                        isLastPage = products == null || products.isEmpty();
                     }
                 } else {
                     Log.e(TAG, "Search failed: " + response.message());
@@ -118,6 +157,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable t) {
+                isLoading = false;
                 Log.e(TAG, "Search error", t);
                 Toast.makeText(SearchResultsActivity.this, "Lỗi kết nối máy chủ", Toast.LENGTH_SHORT).show();
             }

@@ -68,6 +68,26 @@ public class HomeFragment extends Fragment {
     
     private FusedLocationProviderClient fusedLocationClient;
     private ActivityResultLauncher<String[]> locationPermissionRequest;
+    
+    private int apiCallsCompleted = 0;
+    private final int TOTAL_API_CALLS = 3; // categories, featured products, promotions
+    private android.widget.ProgressBar progressBar;
+    private android.widget.ProgressBar progressBarLoadMore;
+    private androidx.core.widget.NestedScrollView contentScrollView;
+    
+    // Pagination for featured products
+    private int currentPage = 1;
+    private int limit = 20;
+    private boolean isLoadingMore = false;
+    private boolean isLastPage = false;
+    
+    private void checkDataLoaded() {
+        apiCallsCompleted++;
+        if (apiCallsCompleted >= TOTAL_API_CALLS) {
+            if (progressBar != null) progressBar.setVisibility(View.GONE);
+            if (contentScrollView != null) contentScrollView.setVisibility(View.VISIBLE);
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -127,6 +147,9 @@ public class HomeFragment extends Fragment {
         tvLocationLabel = view.findViewById(R.id.tvLocationLabel);
         tvLocation = view.findViewById(R.id.tvLocation);
         View searchContainer = view.findViewById(R.id.searchContainer);
+        progressBar = view.findViewById(R.id.progressBar);
+        contentScrollView = view.findViewById(R.id.contentScrollView);
+        progressBarLoadMore = view.findViewById(R.id.progressBarLoadMore);
         
         sessionManager = new com.ptithcm.lottemart.data.local.SessionManager(getContext());
         
@@ -189,12 +212,29 @@ public class HomeFragment extends Fragment {
         LayoutAnimationController animController2 = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation_slide_right);
         rvFeatured.setLayoutAnimation(animController2);
         rvFeatured.setAdapter(productAdapter);
+        rvFeatured.setNestedScrollingEnabled(false);
+        
+        // Infinite scroll via NestedScrollView
+        if (contentScrollView != null) {
+            contentScrollView.setOnScrollChangeListener((androidx.core.widget.NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                if (v.getChildAt(v.getChildCount() - 1) != null) {
+                    // Check if scrolled to bottom
+                    if ((scrollY >= (v.getChildAt(v.getChildCount() - 1).getMeasuredHeight() - v.getMeasuredHeight() - 200)) && scrollY > oldScrollY) {
+                        if (!isLoadingMore && !isLastPage) {
+                            currentPage++;
+                            fetchFeaturedProducts();
+                        }
+                    }
+                }
+            });
+        }
     }
 
     private void fetchCategories() {
         apiService.getCategories().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>>() {
             @Override
             public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> response) {
+                checkDataLoaded();
                 if (response.isSuccessful() && response.body() != null) {
                     categoryAdapter.setCategories(response.body().getData());
                 } else {
@@ -204,6 +244,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> call, Throwable t) {
+                checkDataLoaded();
                 Log.e(TAG, "Error fetching categories", t);
                 Toast.makeText(getContext(), "Không thể tải danh mục", Toast.LENGTH_SHORT).show();
             }
@@ -211,11 +252,31 @@ public class HomeFragment extends Fragment {
     }
 
     private void fetchFeaturedProducts() {
-        apiService.getFeaturedProducts().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>>() {
+        isLoadingMore = true;
+        if (currentPage > 1 && progressBarLoadMore != null) {
+            progressBarLoadMore.setVisibility(View.VISIBLE);
+        }
+        apiService.getFeaturedProducts(currentPage, limit).enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>>() {
             @Override
             public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> response) {
+                checkDataLoaded();
+                isLoadingMore = false;
+                if (progressBarLoadMore != null) progressBarLoadMore.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
-                    productAdapter.setProducts(response.body().getData());
+                    java.util.List<com.ptithcm.lottemart.data.models.Product> newProducts = response.body().getData();
+                    com.ptithcm.lottemart.data.api.ApiResponse.PaginationMeta pagination = response.body().getPagination();
+                    
+                    if (currentPage == 1) {
+                        productAdapter.setProducts(newProducts);
+                    } else {
+                        productAdapter.addProducts(newProducts);
+                    }
+                    
+                    if (pagination != null) {
+                        isLastPage = currentPage >= pagination.getTotalPages();
+                    } else {
+                        isLastPage = newProducts == null || newProducts.isEmpty();
+                    }
                 } else {
                     Log.e(TAG, "Failed to fetch featured products: " + response.message());
                 }
@@ -223,6 +284,9 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, Throwable t) {
+                checkDataLoaded();
+                isLoadingMore = false;
+                if (progressBarLoadMore != null) progressBarLoadMore.setVisibility(View.GONE);
                 Log.e(TAG, "Error fetching featured products", t);
                 Toast.makeText(getContext(), "Không thể tải sản phẩm nổi bật", Toast.LENGTH_SHORT).show();
             }
@@ -274,6 +338,7 @@ public class HomeFragment extends Fragment {
         apiService.getPromotions().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>>() {
             @Override
             public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> response) {
+                checkDataLoaded();
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
                     List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion> promos = response.body().getData();
                     List<com.ptithcm.lottemart.data.models.Banner> banners = new ArrayList<>();
@@ -314,6 +379,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> call, Throwable t) {
+                checkDataLoaded();
                 Log.e(TAG, "Error fetching promotions banner", t);
             }
         });
@@ -352,7 +418,7 @@ public class HomeFragment extends Fragment {
             imageUrl = promotion.getBannerImage();
         }
         if (imageUrl != null && !imageUrl.isEmpty()) {
-            Glide.with(this).load(imageUrl).into(ivPromo);
+            Glide.with(this).load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(imageUrl)).into(ivPromo);
         }
 
         android.widget.ImageButton btnClose = new android.widget.ImageButton(getContext());

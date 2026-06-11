@@ -22,16 +22,28 @@ public interface ProductApiService {
     Call<ApiResponse<List<Branch>>> getBranches();
 
     @GET("catalog/products")
-    Call<ApiResponse<List<Product>>> getProducts(@Query("category_id") String categoryId);
+    Call<ApiResponse<List<Product>>> getProducts(
+        @Query("category_id") String categoryId,
+        @Query("page") int page,
+        @Query("limit") int limit
+    );
 
     @GET("catalog/products/featured")
-    Call<ApiResponse<List<Product>>> getFeaturedProducts();
+    Call<ApiResponse<List<Product>>> getFeaturedProducts(
+        @Query("page") int page,
+        @Query("limit") int limit
+    );
 
     @GET("catalog/products/{id}")
     Call<ApiResponse<Product>> getProductById(@Path("id") String id);
 
     @GET("catalog/products/search")
-    Call<ApiResponse<List<Product>>> searchProducts(@Query("q") String query, @Query("sort_by") String sortBy);
+    Call<ApiResponse<List<Product>>> searchProducts(
+        @Query("q") String query, 
+        @Query("sort_by") String sortBy,
+        @Query("page") int page,
+        @Query("limit") int limit
+    );
 
     @PUT("/api/v1/catalog/branches/{id}")
     Call<ApiResponse<Branch>> updateBranch(@Header("Authorization") String token, @Path("id") String id, @Body Branch branch);

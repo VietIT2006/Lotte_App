@@ -32,6 +32,11 @@ public class CategoryProductsActivity extends AppCompatActivity {
     private ProductApiService apiService;
     private String categoryId;
     private String categoryName;
+    
+    private int currentPage = 1;
+    private int limit = 20;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,22 @@ public class CategoryProductsActivity extends AppCompatActivity {
         });
         rvProducts.setLayoutManager(new GridLayoutManager(this, 2));
         rvProducts.setAdapter(adapter);
+        
+        rvProducts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@androidx.annotation.NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy > 0) { // Scrolling down
+                    GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+                    if(layoutManager != null && layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItemCount() - 1) {
+                        if(!isLoading && !isLastPage) {
+                            currentPage++;
+                            fetchProducts();
+                        }
+                    }
+                }
+            }
+        });
 
         apiService = RetrofitClient.getClient().create(ProductApiService.class);
         fetchProducts();
@@ -62,17 +83,34 @@ public class CategoryProductsActivity extends AppCompatActivity {
 
     private void fetchProducts() {
         if (categoryId == null) return;
+        
+        isLoading = true;
 
-        apiService.getProducts(categoryId).enqueue(new Callback<ApiResponse<List<Product>>>() {
+        apiService.getProducts(categoryId, currentPage, limit).enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
+                isLoading = false;
                 if (response.isSuccessful() && response.body() != null) {
-                    adapter.setProducts(response.body().getData());
+                    List<Product> newProducts = response.body().getData();
+                    ApiResponse.PaginationMeta pagination = response.body().getPagination();
+                    
+                    if (currentPage == 1) {
+                        adapter.setProducts(newProducts);
+                    } else {
+                        adapter.addProducts(newProducts);
+                    }
+                    
+                    if (pagination != null) {
+                        isLastPage = currentPage >= pagination.getTotalPages();
+                    } else {
+                        isLastPage = newProducts == null || newProducts.isEmpty();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable t) {
+                isLoading = false;
                 Toast.makeText(CategoryProductsActivity.this, "Lỗi tải sản phẩm", Toast.LENGTH_SHORT).show();
             }
         });

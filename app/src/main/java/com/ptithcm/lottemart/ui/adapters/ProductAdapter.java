@@ -34,6 +34,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         notifyDataSetChanged();
     }
 
+    public void addProducts(List<Product> newProducts) {
+        if (newProducts == null || newProducts.isEmpty()) return;
+        int startPosition = this.products.size();
+        this.products.addAll(newProducts);
+        notifyItemRangeInserted(startPosition, newProducts.size());
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -75,7 +82,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
             Glide.with(context)
-                    .load(product.getImageUrl())
+                    .load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(product.getImageUrl()))
                     .placeholder(new ColorDrawable(Color.LTGRAY))
                     .into(holder.image);
         } else {

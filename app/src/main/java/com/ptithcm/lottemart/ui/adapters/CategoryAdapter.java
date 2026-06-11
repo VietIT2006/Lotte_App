@@ -48,7 +48,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         if (category.getImageUrl() != null && !category.getImageUrl().isEmpty()) {
             Glide.with(context)
-                    .load(category.getImageUrl())
+                    .load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(category.getImageUrl()))
                     .placeholder(android.R.drawable.ic_menu_gallery)
                     .into(holder.image);
         }

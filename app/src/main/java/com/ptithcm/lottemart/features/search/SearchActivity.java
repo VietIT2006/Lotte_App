@@ -23,6 +23,11 @@ public class SearchActivity extends AppCompatActivity {
     private com.ptithcm.lottemart.ui.adapters.ProductAdapter productAdapter;
     private com.ptithcm.lottemart.data.api.ProductApiService apiService;
     private String currentSort = "latest";
+    private int currentPage = 1;
+    private int limit = 20;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+    private String currentQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,22 @@ public class SearchActivity extends AppCompatActivity {
         rvResults.setLayoutAnimation(animController);
         rvResults.setAdapter(productAdapter);
         
+        rvResults.addOnScrollListener(new androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@androidx.annotation.NonNull androidx.recyclerview.widget.RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy > 0) {
+                    androidx.recyclerview.widget.GridLayoutManager layoutManager = (androidx.recyclerview.widget.GridLayoutManager) recyclerView.getLayoutManager();
+                    if(layoutManager != null && layoutManager.findLastCompletelyVisibleItemPosition() == productAdapter.getItemCount() - 1) {
+                        if(!isLoading && !isLastPage) {
+                            currentPage++;
+                            performSearch(currentQuery, false);
+                        }
+                    }
+                }
+            }
+        });
+        
         ChipGroup chipGroupHistory = findViewById(R.id.chipGroupHistory);
         String[] recentSearches = {"Thịt heo", "Sữa chua", "Rau củ", "Trái cây"};
         for (String s : recentSearches) {
@@ -65,7 +86,7 @@ public class SearchActivity extends AppCompatActivity {
             chip.setCheckable(false);
             chip.setOnClickListener(v -> {
                 etSearch.setText(s);
-                performSearch(s);
+                performSearch(s, true);
             });
             chipGroupHistory.addView(chip);
         }
@@ -101,7 +122,7 @@ public class SearchActivity extends AppCompatActivity {
 
         etSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
-                performSearch(etSearch.getText().toString().trim());
+                performSearch(etSearch.getText().toString().trim(), true);
                 return true;
             }
             return false;
@@ -117,7 +138,7 @@ public class SearchActivity extends AppCompatActivity {
                         currentSort = "price_asc";
                         ((android.widget.TextView)v).setText("Sắp xếp: Giá thấp đến cao");
                     }
-                    performSearch(etSearch.getText().toString().trim());
+                    performSearch(etSearch.getText().toString().trim(), true);
                 }).start();
             }).start();
         });
@@ -138,9 +159,15 @@ public class SearchActivity extends AppCompatActivity {
         layoutResults.setVisibility(android.view.View.GONE);
     }
 
-    private void performSearch(String query) {
+    private void performSearch(String query, boolean isNewSearch) {
         if (query.isEmpty()) return;
         
+        if (isNewSearch) {
+            currentPage = 1;
+            isLastPage = false;
+            currentQuery = query;
+        }
+
         // Hide keyboard
         android.view.View view = this.getCurrentFocus();
         if (view != null) {
@@ -150,18 +177,35 @@ public class SearchActivity extends AppCompatActivity {
 
         layoutSuggestions.setVisibility(android.view.View.GONE);
         layoutResults.setVisibility(android.view.View.VISIBLE);
+        
+        isLoading = true;
 
-        apiService.searchProducts(query, currentSort).enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>>() {
+        apiService.searchProducts(query, currentSort, currentPage, limit).enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>>() {
             @Override
             public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> response) {
+                isLoading = false;
                 if (response.isSuccessful() && response.body() != null) {
-                    productAdapter.setProducts(response.body().getData());
-                    rvResults.scheduleLayoutAnimation();
+                    java.util.List<com.ptithcm.lottemart.data.models.Product> products = response.body().getData();
+                    com.ptithcm.lottemart.data.api.ApiResponse.PaginationMeta pagination = response.body().getPagination();
+                    
+                    if (currentPage == 1) {
+                        productAdapter.setProducts(products);
+                        rvResults.scheduleLayoutAnimation();
+                    } else {
+                        productAdapter.addProducts(products);
+                    }
+                    
+                    if (pagination != null) {
+                        isLastPage = currentPage >= pagination.getTotalPages();
+                    } else {
+                        isLastPage = products == null || products.isEmpty();
+                    }
                 }
             }
 
             @Override
             public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, Throwable t) {
+                isLoading = false;
                 android.widget.Toast.makeText(SearchActivity.this, "Lỗi kết nối", android.widget.Toast.LENGTH_SHORT).show();
             }
         });

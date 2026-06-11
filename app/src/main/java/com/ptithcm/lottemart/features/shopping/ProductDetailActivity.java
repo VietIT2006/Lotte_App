@@ -201,7 +201,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
             Glide.with(this)
-                    .load(product.getImageUrl())
+                    .load(com.ptithcm.lottemart.data.remote.NetworkConfig.getFullImageUrl(product.getImageUrl()))
                     .into(ivProductImage);
         }
     }

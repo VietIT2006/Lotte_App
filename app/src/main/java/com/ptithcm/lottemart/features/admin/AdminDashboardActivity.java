@@ -143,7 +143,7 @@ public class AdminDashboardActivity extends BaseAdminActivity {
 
         // Load Products count for KPI 3
         ProductApiService productApi = RetrofitClient.getClient().create(ProductApiService.class);
-        productApi.getProducts(null).enqueue(new Callback<ApiResponse<List<Product>>>() {
+        productApi.getProducts(null, 1, 1000).enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {

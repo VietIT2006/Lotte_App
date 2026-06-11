@@ -148,7 +148,7 @@ public class AdminCreateImportOrderActivity extends BaseAdminActivity {
     }
 
     private void fetchProducts() {
-        RetrofitClient.getClient().create(ProductApiService.class).getProducts(null).enqueue(new Callback<ApiResponse<List<Product>>>() {
+        RetrofitClient.getClient().create(ProductApiService.class).getProducts(null, 1, 1000).enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
