@@ -28,8 +28,8 @@ class PaymentsService {
     async createPayosLink({ orderId, amount, description, type, userId }) {
         const orderCode = Math.floor(Date.now() % 100000000) * 10 + Math.floor(Math.random() * 10);
         
-        const returnUrl = "https://lottemart.com/payment-success";
-        const cancelUrl = "https://lottemart.com/payment-failure";
+        const returnUrl = "https://lotte-app.local/payment-success";
+        const cancelUrl = "https://lotte-app.local/payment-failure";
 
         const data = {
             orderCode: orderCode,
@@ -72,47 +72,80 @@ class PaymentsService {
     }
 
     async confirmPayment(orderCode) {
-        const tx = await db.collection('payos_transactions').findOne({ order_code: Number(orderCode), status: 'pending' });
+        const tx = await db.collection('payos_transactions').findOne({ order_code: Number(orderCode) });
         if (!tx) {
             return { success: false, message: 'Giao dịch không tồn tại hoặc đã xử lý' };
         }
 
-        // Update transaction status
-        await db.collection('payos_transactions').updateOne(
-            { _id: tx._id },
-            { $set: { status: 'success', paid_at: new Date() } }
-        );
-
-        if (tx.type === 'order') {
-            // Update order status to paid
-            await db.collection('orders').updateOne(
-                { _id: tx.order_id },
-                { 
-                    $set: { 
-                        status: 'CONFIRMED',
-                        'payment.status': 'PAID',
-                        updated_at: new Date()
-                    } 
-                }
-            );
-        } else if (tx.type === 'wallet_topup') {
-            // Update shipper wallet balance
-            await db.collection('users').updateOne(
-                { _id: tx.user_id },
-                { $inc: { wallet_balance: Number(tx.amount) } }
-            );
-
-            // Insert wallet transaction history
-            await db.collection('wallet_transactions').insertOne({
-                user_id: tx.user_id,
-                amount: Number(tx.amount),
-                type: 'credit',
-                description: 'Nạp tiền ví qua PayOS',
-                created_at: new Date()
-            });
+        if (tx.status === 'success') {
+            return { success: true };
         }
 
-        return { success: true };
+        // Call PayOS API to verify real status
+        try {
+            const response = await axios.get(`https://api-merchant.payos.vn/v2/payment-requests/${orderCode}`, {
+                headers: {
+                    'x-client-id': 'a187b55f-6c8a-499b-886b-722fcc0c3039',
+                    'x-api-key': 'b8a86931-3e77-4787-8acd-322dceb91f70',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.data && response.data.code === '00') {
+                const payosStatus = response.data.data.status; // 'PAID', 'PENDING', 'CANCELLED', etc.
+                if (payosStatus === 'PAID') {
+                    // Update transaction status
+                    await db.collection('payos_transactions').updateOne(
+                        { _id: tx._id },
+                        { $set: { status: 'success', paid_at: new Date() } }
+                    );
+
+                    if (tx.type === 'order') {
+                        // Update order status to paid
+                        await db.collection('orders').updateOne(
+                            { _id: tx.order_id },
+                            { 
+                                $set: { 
+                                    status: 'CONFIRMED',
+                                    'payment.status': 'PAID',
+                                    updated_at: new Date()
+                                } 
+                            }
+                        );
+                    } else if (tx.type === 'wallet_topup') {
+                        // Update shipper wallet balance
+                        await db.collection('users').updateOne(
+                            { _id: tx.user_id },
+                            { $inc: { wallet_balance: Number(tx.amount) } }
+                        );
+
+                        // Insert wallet transaction history
+                        await db.collection('wallet_transactions').insertOne({
+                            user_id: tx.user_id,
+                            amount: Number(tx.amount),
+                            type: 'credit',
+                            description: 'Nạp tiền ví qua PayOS',
+                            created_at: new Date()
+                        });
+                    }
+
+                    return { success: true };
+                } else if (payosStatus === 'CANCELLED') {
+                    await db.collection('payos_transactions').updateOne(
+                        { _id: tx._id },
+                        { $set: { status: 'cancelled', cancelled_at: new Date() } }
+                    );
+                    return { success: false, message: 'Giao dịch đã bị hủy trên cổng thanh toán' };
+                } else {
+                    return { success: false, message: `Giao dịch chưa được thanh toán (Trạng thái: ${payosStatus})` };
+                }
+            } else {
+                return { success: false, message: response.data ? response.data.desc || response.data.message : 'Lỗi kết nối PayOS' };
+            }
+        } catch (error) {
+            console.error("Error verifying payment with PayOS:", error.message);
+            return { success: false, message: 'Lỗi kiểm tra trạng thái giao dịch với PayOS' };
+        }
     }
 }
 

@@ -94,6 +94,11 @@ public class ShipperDashboardActivity extends AppCompatActivity implements Navig
             startActivity(intent);
         });
 
+        findViewById(R.id.cardWallet).setOnClickListener(v -> {
+            Intent intent = new Intent(this, ShipperWalletActivity.class);
+            startActivity(intent);
+        });
+
         // Status switch listeners
         android.content.SharedPreferences prefs = getSharedPreferences("ShipperPrefs", MODE_PRIVATE);
 

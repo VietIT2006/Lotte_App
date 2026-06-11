@@ -67,12 +67,24 @@ public class PayosPaymentActivity extends AppCompatActivity {
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url.startsWith("https://lotte-app.local/payment-success")) {
+                    handleSuccess();
+                    return true;
+                } else if (url.startsWith("https://lotte-app.local/payment-failure")) {
+                    handleCancel();
+                    return true;
+                }
+                return super.shouldOverrideUrlLoading(view, url);
+            }
+
+            @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
 
-                if (url.startsWith("https://lottemart.com/payment-success")) {
+                if (url.startsWith("https://lotte-app.local/payment-success")) {
                     handleSuccess();
-                } else if (url.startsWith("https://lottemart.com/payment-failure")) {
+                } else if (url.startsWith("https://lotte-app.local/payment-failure")) {
                     handleCancel();
                 }
             }
@@ -118,6 +130,30 @@ public class PayosPaymentActivity extends AppCompatActivity {
     }
 
     private void handleCancel() {
+        if (orderCode != null && !orderCode.isEmpty()) {
+            Toast.makeText(this, "Đang kiểm tra trạng thái thanh toán...", Toast.LENGTH_SHORT).show();
+            PayosConfirmService service = RetrofitClient.getClient().create(PayosConfirmService.class);
+            service.confirmPayment(orderCode).enqueue(new Callback<ApiResponse<Void>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                    if (response.isSuccessful()) {
+                        handleSuccess();
+                    } else {
+                        executeCancel();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                    executeCancel();
+                }
+            });
+        } else {
+            executeCancel();
+        }
+    }
+
+    private void executeCancel() {
         Toast.makeText(this, "Thanh toán đã bị hủy!", Toast.LENGTH_SHORT).show();
         if ("order".equals(type)) {
             Intent intent = new Intent(this, PaymentFailureActivity.class);

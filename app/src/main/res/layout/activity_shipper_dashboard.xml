@@ -122,6 +122,7 @@
 
                     <!-- Wallet Card -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardWallet"
                         android:layout_width="0dp"
                         android:layout_height="140dp"
                         android:layout_weight="1"
