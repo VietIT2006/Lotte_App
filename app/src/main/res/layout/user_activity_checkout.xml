@@ -214,7 +214,21 @@
                     android:id="@+id/rbPayOS"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ví điện tử (PayOS)"
+                    android:text="Thanh toán trực tuyến PayOS"
+                    android:padding="12dp" />
+
+                <RadioButton
+                    android:id="@+id/rbMomo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ví điện tử MoMo"
+                    android:padding="12dp" />
+
+                <RadioButton
+                    android:id="@+id/rbVNPAY"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ví điện tử VNPAY"
                     android:padding="12dp" />
             </RadioGroup>
 

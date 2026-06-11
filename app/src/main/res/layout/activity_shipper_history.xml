@@ -20,67 +20,47 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_back"
-            app:tint="#C00004"/>
+            app:tint="#C00004"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Lotte Delivery"
+            android:text="Lịch sử đơn hàng"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#C00004"
             android:layout_marginStart="16dp"/>
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@mipmap/ic_launcher_round"/>
     </LinearLayout>
 
     <TextView
-        android:id="@+id/tvOrdersTitle"
+        android:id="@+id/tvHistoryTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:text="Đơn hàng được gán"
+        android:text="Đơn hàng đã giao"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#303333"/>
 
-    <!-- Tabs Mockup -->
-    <LinearLayout
+    <!-- Empty State -->
+    <TextView
+        android:id="@+id/tvEmptyHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="#E1E3E3"
-        android:padding="4dp">
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Assigned"
-            android:textColor="#C00004"
-            android:backgroundTint="@color/white"
-            android:elevation="2dp"/>
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="In Progress"
-            android:textColor="#5D5F60"
-            android:backgroundTint="#00000000"
-            android:elevation="0dp"
-            android:stateListAnimator="@null"/>
-    </LinearLayout>
+        android:gravity="center"
+        android:layout_marginTop="100dp"
+        android:text="Chưa có đơn hàng nào đã hoàn thành"
+        android:textColor="@color/grey_text"
+        android:textSize="16sp"
+        android:visibility="gone" />
 
     <!-- Orders List -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvShipperOrders"
+        android:id="@+id/rvShipperHistory"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="80dp"/>
+        android:paddingBottom="16dp"/>
 
 </LinearLayout>

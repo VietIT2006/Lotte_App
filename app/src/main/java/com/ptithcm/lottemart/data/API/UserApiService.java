@@ -46,4 +46,21 @@ public interface UserApiService {
 
     @PUT("/api/v1/users/admin/{id}/role")
     Call<ApiResponse<User>> updateUserRole(@Header("Authorization") String token, @Path("id") String id, @Body RoleUpdateRequest request);
+
+    @POST("payments/create-link")
+    Call<ApiResponse<PayosLinkResponse>> createPayosLink(@Body PayosLinkRequest request);
+
+    class PayosLinkRequest {
+        public String orderId;
+        public double amount;
+        public PayosLinkRequest(String orderId, double amount) {
+            this.orderId = orderId;
+            this.amount = amount;
+        }
+    }
+
+    class PayosLinkResponse {
+        public String checkoutUrl;
+        public String orderCode;
+    }
 }

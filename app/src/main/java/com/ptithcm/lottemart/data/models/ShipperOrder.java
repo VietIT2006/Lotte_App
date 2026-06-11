@@ -10,6 +10,8 @@ public class ShipperOrder implements Serializable {
     private double total_amount;
     private Object order_address; // In real app, create an Address class to parse JSON
     private String created_at;
+    private String payment_method;
+    private String payment_status;
 
     // Getters and Setters
     public String getId() { return id; }
@@ -29,4 +31,10 @@ public class ShipperOrder implements Serializable {
 
     public String getCreatedAt() { return created_at; }
     public void setCreatedAt(String created_at) { this.created_at = created_at; }
+
+    public String getPaymentMethod() { return payment_method; }
+    public void setPaymentMethod(String payment_method) { this.payment_method = payment_method; }
+
+    public String getPaymentStatus() { return payment_status; }
+    public void setPaymentStatus(String payment_status) { this.payment_status = payment_status; }
 }

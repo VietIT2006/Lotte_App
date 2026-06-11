@@ -12,6 +12,9 @@ router.get('/shipper/orders', deliveryController.getShipperOrders);
 router.patch('/shipper/orders/:id/status', deliveryController.updateOrderStatus);
 router.post('/shipper/orders/:id/evidence', deliveryController.uploadEvidence);
 router.patch('/shipper/profile/location', deliveryController.updateLocation);
+router.get('/shipper/wallet', deliveryController.getWalletInfo);
+router.patch('/shipper/status', deliveryController.updateShipperStatus);
+router.post('/shipper/wallet/topup', deliveryController.topupWallet);
 
 // API cho Admin (Quản lý Shipper, Phân bổ đơn)
 router.get('/admin/shippers', deliveryController.getShippers);

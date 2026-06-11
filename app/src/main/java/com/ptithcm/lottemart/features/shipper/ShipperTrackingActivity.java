@@ -77,9 +77,9 @@ public class ShipperTrackingActivity extends AppCompatActivity {
             "    <div id='map'></div>\n" +
             "    <script>\n" +
             "        var map = L.map('map').setView([10.762622, 106.660172], 13);\n" +
-            "        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {\n" +
-            "            maxZoom: 19,\n" +
-            "            attribution: '© OpenStreetMap'\n" +
+            "        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {\n" +
+            "            maxZoom: 20,\n" +
+            "            attribution: '© OpenStreetMap contributors © CARTO'\n" +
             "        }).addTo(map);\n" +
             "\n" +
             "        var customerMarker = null;\n" +
@@ -140,6 +140,7 @@ public class ShipperTrackingActivity extends AppCompatActivity {
         WebSettings webSettings = mapWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
+        webSettings.setUserAgentString("LotteMartApp/1.0 (PTITHCM Student Project)");
         mapWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
@@ -198,6 +199,10 @@ public class ShipperTrackingActivity extends AppCompatActivity {
 
     private void markAsArrived() {
         Toast.makeText(this, "Đã cập nhật trạng thái: Đã đến nơi", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(ShipperTrackingActivity.this, ShipperProofOfDeliveryActivity.class);
+        intent.putExtra("ORDER_ID", orderId);
+        startActivity(intent);
+        finish();
     }
 
     private void initSocket() {
