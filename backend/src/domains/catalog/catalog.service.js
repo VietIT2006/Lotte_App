@@ -44,11 +44,20 @@ class CatalogService {
             finalImage = this.getSmartFallback(name, 'product');
         }
 
+        // Lấy giá từ branch_info nếu có
+        let price = Number(item.price) > 0 ? Number(item.price) : (Number(item.import_price) || 25000);
+        let original_price = Number(item.original_price) || (Number(item.price) * 1.2) || 35000;
+        
+        if (item.branch_info && item.branch_info.length > 0) {
+            if (item.branch_info[0].price) price = Number(item.branch_info[0].price);
+            if (item.branch_info[0].original_price) original_price = Number(item.branch_info[0].original_price);
+        }
+
         return {
             id: item._id ? item._id.toString() : "",
             name: name,
-            price: Number(item.price) > 0 ? Number(item.price) : (Number(item.import_price) || 25000),
-            original_price: Number(item.original_price) || (Number(item.price) * 1.2) || 35000,
+            price: price,
+            original_price: original_price,
             thumbnail: finalImage, // LUÔN TRẢ VỀ ẢNH SỐNG
             description: item.description || `Sản phẩm chất lượng từ thương hiệu ${item.brand || 'Lotte Mart'}.`,
             category_id: item.category_id ? item.category_id.toString() : ""
@@ -106,14 +115,24 @@ class CatalogService {
             if (categoryId) {
                 filter.$or = [{ category_id: categoryId }, { category_id: this.toId(categoryId) }];
             }
-            const products = await db.collection('products').find(filter).sort({ created_at: -1 }).limit(20).toArray();
+            const products = await db.collection('products').aggregate([
+                { $match: filter },
+                { $sort: { created_at: -1 } },
+                { $limit: 20 },
+                { $lookup: { from: 'branchproducts', localField: '_id', foreignField: 'product_id', as: 'branch_info' } }
+            ]).toArray();
             return products.map(p => this.transformProduct(p));
         }) || [];
     }
 
     async getFeaturedProducts() {
         return await this.wrapAction(async () => {
-            const products = await db.collection('products').find({ is_active: true }).sort({ created_at: -1 }).limit(20).toArray();
+            const products = await db.collection('products').aggregate([
+                { $match: { is_active: true } },
+                { $sort: { created_at: -1 } },
+                { $limit: 20 },
+                { $lookup: { from: 'branchproducts', localField: '_id', foreignField: 'product_id', as: 'branch_info' } }
+            ]).toArray();
             return products.map(p => this.transformProduct(p));
         }) || [];
     }
@@ -121,8 +140,11 @@ class CatalogService {
     async getProductById(id) {
         return await this.wrapAction(async () => {
             const query = { $or: [{ _id: id }, { _id: this.toId(id) }] };
-            const product = await db.collection('products').findOne(query);
-            return this.transformProduct(product);
+            const products = await db.collection('products').aggregate([
+                { $match: query },
+                { $lookup: { from: 'branchproducts', localField: '_id', foreignField: 'product_id', as: 'branch_info' } }
+            ]).toArray();
+            return products.length > 0 ? this.transformProduct(products[0]) : null;
         });
     }
 
@@ -132,7 +154,11 @@ class CatalogService {
                 is_active: true, 
                 $or: [{ name: { $regex: q, $options: 'i' } }, { brand: { $regex: q, $options: 'i' } }]
             };
-            const products = await db.collection('products').find(filter).limit(20).toArray();
+            const products = await db.collection('products').aggregate([
+                { $match: filter },
+                { $limit: 20 },
+                { $lookup: { from: 'branchproducts', localField: '_id', foreignField: 'product_id', as: 'branch_info' } }
+            ]).toArray();
             return products.map(p => this.transformProduct(p));
         }) || [];
     }
