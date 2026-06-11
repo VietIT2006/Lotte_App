@@ -17,6 +17,7 @@ router.delete('/cart/:branch_product_id', orderingController.removeFromCart);
 router.get('/history', orderingController.getOrders);
 router.get('/:id', orderingController.getOrderById);
 router.post('/checkout', orderingController.createOrder);
+router.put('/:id/pay', orderingController.markOrderAsPaid);
 
 // Admin Orders
 router.get('/admin/orders', orderingController.getAdminOrders);

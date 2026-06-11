@@ -213,7 +213,10 @@ public class CartFragment extends Fragment {
 
     private void fetchCartItems() {
         if (sessionManager == null || orderApiService == null || sessionManager.getAuthToken() == null) {
-            loadMockCartItems();
+            currentCartItems.clear();
+            adapter.notifyDataSetChanged();
+            updateTotalAmount();
+            checkEmptyState();
             return;
         }
 
@@ -233,49 +236,30 @@ public class CartFragment extends Fragment {
                     updateTotalAmount();
                     checkEmptyState();
                 } else {
-                    loadMockCartItems();
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Không thể tải giỏ hàng!", Toast.LENGTH_SHORT).show();
+                    }
+                    currentCartItems.clear();
+                    adapter.notifyDataSetChanged();
+                    updateTotalAmount();
+                    checkEmptyState();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<OrderApiService.CartResponse>> call, Throwable t) {
-                loadMockCartItems();
-            }
-        });
-    }
-
-    private void loadMockCartItems() {
-        apiService.getFeaturedProducts().enqueue(new Callback<ApiResponse<List<Product>>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Product> products = response.body().getData();
-                    currentCartItems.clear();
-                    
-                    if (products != null && !products.isEmpty()) {
-                        for (int i = 0; i < products.size(); i++) {
-                            Product p = products.get(i);
-                            currentCartItems.add(new CartItem(String.valueOf(i + 1), p, 1));
-                        }
-                    }
-                    
-                    adapter.notifyDataSetChanged();
-                    updateTotalAmount();
-                    checkEmptyState();
-                } else {
-                    Log.e(TAG, "Failed to fetch cart items: " + response.message());
-                    checkEmptyState();
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Lỗi kết nối", Toast.LENGTH_SHORT).show();
                 }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<List<Product>>> call, Throwable t) {
-                Log.e(TAG, "Error fetching cart items", t);
-                Toast.makeText(getContext(), "Không thể kết nối đến server", Toast.LENGTH_SHORT).show();
+                currentCartItems.clear();
+                adapter.notifyDataSetChanged();
+                updateTotalAmount();
                 checkEmptyState();
             }
         });
     }
+
+
 
     private void loadProfileAddress() {
         if (sessionManager == null || !sessionManager.isLoggedIn()) return;

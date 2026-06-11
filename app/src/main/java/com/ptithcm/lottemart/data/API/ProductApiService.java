@@ -62,14 +62,27 @@ public interface ProductApiService {
     Call<ApiResponse<List<Promotion>>> getPromotions();
 
     class Promotion {
+        @com.google.gson.annotations.SerializedName("_id")
         private String id;
         private String title;
+        private String subtitle;
         private String description;
         private String banner_image;
+        private String image_url;
+        private String category_id;
+        private String product_id;
+        private String link;
+        private String position;
 
         public String getId() { return id; }
         public String getTitle() { return title; }
+        public String getSubtitle() { return subtitle; }
         public String getDescription() { return description; }
         public String getBannerImage() { return banner_image; }
+        public String getImageUrl() { return image_url; }
+        public String getCategoryId() { return category_id; }
+        public String getProductId() { return product_id; }
+        public String getLink() { return link; }
+        public String getPosition() { return position; }
     }
 }

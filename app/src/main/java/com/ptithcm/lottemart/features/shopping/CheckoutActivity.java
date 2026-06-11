@@ -188,6 +188,36 @@ public class CheckoutActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_CODE_COUPON);
         });
 
+        findViewById(R.id.btnApplyVoucher).setOnClickListener(v -> {
+            android.widget.EditText etVoucherCode = findViewById(R.id.etVoucherCode);
+            if (etVoucherCode == null) return;
+            String code = etVoucherCode.getText().toString().trim().toUpperCase();
+            if (code.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập mã giảm giá!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Logic áp mã giả lập nếu API không có sẵn endpoint check mã
+            if (code.equals("GIAM50K")) {
+                selectedCoupon = new Coupon("GIAM50K", "Giảm 50.000đ", 50000, "", true);
+                Toast.makeText(this, "Đã áp dụng mã GIAM50K", Toast.LENGTH_SHORT).show();
+            } else if (code.equals("FREESHIP")) {
+                selectedCoupon = new Coupon("FREESHIP", "Miễn phí vận chuyển", 25000, "", true);
+                Toast.makeText(this, "Đã áp dụng mã FREESHIP", Toast.LENGTH_SHORT).show();
+            } else if (code.equals("NEWUSER")) {
+                selectedCoupon = new Coupon("NEWUSER", "Giảm 100.000đ cho bạn mới", 100000, "", true);
+                Toast.makeText(this, "Đã áp dụng mã NEWUSER", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Mã giảm giá không hợp lệ hoặc đã hết hạn!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            TextView btnSelectVoucher = findViewById(R.id.btnSelectVoucher);
+            if (btnSelectVoucher != null) {
+                btnSelectVoucher.setText("Đang dùng: " + selectedCoupon.getCode());
+            }
+            calculatePrices();
+        });
+
         btnPlaceOrder.setOnClickListener(v -> handlePlaceOrder());
     }
 
