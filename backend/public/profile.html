@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Profile</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:20px}
+    label{display:block;margin-top:8px}
+    input,textarea{width:300px;padding:6px}
+    img.avatar{width:120px;height:120px;object-fit:cover;border-radius:8px}
+    .row{margin-top:10px}
+  </style>
+</head>
+<body>
+  <h2>Trang Profile (Web)</h2>
+
+  <div>
+    <label>Token (dán Bearer token ở đây):</label>
+    <input id="token" placeholder="Bearer ey..." />
+    <button id="load">Tải profile</button>
+  </div>
+
+  <div id="profile" style="display:none;margin-top:20px">
+    <h3>Thông tin người dùng</h3>
+    <div class="row">
+      <img id="avatarImg" class="avatar" src="/uploads/avatars/default.png" alt="avatar" />
+    </div>
+    <div class="row">
+      <label>Username</label>
+      <input id="username" disabled />
+    </div>
+    <div class="row">
+      <label>Họ tên</label>
+      <input id="full_name" />
+    </div>
+    <div class="row">
+      <label>Email</label>
+      <input id="email" disabled />
+    </div>
+    <div class="row">
+      <label>Phone</label>
+      <input id="phone" />
+    </div>
+    <div class="row">
+      <label>Address</label>
+      <textarea id="address" rows="3"></textarea>
+    </div>
+    <div class="row">
+      <button id="save">Lưu thay đổi</button>
+    </div>
+
+    <h4>Cập nhật Avatar</h4>
+    <form id="avatarForm">
+      <input type="file" name="avatar" accept="image/*" />
+      <button type="submit">Upload</button>
+    </form>
+
+    <div id="msg" style="color:green;margin-top:10px"></div>
+  </div>
+
+  <script>
+    const el = id=>document.getElementById(id);
+    let currentToken = '';
+
+    document.getElementById('load').addEventListener('click', async ()=>{
+      const token = el('token').value.trim();
+      if(!token){alert('Vui lòng nhập token');return}
+      currentToken = token.replace(/^Bearer\s*/i,'');
+      await loadProfile();
+    });
+
+    async function loadProfile(){
+      try{
+        const res = await fetch('/api/v1/users/profile',{headers:{'Authorization':'Bearer '+currentToken}});
+        if(!res.ok) throw new Error(await res.text());
+        const body = await res.json();
+        if(!body.success) throw new Error(body.message||'Error');
+        const u = body.data;
+        el('profile').style.display='block';
+        el('username').value = u.username||'';
+        el('full_name').value = u.full_name||'';
+        el('email').value = u.email||'';
+        el('phone').value = u.phone||'';
+        el('address').value = u.address||'';
+        el('avatarImg').src = u.avatar || '/uploads/avatars/default.png';
+        el('msg').textContent='';
+      }catch(e){
+        alert('Không thể tải profile: '+e.message);
+      }
+    }
+
+    document.getElementById('save').addEventListener('click', async ()=>{
+      try{
+        const payload = {
+          full_name: el('full_name').value.trim(),
+          phone: el('phone').value.trim(),
+          address: el('address').value.trim()
+        };
+        const res = await fetch('/api/v1/users/profile',{
+          method:'PUT',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentToken},
+          body:JSON.stringify(payload)
+        });
+        const body = await res.json();
+        if(!res.ok || !body.success) throw new Error(body.message||'Error');
+        el('msg').textContent = 'Cập nhật thành công.';
+        await loadProfile();
+      }catch(e){
+        alert('Lỗi khi lưu: '+e.message);
+      }
+    });
+
+    document.getElementById('avatarForm').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const input = ev.target.querySelector('input[type=file]');
+      if(!input.files.length){alert('Chọn file');return}
+      const fd = new FormData();
+      fd.append('avatar', input.files[0]);
+      try{
+        const res = await fetch('/api/v1/users/profile/avatar',{
+          method:'POST',
+          headers:{'Authorization':'Bearer '+currentToken},
+          body: fd
+        });
+        const body = await res.json();
+        if(!res.ok || !body.success) throw new Error(body.message||'Error');
+        el('msg').textContent = 'Avatar cập nhật.';
+        await loadProfile();
+      }catch(e){
+        alert('Upload lỗi: '+e.message);
+      }
+    });
+  </script>
+</body>
+</html>

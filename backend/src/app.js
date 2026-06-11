@@ -22,6 +22,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+// Serve other static public files (profile page, assets, etc.)
+app.use(express.static(path.join(__dirname, '../public')));
  
 // Logger middleware
 app.use((req, res, next) => {
@@ -42,6 +44,11 @@ app.use('/api/v1/purchasing', purchasingRoutes);
 app.use('/api/v1/customer-service', customerServiceRoutes);
 app.use('/api/v1/notifications', notificationsRoutes);
 app.use('/api/v1/delivery', deliveryRoutes);
+
+// Simple static profile page (uses token input to call API)
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/profile.html'));
+});
 
 // 404 Not Found Handle
 app.use((req, res, next) => {

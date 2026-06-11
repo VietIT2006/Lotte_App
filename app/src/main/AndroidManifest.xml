@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ptithcm.lottemart"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.ptithcm.lottemart">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <queries>
+        <package android:name="com.facebook.katana" />
+    </queries>
 
     <application
         android:name=".CrashReportingApplication"
@@ -21,8 +25,20 @@
         android:theme="@style/Theme.LotteMart"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".features.profile.ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".features.auth.LoginActivity"
+<<<<<<< HEAD
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+=======
             android:exported="false">
+>>>>>>> d5ddca9efe8a0413e017b423920db480766ead0a
         </activity>
         <activity
             android:name=".features.auth.RegisterActivity"
@@ -106,8 +122,8 @@
             android:exported="false" />
         <activity
             android:name=".features.search.SearchActivity"
-            android:windowSoftInputMode="stateVisible"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateVisible" />
         <activity
             android:name=".features.categories.CategoryProductsActivity"
             android:exported="false" />
@@ -164,16 +180,19 @@
             android:exported="false" />
         <activity
             android:name=".features.shopping.MapPickerActivity"
-            android:exported="false" />
-        <!-- Google Maps API Key -->
+            android:exported="false" /> <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="@string/google_maps_key" /> <!-- Facebook Config -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
 
-        <!-- Facebook Config -->
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
-        <activity android:name="com.facebook.FacebookActivity"
+        <activity
+            android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
         <activity
@@ -181,8 +200,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
@@ -205,9 +226,5 @@
             android:name=".features.shopping.OrderDetailActivity"
             android:exported="false" />
     </application>
-
-    <queries>
-        <package android:name="com.facebook.katana" />
-    </queries>
 
 </manifest>

@@ -22,7 +22,7 @@
     <string name="facebook_client_token">YOUR_CLIENT_TOKEN</string>
     <string name="google_client_id">307296587798-8bea33ta76bt97t24k3vugs2qm11io20.apps.googleusercontent.com</string>
     <string name="google_web_client_id">307296587798-h0il799eh6mrlout1ediv3o1mp194dsr.apps.googleusercontent.com</string>
-    
+
     <!-- Google Maps API Key -->
     <string name="google_maps_key" translatable="false">YOUR_API_KEY_HERE</string>
 </resources>
