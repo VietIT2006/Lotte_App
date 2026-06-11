@@ -51,6 +51,8 @@ public class HomeFragment extends Fragment {
     private androidx.viewpager2.widget.ViewPager2 vpBanner;
     private android.os.Handler sliderHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable sliderRunnable;
+    
+    private static boolean hasShownPromoPopup = false;
 
     @Nullable
     @Override
@@ -199,9 +201,25 @@ public class HomeFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
                     List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion> promos = response.body().getData();
                     List<com.ptithcm.lottemart.data.models.Banner> banners = new ArrayList<>();
+                    
+                    com.ptithcm.lottemart.data.api.ProductApiService.Promotion popupPromo = null;
+                    
                     for (com.ptithcm.lottemart.data.api.ProductApiService.Promotion p : promos) {
                         banners.add(new com.ptithcm.lottemart.data.models.Banner(p.getId(), p.getTitle(), p.getDescription(), p.getBannerImage()));
+                        if ("home".equalsIgnoreCase(p.getPosition()) && popupPromo == null) {
+                            popupPromo = p;
+                        }
                     }
+                    
+                    if (popupPromo == null && !promos.isEmpty()) {
+                        popupPromo = promos.get(0);
+                    }
+                    
+                    if (!hasShownPromoPopup && popupPromo != null) {
+                        showPromotionPopup(popupPromo);
+                        hasShownPromoPopup = true;
+                    }
+
                     if (vpBanner != null) {
                         com.ptithcm.lottemart.ui.adapters.BannerAdapter adapter = new com.ptithcm.lottemart.ui.adapters.BannerAdapter(getContext(), banners);
                         vpBanner.setAdapter(adapter);
@@ -223,6 +241,70 @@ public class HomeFragment extends Fragment {
                 Log.e(TAG, "Error fetching promotions banner", t);
             }
         });
+    }
+
+    private void showPromotionPopup(com.ptithcm.lottemart.data.api.ProductApiService.Promotion promotion) {
+        if (getContext() == null || getActivity() == null) return;
+        
+        android.app.Dialog dialog = new android.app.Dialog(getContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        android.widget.RelativeLayout layout = new android.widget.RelativeLayout(getContext());
+        layout.setLayoutParams(new android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        android.widget.ImageView ivPromo = new android.widget.ImageView(getContext());
+        ivPromo.setId(android.view.View.generateViewId());
+        ivPromo.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        ivPromo.setAdjustViewBounds(true);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        ivPromo.setPadding(padding, padding, padding, padding);
+        
+        android.widget.RelativeLayout.LayoutParams ivParams = new android.widget.RelativeLayout.LayoutParams(
+                (int) (320 * getResources().getDisplayMetrics().density),
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        ivParams.addRule(android.widget.RelativeLayout.CENTER_IN_PARENT);
+        layout.addView(ivPromo, ivParams);
+
+        String imageUrl = promotion.getImageUrl();
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            imageUrl = promotion.getBannerImage();
+        }
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Glide.with(this).load(imageUrl).into(ivPromo);
+        }
+
+        android.widget.ImageButton btnClose = new android.widget.ImageButton(getContext());
+        btnClose.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        btnClose.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        btnClose.setColorFilter(android.graphics.Color.LTGRAY);
+        android.widget.RelativeLayout.LayoutParams btnParams = new android.widget.RelativeLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        btnParams.addRule(android.widget.RelativeLayout.ALIGN_TOP, ivPromo.getId());
+        btnParams.addRule(android.widget.RelativeLayout.ALIGN_END, ivPromo.getId());
+        layout.addView(btnClose, btnParams);
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        ivPromo.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (promotion.getCategoryId() != null && !promotion.getCategoryId().isEmpty()) {
+                Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.categories.CategoryProductsActivity.class);
+                intent.putExtra("CATEGORY_ID", promotion.getCategoryId());
+                intent.putExtra("CATEGORY_NAME", promotion.getTitle());
+                startActivity(intent);
+            } else if (promotion.getLink() != null && !promotion.getLink().isEmpty()) {
+                Toast.makeText(getContext(), "Chuyển đến: " + promotion.getLink(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.setContentView(layout);
+        dialog.show();
     }
 
     private void updateLocationUI(String name, String address) {

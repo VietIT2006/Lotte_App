@@ -25,6 +25,12 @@ public interface OrderApiService {
             @Body UpdateOrderStatusRequest request
     );
 
+    @PUT("/api/v1/ordering/{id}/pay")
+    Call<ApiResponse<Order>> markOrderAsPaid(
+            @Header("Authorization") String token,
+            @Path("id") String orderId
+    );
+
     @POST("/api/v1/ordering/checkout")
     Call<ApiResponse<Order>> checkout(
             @Header("Authorization") String token,

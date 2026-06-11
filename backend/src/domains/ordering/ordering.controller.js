@@ -104,6 +104,20 @@ class OrderingController {
         }
     }
 
+    async markOrderAsPaid(req, res, next) {
+        try {
+            const { id } = req.params;
+            const updatedOrder = await orderingService.updateOrderStatus(id, 'PAID');
+            res.status(200).json({
+                success: true,
+                message: 'Order marked as paid successfully',
+                data: updatedOrder
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     // --- ADMIN ---
     async getAdminOrders(req, res, next) {
         try {
