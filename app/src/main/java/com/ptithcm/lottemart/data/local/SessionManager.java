@@ -179,4 +179,13 @@ public class SessionManager {
         java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<java.util.List<com.ptithcm.lottemart.data.models.Address>>(){}.getType();
         return gson.fromJson(json, type);
     }
+    
+    public boolean hasAskedLocationPermission() {
+        return pref.getBoolean("has_asked_location_permission", false);
+    }
+    
+    public void setAskedLocationPermission(boolean asked) {
+        editor.putBoolean("has_asked_location_permission", asked);
+        editor.apply();
+    }
 }

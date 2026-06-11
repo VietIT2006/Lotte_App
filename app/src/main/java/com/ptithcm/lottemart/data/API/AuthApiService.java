@@ -14,4 +14,10 @@ public interface AuthApiService {
 
     @POST("auth/social-login")
     Call<ApiResponse<AuthResponseData>> socialLogin(@Body SocialLoginRequest request);
+
+    @POST("auth/forgot-password")
+    Call<ApiResponse<Object>> forgotPassword(@Body ForgotPasswordRequest request);
+
+    @POST("auth/reset-password")
+    Call<ApiResponse<Object>> resetPassword(@Body ResetPasswordRequest request);
 }

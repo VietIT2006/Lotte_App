@@ -197,6 +197,107 @@ class AuthService {
 
         return { user: this.transformUser(user), token };
     }
+
+    async forgotPassword(email) {
+        const user = await db.collection('users').findOne({ email: email });
+        if (!user) {
+            const err = new Error('Không tìm thấy tài khoản với email này');
+            err.statusCode = 404;
+            throw err;
+        }
+
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+        // Save OTP to DB
+        await db.collection('users').updateOne(
+            { _id: user._id },
+            { 
+                $set: { 
+                    email_verification_code: otp,
+                    email_verification_expires_at: expiresAt,
+                    updated_at: new Date()
+                } 
+            }
+        );
+
+        // Send email
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.SMTP_EMAIL,
+                pass: process.env.SMTP_PASSWORD
+            }
+        });
+
+        const mailOptions = {
+            from: `"Lotte Mart App" <${process.env.SMTP_EMAIL}>`,
+            to: email,
+            subject: 'Lotte Mart - Mã xác nhận quên mật khẩu',
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2>Xin chào ${user.full_name || 'bạn'},</h2>
+                    <p>Bạn đã yêu cầu khôi phục mật khẩu. Dưới đây là mã xác nhận (OTP) 6 số của bạn:</p>
+                    <h1 style="color: #D32F2F; letter-spacing: 5px;">${otp}</h1>
+                    <p>Mã này sẽ hết hạn trong vòng 5 phút.</p>
+                    <p>Nếu bạn không yêu cầu thay đổi mật khẩu, vui lòng bỏ qua email này.</p>
+                    <hr/>
+                    <p style="font-size: 12px; color: #777;">Đội ngũ Lotte Mart</p>
+                </div>
+            `
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+        } catch (error) {
+            console.error('Error sending email:', error);
+            const err = new Error('Lỗi khi gửi email. Vui lòng kiểm tra lại cấu hình SMTP.');
+            err.statusCode = 500;
+            throw err;
+        }
+
+        return { message: 'OTP sent successfully' };
+    }
+
+    async resetPassword(email, otp, newPassword) {
+        const user = await db.collection('users').findOne({ email: email });
+        if (!user) {
+            const err = new Error('Không tìm thấy tài khoản');
+            err.statusCode = 404;
+            throw err;
+        }
+
+        if (user.email_verification_code !== otp) {
+            const err = new Error('Mã OTP không chính xác');
+            err.statusCode = 400;
+            throw err;
+        }
+
+        if (new Date() > user.email_verification_expires_at) {
+            const err = new Error('Mã OTP đã hết hạn');
+            err.statusCode = 400;
+            throw err;
+        }
+
+        // Update password
+        const passwordHash = await bcrypt.hash(newPassword, 10);
+        await db.collection('users').updateOne(
+            { _id: user._id },
+            { 
+                $set: { 
+                    password_hash: passwordHash,
+                    password_changed_at: new Date(),
+                    updated_at: new Date(),
+                    email_verification_code: null, // Clear OTP
+                    email_verification_expires_at: null
+                } 
+            }
+        );
+
+        return { message: 'Password reset successfully' };
+    }
 }
 
 module.exports = new AuthService();

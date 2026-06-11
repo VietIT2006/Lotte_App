@@ -35,6 +35,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
@@ -53,6 +62,26 @@ public class HomeFragment extends Fragment {
     private Runnable sliderRunnable;
     
     private static boolean hasShownPromoPopup = false;
+    
+    private FusedLocationProviderClient fusedLocationClient;
+    private ActivityResultLauncher<String[]> locationPermissionRequest;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        locationPermissionRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+            Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
+            Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false);
+            if ((fineLocationGranted != null && fineLocationGranted) || (coarseLocationGranted != null && coarseLocationGranted)) {
+                requestLocationAndFindNearestBranch();
+            } else {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Không thể tự động chọn chi nhánh vì thiếu quyền vị trí", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
     @Nullable
     @Override
@@ -66,6 +95,7 @@ public class HomeFragment extends Fragment {
         
         initViews(view);
         apiService = RetrofitClient.getClient().create(ProductApiService.class);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         
         fetchCategories();
         fetchFeaturedProducts();
@@ -184,6 +214,12 @@ public class HomeFragment extends Fragment {
                     }
                     
                     updateLocationUI(selectedBranch.getName(), selectedBranch.getAddress());
+                    
+                    // Auto-select nearest branch based on location (only once per app install/login)
+                    if (!sessionManager.hasAskedLocationPermission()) {
+                        checkLocationPermissionAndAutoSelectBranch();
+                        sessionManager.setAskedLocationPermission(true);
+                    }
                 }
             }
 
@@ -336,6 +372,95 @@ public class HomeFragment extends Fragment {
                     updateLocationUI(selected.getName(), selected.getAddress());
                 })
                 .show();
+    }
+
+    private void checkLocationPermissionAndAutoSelectBranch() {
+        if (getContext() == null) return;
+        
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            requestLocationAndFindNearestBranch();
+        } else {
+            locationPermissionRequest.launch(new String[] {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            });
+        }
+    }
+
+    private void requestLocationAndFindNearestBranch() {
+        if (getContext() == null || fusedLocationClient == null || availableBranches == null || availableBranches.isEmpty()) return;
+        
+        try {
+            fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+                if (location != null) {
+                    findNearestBranch(location);
+                } else {
+                    // Fallback to mock user location if GPS is unavailable (e.g. on emulator)
+                    Location mockUserLoc = new Location("mock");
+                    mockUserLoc.setLatitude(10.776889); // Center of HCMC
+                    mockUserLoc.setLongitude(106.700806);
+                    findNearestBranch(mockUserLoc);
+                }
+            }).addOnFailureListener(e -> {
+                Location mockUserLoc = new Location("mock");
+                mockUserLoc.setLatitude(10.776889);
+                mockUserLoc.setLongitude(106.700806);
+                findNearestBranch(mockUserLoc);
+            });
+        } catch (SecurityException e) {
+            Log.e(TAG, "Location permission missing", e);
+        }
+    }
+    
+    private void findNearestBranch(Location userLocation) {
+        if (availableBranches == null || availableBranches.isEmpty()) return;
+        
+        com.ptithcm.lottemart.data.models.Branch nearestBranch = null;
+        float minDistance = Float.MAX_VALUE;
+        
+        for (com.ptithcm.lottemart.data.models.Branch b : availableBranches) {
+            Location branchLocation = getMockBranchLocation(b.getName());
+            if (branchLocation != null) {
+                float distance = userLocation.distanceTo(branchLocation);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestBranch = b;
+                }
+            }
+        }
+        
+        if (nearestBranch != null) {
+            sessionManager.saveSelectedBranch(nearestBranch.getId(), nearestBranch.getName(), nearestBranch.getAddress());
+            updateLocationUI(nearestBranch.getName(), nearestBranch.getAddress());
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Đã tự động chọn chi nhánh gần bạn nhất: " + nearestBranch.getName(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    
+    private Location getMockBranchLocation(String branchName) {
+        Location loc = new Location("mock");
+        String lowerName = branchName != null ? branchName.toLowerCase() : "";
+        
+        if (lowerName.contains("nam sài gòn") || lowerName.contains("quận 7")) {
+            loc.setLatitude(10.735165);
+            loc.setLongitude(106.700142);
+        } else if (lowerName.contains("gò vấp")) {
+            loc.setLatitude(10.835472);
+            loc.setLongitude(106.666111);
+        } else if (lowerName.contains("tân bình")) {
+            loc.setLatitude(10.801648);
+            loc.setLongitude(106.655823);
+        } else if (lowerName.contains("hà nội") || lowerName.contains("ba đình")) {
+            loc.setLatitude(21.031580);
+            loc.setLongitude(105.812230);
+        } else {
+            // Default center of HCMC
+            loc.setLatitude(10.776889);
+            loc.setLongitude(106.700806);
+        }
+        return loc;
     }
 
     private void setupBannerCarousel(View view) {
