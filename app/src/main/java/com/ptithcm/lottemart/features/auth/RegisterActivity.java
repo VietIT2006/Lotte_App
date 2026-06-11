@@ -7,6 +7,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -43,6 +45,31 @@ public class RegisterActivity extends AppCompatActivity {
 
         initViews();
         setupListeners();
+        startAnimations();
+    }
+
+    private void startAnimations() {
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+        Animation slideUp1 = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+        Animation slideUp2 = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+        Animation slideUp3 = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+        Animation slideUp4 = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+
+        slideUp1.setStartOffset(150);
+        slideUp2.setStartOffset(300);
+        slideUp3.setStartOffset(450);
+        slideUp4.setStartOffset(600);
+
+        findViewById(R.id.tvRegisterTitle).startAnimation(fadeIn);
+        findViewById(R.id.tvRegisterDesc).startAnimation(fadeIn);
+
+        tilFullName.startAnimation(slideUp1);
+        tilRegisterEmail.startAnimation(slideUp2);
+        tilRegisterPassword.startAnimation(slideUp3);
+        tilConfirmPassword.startAnimation(slideUp3);
+
+        btnRegister.startAnimation(slideUp4);
+        tvSignIn.startAnimation(slideUp4);
     }
 
     private void initViews() {
@@ -61,7 +88,11 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnRegister.setOnClickListener(v -> handleRegistration());
+        btnRegister.setOnClickListener(v -> {
+            v.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction(() -> {
+                v.animate().scaleX(1f).scaleY(1f).setDuration(100).withEndAction(this::handleRegistration).start();
+            }).start();
+        });
 
         tvSignIn.setOnClickListener(v -> finish());
 
@@ -142,8 +173,9 @@ public class RegisterActivity extends AppCompatActivity {
                 btnRegister.setText("Đăng ký");
 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    Toast.makeText(RegisterActivity.this, "Đăng ký thành công! Vui lòng đăng nhập.", Toast.LENGTH_LONG).show();
-                    finish(); // Go back to login
+                    showSuccessDialog("Đăng ký thành công! Vui lòng đăng nhập.", () -> {
+                        finish(); // Go back to login
+                    });
                 } else {
                     String errorMsg = "Đăng ký thất bại";
                     if (response.body() != null && response.body().getMessage() != null) {
@@ -161,6 +193,27 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(RegisterActivity.this, "Lỗi kết nối máy chủ", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showSuccessDialog(String message, Runnable onContinue) {
+        android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_success);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.setCancelable(false);
+
+        TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
+        tvMessage.setText(message);
+
+        dialog.show();
+
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            if (onContinue != null) {
+                onContinue.run();
+            }
+        }, 2000);
     }
 
     private abstract static class SimpleTextWatcher implements TextWatcher {

@@ -7,6 +7,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -82,6 +84,7 @@ public class LoginActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         setupSocialLogin();
+        startAnimations();
     }
 
     private void setupSocialLogin() {
@@ -147,8 +150,39 @@ public class LoginActivity extends AppCompatActivity {
         tvSignUp = findViewById(R.id.tvSignUp);
     }
 
+    private void startAnimations() {
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+        Animation slideUp1 = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+        Animation slideUp2 = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+        Animation slideUp3 = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+
+        slideUp1.setStartOffset(200);
+        slideUp2.setStartOffset(400);
+        slideUp3.setStartOffset(600);
+
+        findViewById(R.id.imageContainer).startAnimation(fadeIn);
+        findViewById(R.id.tvWelcome).startAnimation(fadeIn);
+        findViewById(R.id.tvSubWelcome).startAnimation(fadeIn);
+
+        tilEmail.startAnimation(slideUp1);
+        findViewById(R.id.labelEmail).startAnimation(slideUp1);
+
+        tilPassword.startAnimation(slideUp2);
+        findViewById(R.id.labelPassword).startAnimation(slideUp2);
+        tvForgotPassword.startAnimation(slideUp2);
+
+        btnLogin.startAnimation(slideUp3);
+        findViewById(R.id.divider).startAnimation(slideUp3);
+        findViewById(R.id.btnGoogle).startAnimation(slideUp3);
+        findViewById(R.id.btnFacebook).startAnimation(slideUp3);
+    }
+
     private void setupListeners() {
-        btnLogin.setOnClickListener(v -> handleLogin());
+        btnLogin.setOnClickListener(v -> {
+            v.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction(() -> {
+                v.animate().scaleX(1f).scaleY(1f).setDuration(100).withEndAction(this::handleLogin).start();
+            }).start();
+        });
 
         tvForgotPassword.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
@@ -222,13 +256,13 @@ public class LoginActivity extends AppCompatActivity {
                     // CẬP NHẬT TOKEN VÀO HỆ THỐNG MẠNG NGAY LẬP TỨC
                     com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
                     
-                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    
-                    if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
-                        navigateToAdminMain();
-                    } else {
-                        navigateToMain();
-                    }
+                    showSuccessDialog("Chào mừng trở lại!", () -> {
+                        if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
+                            navigateToAdminMain();
+                        } else {
+                            navigateToMain();
+                        }
+                    });
                 } else {
                     String errorMsg = "Email hoặc mật khẩu không hợp lệ";
                     if (response.body() != null && response.body().getMessage() != null) {
@@ -313,12 +347,13 @@ public class LoginActivity extends AppCompatActivity {
                     // Cập nhật Retrofit với token mới
                     com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
                     
-                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
-                        navigateToAdminMain();
-                    } else {
-                        navigateToMain();
-                    }
+                    showSuccessDialog("Đăng nhập thành công!", () -> {
+                        if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
+                            navigateToAdminMain();
+                        } else {
+                            navigateToMain();
+                        }
+                    });
                 } else {
                     String errorMsg = "Lỗi đăng nhập mạng xã hội";
                     if (response.body() != null && response.body().getMessage() != null) {
@@ -347,6 +382,27 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(LoginActivity.this, com.ptithcm.lottemart.features.admin.AdminDashboardActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void showSuccessDialog(String message, Runnable onContinue) {
+        android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_success);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.setCancelable(false);
+
+        TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
+        tvMessage.setText(message);
+
+        dialog.show();
+
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            if (onContinue != null) {
+                onContinue.run();
+            }
+        }, 2000);
     }
 
     private abstract static class SimpleTextWatcher implements TextWatcher {

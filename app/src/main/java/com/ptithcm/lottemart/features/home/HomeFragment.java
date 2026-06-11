@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 
 import com.bumptech.glide.Glide;
 
@@ -101,6 +104,21 @@ public class HomeFragment extends Fragment {
         fetchFeaturedProducts();
         fetchBranchInfo();
         fetchPromotions();
+        startEntranceAnimations(view);
+    }
+
+    private void startEntranceAnimations(View view) {
+        Animation slideUp = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up);
+        Animation fadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in);
+        
+        View searchContainer = view.findViewById(R.id.searchContainer);
+        if (searchContainer != null) {
+            searchContainer.startAnimation(slideUp);
+        }
+        
+        if (vpBanner != null) {
+            vpBanner.startAnimation(fadeIn);
+        }
     }
 
     private void initViews(View view) {
@@ -121,14 +139,22 @@ public class HomeFragment extends Fragment {
 
         if (btnNotification != null) {
             btnNotification.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.notifications.NotificationActivity.class);
-                startActivity(intent);
+                v.animate().scaleX(0.8f).scaleY(0.8f).setDuration(100).withEndAction(() -> {
+                    v.animate().scaleX(1f).scaleY(1f).setDuration(100).withEndAction(() -> {
+                        Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.notifications.NotificationActivity.class);
+                        startActivity(intent);
+                    }).start();
+                }).start();
             });
         }
 
         searchContainer.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.search.SearchActivity.class);
-            startActivity(intent);
+            v.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction(() -> {
+                v.animate().scaleX(1f).scaleY(1f).setDuration(100).withEndAction(() -> {
+                    Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.search.SearchActivity.class);
+                    startActivity(intent);
+                }).start();
+            }).start();
         });
 
 
@@ -140,6 +166,8 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
         rvCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        LayoutAnimationController animController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation_slide_right);
+        rvCategories.setLayoutAnimation(animController);
         rvCategories.setAdapter(categoryAdapter);
 
         productAdapter = new ProductAdapter(getContext(), new ArrayList<>(), product -> {
@@ -148,6 +176,8 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
         });
         rvFeatured.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        LayoutAnimationController animController2 = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation_slide_right);
+        rvFeatured.setLayoutAnimation(animController2);
         rvFeatured.setAdapter(productAdapter);
     }
 

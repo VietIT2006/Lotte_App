@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,6 +33,8 @@ public class SearchActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         showSuggestions();
+        
+        findViewById(R.id.searchHeaderUnified).startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_up));
     }
 
     private void initViews() {
@@ -47,7 +53,22 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         rvResults.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 2));
+        LayoutAnimationController animController = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_slide_right);
+        rvResults.setLayoutAnimation(animController);
         rvResults.setAdapter(productAdapter);
+        
+        ChipGroup chipGroupHistory = findViewById(R.id.chipGroupHistory);
+        String[] recentSearches = {"Thịt heo", "Sữa chua", "Rau củ", "Trái cây"};
+        for (String s : recentSearches) {
+            Chip chip = new Chip(this);
+            chip.setText(s);
+            chip.setCheckable(false);
+            chip.setOnClickListener(v -> {
+                etSearch.setText(s);
+                performSearch(s);
+            });
+            chipGroupHistory.addView(chip);
+        }
         
         etSearch.requestFocus();
     }
@@ -87,14 +108,18 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnSortPrice).setOnClickListener(v -> {
-            if (currentSort.equals("price_asc")) {
-                currentSort = "price_desc";
-                ((android.widget.TextView)v).setText("Sắp xếp: Giá cao đến thấp");
-            } else {
-                currentSort = "price_asc";
-                ((android.widget.TextView)v).setText("Sắp xếp: Giá thấp đến cao");
-            }
-            performSearch(etSearch.getText().toString().trim());
+            v.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100).withEndAction(() -> {
+                v.animate().scaleX(1f).scaleY(1f).setDuration(100).withEndAction(() -> {
+                    if (currentSort.equals("price_asc")) {
+                        currentSort = "price_desc";
+                        ((android.widget.TextView)v).setText("Sắp xếp: Giá cao đến thấp");
+                    } else {
+                        currentSort = "price_asc";
+                        ((android.widget.TextView)v).setText("Sắp xếp: Giá thấp đến cao");
+                    }
+                    performSearch(etSearch.getText().toString().trim());
+                }).start();
+            }).start();
         });
 
         findViewById(R.id.btnFilterPrice).setOnClickListener(v -> {
@@ -131,6 +156,7 @@ public class SearchActivity extends AppCompatActivity {
             public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Product>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     productAdapter.setProducts(response.body().getData());
+                    rvResults.scheduleLayoutAnimation();
                 }
             }
 
