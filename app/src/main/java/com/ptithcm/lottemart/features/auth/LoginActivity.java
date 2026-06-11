@@ -389,6 +389,12 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
+    private void navigateToShipperMain() {
+        Intent intent = new Intent(LoginActivity.this, com.ptithcm.lottemart.features.shipper.ShipperDashboardActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     private void showSuccessDialog(String message, Runnable onContinue) {
         android.app.Dialog dialog = new android.app.Dialog(this);
         dialog.setContentView(R.layout.dialog_success);
