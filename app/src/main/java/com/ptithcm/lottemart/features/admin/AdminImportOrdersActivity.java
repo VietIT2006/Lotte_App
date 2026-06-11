@@ -1,26 +1,27 @@
 package com.ptithcm.lottemart.features.admin;
-import com.ptithcm.lottemart.data.models.ImportOrder;
-import com.ptithcm.lottemart.data.api.PurchasingApiService;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Toast;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.ptithcm.lottemart.R;
 import com.ptithcm.lottemart.data.api.ApiResponse;
-import com.ptithcm.lottemart.data.remote.RetrofitClient;
+import com.ptithcm.lottemart.data.api.PurchasingApiService;
 import com.ptithcm.lottemart.data.local.SessionManager;
-import java.util.List;
+import com.ptithcm.lottemart.data.models.ImportOrder;
+import com.ptithcm.lottemart.data.remote.RetrofitClient;
 import java.util.ArrayList;
+import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import android.widget.Toast;
-
-
-import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import com.ptithcm.lottemart.R;
 
 public class AdminImportOrdersActivity extends BaseAdminActivity {
+    private AdminImportOrderAdapter adapter;
+    private SessionManager sessionManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,12 +29,37 @@ public class AdminImportOrdersActivity extends BaseAdminActivity {
 
         setHeaderTitle("Quản lý Đơn nhập");
 
+        sessionManager = new SessionManager(this);
+
         RecyclerView rvList = findViewById(R.id.rvList);
         rvList.setLayoutManager(new LinearLayoutManager(this));
-                AdminImportOrderAdapter adapter = new AdminImportOrderAdapter(this, new ArrayList<>(), item -> {});
+        
+        adapter = new AdminImportOrderAdapter(this, new ArrayList<>(), order -> {
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(AdminImportOrdersActivity.this)
+                .setTitle("Xác nhận nhập kho")
+                .setMessage("Bạn có chắc chắn muốn xác nhận nhập kho cho phiếu " + order.getOrderCode() + "? Hệ thống sẽ tự động cập nhật số lượng sản phẩm vào kho hàng.")
+                .setPositiveButton("Nhập kho", (dialog, which) -> receiveOrder(order))
+                .setNegativeButton("Hủy", null)
+                .show();
+        });
         rvList.setAdapter(adapter);
 
-        SessionManager sessionManager = new SessionManager(this);
+        FloatingActionButton fabAddImportOrder = findViewById(R.id.fabAddImportOrder);
+        if (fabAddImportOrder != null) {
+            fabAddImportOrder.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminImportOrdersActivity.this, AdminCreateImportOrderActivity.class);
+                startActivity(intent);
+            });
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadImportOrders();
+    }
+
+    private void loadImportOrders() {
         String token = "Bearer " + sessionManager.getAuthToken();
         RetrofitClient.getClient().create(PurchasingApiService.class).getImportOrders(token).enqueue(new Callback<ApiResponse<List<ImportOrder>>>() {
             @Override
@@ -51,6 +77,27 @@ public class AdminImportOrdersActivity extends BaseAdminActivity {
                 Toast.makeText(AdminImportOrdersActivity.this, "Lỗi mạng", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-        }
+    private void receiveOrder(ImportOrder order) {
+        String token = "Bearer " + sessionManager.getAuthToken();
+        RetrofitClient.getClient().create(PurchasingApiService.class)
+            .receiveImportOrder(token, order.getId())
+            .enqueue(new Callback<ApiResponse<Void>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(AdminImportOrdersActivity.this, "Đã nhập kho thành công!", Toast.LENGTH_SHORT).show();
+                        loadImportOrders();
+                    } else {
+                        Toast.makeText(AdminImportOrdersActivity.this, "Không thể xác nhận nhập kho!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                    Toast.makeText(AdminImportOrdersActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
 }

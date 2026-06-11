@@ -37,15 +37,16 @@ public class LPointActivity extends AppCompatActivity {
         }
 
         tvPointsBalance = findViewById(R.id.tvPointsBalance);
-        
-        // Lấy điểm offline tạm từ session trước
-        currentPoints = sessionManager.getLottePoints();
-        tvPointsBalance.setText(String.format("%,d P", currentPoints));
-
-        // Sau đó tải điểm online từ Backend
-        fetchPointsOnline();
 
         setupListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        currentPoints = sessionManager.getLottePoints();
+        tvPointsBalance.setText(String.format("%,d P", currentPoints));
+        fetchPointsOnline();
     }
 
     private void fetchPointsOnline() {
@@ -98,17 +99,20 @@ public class LPointActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        findViewById(R.id.btnTransfer).setOnClickListener(v -> 
-            Toast.makeText(this, "Chức năng Chuyển điểm thành viên đang được xây dựng!", Toast.LENGTH_SHORT).show()
-        );
+        findViewById(R.id.btnTransfer).setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, LPointTransferActivity.class);
+            startActivity(intent);
+        });
 
-        findViewById(R.id.btnTopup).setOnClickListener(v -> 
-            Toast.makeText(this, "Chức năng Nạp điểm thành viên đang được xây dựng!", Toast.LENGTH_SHORT).show()
-        );
+        findViewById(R.id.btnTopup).setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, LPointTopupActivity.class);
+            startActivity(intent);
+        });
 
-        findViewById(R.id.btnHistory).setOnClickListener(v -> 
-            Toast.makeText(this, "Chức năng xem Lịch sử điểm đang được xây dựng!", Toast.LENGTH_SHORT).show()
-        );
+        findViewById(R.id.btnHistory).setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, LPointHistoryActivity.class);
+            startActivity(intent);
+        });
 
         findViewById(R.id.btnMyCard).setOnClickListener(v -> 
             Toast.makeText(this, "Thẻ thành viên của bạn đã được tích hợp hiển thị bên dưới!", Toast.LENGTH_SHORT).show()

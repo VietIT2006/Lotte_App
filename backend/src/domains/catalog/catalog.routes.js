@@ -28,4 +28,9 @@ router.delete('/branches/:id', catalogController.deleteBranch);
 router.get('/admin/reviews', catalogController.getAllReviews);
 router.delete('/admin/reviews/:id', catalogController.deleteReview);
 
+router.get('/admin/pending-products', catalogController.getPendingProducts);
+router.get('/admin/pending-categories', catalogController.getPendingCategories);
+router.put('/admin/products/:id/approve', catalogController.approveProduct);
+router.put('/admin/categories/:id/approve', catalogController.approveCategory);
+
 module.exports = router;

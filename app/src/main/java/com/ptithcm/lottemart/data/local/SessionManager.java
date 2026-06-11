@@ -163,4 +163,29 @@ public class SessionManager {
     public String getSelectedBranchAddress() {
         return pref.getString(KEY_BRANCH_ADDRESS, null);
     }
+
+    public void saveAddressList(String userId, java.util.List<com.ptithcm.lottemart.data.models.Address> addresses) {
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        String json = gson.toJson(addresses);
+        editor.putString("user_addresses_" + userId, json);
+        editor.apply();
+    }
+
+    public java.util.List<com.ptithcm.lottemart.data.models.Address> getAddressList(String userId) {
+        String json = pref.getString("user_addresses_" + userId, null);
+        if (json == null) return null;
+        
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<java.util.List<com.ptithcm.lottemart.data.models.Address>>(){}.getType();
+        return gson.fromJson(json, type);
+    }
+    
+    public boolean hasAskedLocationPermission() {
+        return pref.getBoolean("has_asked_location_permission", false);
+    }
+    
+    public void setAskedLocationPermission(boolean asked) {
+        editor.putBoolean("has_asked_location_permission", asked);
+        editor.apply();
+    }
 }

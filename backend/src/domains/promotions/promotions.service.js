@@ -6,8 +6,8 @@ class PromotionsService {
         return {
             id: item._id ? item._id.toString() : "",
             title: item.title || "",
-            description: item.description || "",
-            banner_image: item.banner_image || item.image || "",
+            description: item.description || item.subtitle || "",
+            banner_image: item.banner_image || item.image_url || item.mobile_image_url || item.image || "",
             type: item.type || "percent"
         };
     }
@@ -24,10 +24,93 @@ class PromotionsService {
     }
 
     async getActivePromotions() {
-        const promotions = await db.collection('promotions')
+        let promotions = await db.collection('promotions')
             .find({ is_active: true })
             .sort({ created_at: -1 })
             .toArray();
+        
+        // If there are no promotions or they contain localhost placeholder URLs, seed/refresh with the Cloudinary assets
+        const hasLocalhostOrPlaceholder = promotions.some(p => {
+            const url = p.banner_image || p.image || "";
+            return url.includes("localhost") || url.includes("via.placeholder.com") || url.includes("placeholder");
+        });
+
+        if (promotions.length === 0 || hasLocalhostOrPlaceholder) {
+            try {
+                // Clear out localhost/placeholder promotions to avoid broken images on devices
+                if (hasLocalhostOrPlaceholder) {
+                    await db.collection('promotions').deleteMany({
+                        $or: [
+                            { banner_image: { $regex: /localhost|via\.placeholder\.com/ } },
+                            { image: { $regex: /localhost|via\.placeholder\.com/ } }
+                        ]
+                    });
+                }
+
+                const defaultPromos = [
+                    {
+                        title: "Lotte Mart Banner 1",
+                        description: "Khuyến mãi đặc biệt từ Lotte Mart",
+                        banner_image: "https://res.cloudinary.com/dkzrqnahy/image/upload/v1780995391/OIP_1_q92slk.webp",
+                        type: "percent",
+                        is_active: true,
+                        created_at: new Date(),
+                        updated_at: new Date()
+                    },
+                    {
+                        title: "Lotte Mart Banner 2",
+                        description: "Mua sắm thả ga, nhận quà cực đã",
+                        banner_image: "https://res.cloudinary.com/dkzrqnahy/image/upload/v1780995392/OIP_nji4cc.webp",
+                        type: "percent",
+                        is_active: true,
+                        created_at: new Date(),
+                        updated_at: new Date()
+                    },
+                    {
+                        title: "Lotte Mart Banner 3",
+                        description: "Ưu đãi ngập trạng mỗi ngày",
+                        banner_image: "https://res.cloudinary.com/dkzrqnahy/image/upload/v1780995392/OIP_2_emj2gt.webp",
+                        type: "percent",
+                        is_active: true,
+                        created_at: new Date(),
+                        updated_at: new Date()
+                    },
+                    {
+                        title: "Lotte Mart Logo",
+                        description: "Lotte Mart siêu thị của mọi nhà",
+                        banner_image: "https://res.cloudinary.com/dkzrqnahy/image/upload/v1780995392/logo-lotte-mart_kkhoso.jpg",
+                        type: "percent",
+                        is_active: true,
+                        created_at: new Date(),
+                        updated_at: new Date()
+                    },
+                    {
+                        title: "Lotte Mart Biểu tượng",
+                        description: "Biểu tượng Lotte Mart thương hiệu uy tín",
+                        banner_image: "https://res.cloudinary.com/dkzrqnahy/image/upload/v1780995392/bieu-tuong-lotte_fhyde2.jpg",
+                        type: "percent",
+                        is_active: true,
+                        created_at: new Date(),
+                        updated_at: new Date()
+                    }
+                ];
+                
+                // Only insert if those images aren't already in the database
+                for (const promo of defaultPromos) {
+                    const existing = await db.collection('promotions').findOne({ banner_image: promo.banner_image });
+                    if (!existing) {
+                        await db.collection('promotions').insertOne(promo);
+                    }
+                }
+
+                promotions = await db.collection('promotions')
+                    .find({ is_active: true })
+                    .sort({ created_at: -1 })
+                    .toArray();
+            } catch (err) {
+                console.error("Error seeding promotions: ", err);
+            }
+        }
         return promotions.map(p => this.transformPromotion(p));
     }
 

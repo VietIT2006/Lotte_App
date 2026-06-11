@@ -29,12 +29,16 @@
             android:exported="false" />
         <activity
             android:name=".features.auth.LoginActivity"
+<<<<<<< HEAD
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+=======
+            android:exported="false">
+>>>>>>> d5ddca9efe8a0413e017b423920db480766ead0a
         </activity>
         <activity
             android:name=".features.auth.RegisterActivity"
@@ -44,7 +48,12 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".features.admin.AdminDashboardActivity"
             android:exported="false" />
@@ -79,6 +88,9 @@
             android:name=".features.admin.AdminImportOrdersActivity"
             android:exported="false" />
         <activity
+            android:name=".features.admin.AdminCreateImportOrderActivity"
+            android:exported="false" />
+        <activity
             android:name=".features.admin.AdminReceiptsActivity"
             android:exported="false" />
         <activity
@@ -92,6 +104,12 @@
             android:exported="false" />
         <activity
             android:name=".features.admin.AdminReviewsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.fogotPassword.ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.fogotPassword.ResetPasswordActivity"
             android:exported="false" />
         <activity
             android:name=".features.admin.AdminCouponsActivity"
@@ -191,6 +209,21 @@
         </activity>
         <activity
             android:name=".features.home.EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointTransferActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.loyalty.LPointTopupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.OrderListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shopping.OrderDetailActivity"
             android:exported="false" />
     </application>
 

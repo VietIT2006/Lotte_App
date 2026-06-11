@@ -27,6 +27,7 @@ public class AddressBookActivity extends AppCompatActivity {
     private AddressAdapter adapter;
     private List<Address> addressList;
     private SessionManager sessionManager;
+    private String currentUserId;
     private static final int LOCATION_PERMISSION_REQUEST_CODE_AUTO_FILL = 1004;
 
     @Override
@@ -42,20 +43,24 @@ public class AddressBookActivity extends AppCompatActivity {
         }
 
         // Khởi tạo danh sách địa chỉ và lọc theo tài khoản đăng nhập
-        addressList = new ArrayList<>();
-        String currentUserId = sessionManager.getUserId();
+        currentUserId = sessionManager.getUserId();
+        addressList = sessionManager.getAddressList(currentUserId);
 
-        if ("000000000000000000000001".equals(currentUserId)) {
-            // Lọc ra các địa chỉ dành riêng cho Admin
-            addressList.add(new Address("1", "Admin Lotte", "0901234567", "469 Nguyễn Hữu Thọ", "Tân Hưng", "Quận 7", "TP. HCM", true, "home"));
-            addressList.add(new Address("2", "Admin Văn Phòng", "0918765432", "37 Hùng Vương", "Phường 4", "Quận 5", "TP. HCM", false, "office"));
-        } else if ("69c9daead9fb80416235e662".equals(currentUserId)) {
-            // Lọc ra các địa chỉ dành riêng cho tài khoản phamcongt56@gmail.com
-            addressList.add(new Address("1", "Thành Phạm Công", "0846183771", "12 Lê Duẩn", "Bến Nghé", "Quận 1", "TP. HCM", true, "home"));
-            addressList.add(new Address("2", "Phạm Công (Công Ty)", "0909999888", "100 Đường số 7", "Phường Tân Phong", "Quận 7", "TP. HCM", false, "office"));
-        } else {
-            // Các tài khoản khác
-            addressList.add(new Address("1", sessionManager.getUserName(), "0900000000", "Địa chỉ mẫu của bạn", "Phường Bến Thành", "Quận 1", "TP. HCM", true, "home"));
+        if (addressList == null) {
+            addressList = new ArrayList<>();
+            if ("000000000000000000000001".equals(currentUserId)) {
+                // Lọc ra các địa chỉ dành riêng cho Admin
+                addressList.add(new Address("1", "Admin Lotte", "0901234567", "469 Nguyễn Hữu Thọ", "Tân Hưng", "Quận 7", "TP. HCM", true, "home"));
+                addressList.add(new Address("2", "Admin Văn Phòng", "0918765432", "37 Hùng Vương", "Phường 4", "Quận 5", "TP. HCM", false, "office"));
+            } else if ("69c9daead9fb80416235e662".equals(currentUserId)) {
+                // Lọc ra các địa chỉ dành riêng cho tài khoản phamcongt56@gmail.com
+                addressList.add(new Address("1", "Thành Phạm Công", "0846183771", "12 Lê Duẩn", "Bến Nghé", "Quận 1", "TP. HCM", true, "home"));
+                addressList.add(new Address("2", "Phạm Công (Công Ty)", "0909999888", "100 Đường số 7", "Phường Tân Phong", "Quận 7", "TP. HCM", false, "office"));
+            } else {
+                // Các tài khoản khác
+                addressList.add(new Address("1", sessionManager.getUserName(), "0900000000", "Địa chỉ mẫu của bạn", "Phường Bến Thành", "Quận 1", "TP. HCM", true, "home"));
+            }
+            sessionManager.saveAddressList(currentUserId, addressList);
         }
 
         rvAddresses = findViewById(R.id.rvAddresses);
@@ -77,6 +82,7 @@ public class AddressBookActivity extends AppCompatActivity {
                     .setMessage("Bạn có chắc chắn muốn xóa địa chỉ này?")
                     .setPositiveButton("Xóa", (dialog, which) -> {
                         addressList.remove(position);
+                        sessionManager.saveAddressList(currentUserId, addressList);
                         adapter.notifyItemRemoved(position);
                         adapter.notifyItemRangeChanged(position, addressList.size());
                         Toast.makeText(AddressBookActivity.this, "Đã xóa địa chỉ", Toast.LENGTH_SHORT).show();
@@ -226,9 +232,10 @@ public class AddressBookActivity extends AppCompatActivity {
                 }
             }
 
-            String newId = String.valueOf(addressList.size() + 1);
+            String newId = String.valueOf(System.currentTimeMillis());
             Address address = new Address(newId, name, phone, street, ward, district, city, isDefault, label);
             addressList.add(address);
+            sessionManager.saveAddressList(currentUserId, addressList);
             adapter.notifyDataSetChanged();
             Toast.makeText(this, "Đã thêm địa chỉ mới thành công!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();

@@ -125,7 +125,7 @@
                         android:id="@+id/rbCard"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
-                        android:text="Thẻ tín dụng / Ghi nợ"
+                        android:text="Ví điện tử (PayOS)"
                         android:padding="16dp"/>
                 </RadioGroup>
             </androidx.cardview.widget.CardView>

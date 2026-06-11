@@ -6,7 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,12 +35,22 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
     private RecyclerView rvCategories, rvFeatured;
     private CategoryAdapter categoryAdapter;
     private ProductAdapter productAdapter;
+    private ImageView ivHeroBanner;
     private ProductApiService apiService;
     private android.widget.TextView tvLocationLabel;
     private android.widget.TextView tvLocation;
@@ -47,6 +60,28 @@ public class HomeFragment extends Fragment {
     private androidx.viewpager2.widget.ViewPager2 vpBanner;
     private android.os.Handler sliderHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable sliderRunnable;
+    
+    private static boolean hasShownPromoPopup = false;
+    
+    private FusedLocationProviderClient fusedLocationClient;
+    private ActivityResultLauncher<String[]> locationPermissionRequest;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        locationPermissionRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+            Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
+            Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false);
+            if ((fineLocationGranted != null && fineLocationGranted) || (coarseLocationGranted != null && coarseLocationGranted)) {
+                requestLocationAndFindNearestBranch();
+            } else {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Không thể tự động chọn chi nhánh vì thiếu quyền vị trí", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
     @Nullable
     @Override
@@ -60,10 +95,12 @@ public class HomeFragment extends Fragment {
         
         initViews(view);
         apiService = RetrofitClient.getClient().create(ProductApiService.class);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         
         fetchCategories();
         fetchFeaturedProducts();
         fetchBranchInfo();
+        fetchPromotions();
     }
 
     private void initViews(View view) {
@@ -93,6 +130,8 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.search.SearchActivity.class);
             startActivity(intent);
         });
+
+
 
         categoryAdapter = new CategoryAdapter(getContext(), new ArrayList<>(), category -> {
             Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.categories.CategoryProductsActivity.class);
@@ -175,6 +214,12 @@ public class HomeFragment extends Fragment {
                     }
                     
                     updateLocationUI(selectedBranch.getName(), selectedBranch.getAddress());
+                    
+                    // Auto-select nearest branch based on location (only once per app install/login)
+                    if (!sessionManager.hasAskedLocationPermission()) {
+                        checkLocationPermissionAndAutoSelectBranch();
+                        sessionManager.setAskedLocationPermission(true);
+                    }
                 }
             }
 
@@ -183,6 +228,119 @@ public class HomeFragment extends Fragment {
                 Log.e(TAG, "Error fetching branches", t);
             }
         });
+    }
+
+    private void fetchPromotions() {
+        apiService.getPromotions().enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
+                    List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion> promos = response.body().getData();
+                    List<com.ptithcm.lottemart.data.models.Banner> banners = new ArrayList<>();
+                    
+                    com.ptithcm.lottemart.data.api.ProductApiService.Promotion popupPromo = null;
+                    
+                    for (com.ptithcm.lottemart.data.api.ProductApiService.Promotion p : promos) {
+                        banners.add(new com.ptithcm.lottemart.data.models.Banner(p.getId(), p.getTitle(), p.getDescription(), p.getBannerImage()));
+                        if ("home".equalsIgnoreCase(p.getPosition()) && popupPromo == null) {
+                            popupPromo = p;
+                        }
+                    }
+                    
+                    if (popupPromo == null && !promos.isEmpty()) {
+                        popupPromo = promos.get(0);
+                    }
+                    
+                    if (!hasShownPromoPopup && popupPromo != null) {
+                        showPromotionPopup(popupPromo);
+                        hasShownPromoPopup = true;
+                    }
+
+                    if (vpBanner != null) {
+                        com.ptithcm.lottemart.ui.adapters.BannerAdapter adapter = new com.ptithcm.lottemart.ui.adapters.BannerAdapter(getContext(), banners);
+                        vpBanner.setAdapter(adapter);
+                        
+                        View view = getView();
+                        if (view != null) {
+                            android.widget.LinearLayout layoutDots = view.findViewById(R.id.layoutDots);
+                            if (layoutDots != null) {
+                                setupIndicator(layoutDots, banners.size());
+                                setCurrentIndicator(layoutDots, 0);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.api.ProductApiService.Promotion>>> call, Throwable t) {
+                Log.e(TAG, "Error fetching promotions banner", t);
+            }
+        });
+    }
+
+    private void showPromotionPopup(com.ptithcm.lottemart.data.api.ProductApiService.Promotion promotion) {
+        if (getContext() == null || getActivity() == null) return;
+        
+        android.app.Dialog dialog = new android.app.Dialog(getContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        android.widget.RelativeLayout layout = new android.widget.RelativeLayout(getContext());
+        layout.setLayoutParams(new android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        android.widget.ImageView ivPromo = new android.widget.ImageView(getContext());
+        ivPromo.setId(android.view.View.generateViewId());
+        ivPromo.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        ivPromo.setAdjustViewBounds(true);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        ivPromo.setPadding(padding, padding, padding, padding);
+        
+        android.widget.RelativeLayout.LayoutParams ivParams = new android.widget.RelativeLayout.LayoutParams(
+                (int) (320 * getResources().getDisplayMetrics().density),
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        ivParams.addRule(android.widget.RelativeLayout.CENTER_IN_PARENT);
+        layout.addView(ivPromo, ivParams);
+
+        String imageUrl = promotion.getImageUrl();
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            imageUrl = promotion.getBannerImage();
+        }
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Glide.with(this).load(imageUrl).into(ivPromo);
+        }
+
+        android.widget.ImageButton btnClose = new android.widget.ImageButton(getContext());
+        btnClose.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        btnClose.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        btnClose.setColorFilter(android.graphics.Color.LTGRAY);
+        android.widget.RelativeLayout.LayoutParams btnParams = new android.widget.RelativeLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        btnParams.addRule(android.widget.RelativeLayout.ALIGN_TOP, ivPromo.getId());
+        btnParams.addRule(android.widget.RelativeLayout.ALIGN_END, ivPromo.getId());
+        layout.addView(btnClose, btnParams);
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        ivPromo.setOnClickListener(v -> {
+            dialog.dismiss();
+            if (promotion.getCategoryId() != null && !promotion.getCategoryId().isEmpty()) {
+                Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.categories.CategoryProductsActivity.class);
+                intent.putExtra("CATEGORY_ID", promotion.getCategoryId());
+                intent.putExtra("CATEGORY_NAME", promotion.getTitle());
+                startActivity(intent);
+            } else if (promotion.getLink() != null && !promotion.getLink().isEmpty()) {
+                Toast.makeText(getContext(), "Chuyển đến: " + promotion.getLink(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.setContentView(layout);
+        dialog.show();
     }
 
     private void updateLocationUI(String name, String address) {
@@ -214,6 +372,95 @@ public class HomeFragment extends Fragment {
                     updateLocationUI(selected.getName(), selected.getAddress());
                 })
                 .show();
+    }
+
+    private void checkLocationPermissionAndAutoSelectBranch() {
+        if (getContext() == null) return;
+        
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            requestLocationAndFindNearestBranch();
+        } else {
+            locationPermissionRequest.launch(new String[] {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            });
+        }
+    }
+
+    private void requestLocationAndFindNearestBranch() {
+        if (getContext() == null || fusedLocationClient == null || availableBranches == null || availableBranches.isEmpty()) return;
+        
+        try {
+            fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+                if (location != null) {
+                    findNearestBranch(location);
+                } else {
+                    // Fallback to mock user location if GPS is unavailable (e.g. on emulator)
+                    Location mockUserLoc = new Location("mock");
+                    mockUserLoc.setLatitude(10.776889); // Center of HCMC
+                    mockUserLoc.setLongitude(106.700806);
+                    findNearestBranch(mockUserLoc);
+                }
+            }).addOnFailureListener(e -> {
+                Location mockUserLoc = new Location("mock");
+                mockUserLoc.setLatitude(10.776889);
+                mockUserLoc.setLongitude(106.700806);
+                findNearestBranch(mockUserLoc);
+            });
+        } catch (SecurityException e) {
+            Log.e(TAG, "Location permission missing", e);
+        }
+    }
+    
+    private void findNearestBranch(Location userLocation) {
+        if (availableBranches == null || availableBranches.isEmpty()) return;
+        
+        com.ptithcm.lottemart.data.models.Branch nearestBranch = null;
+        float minDistance = Float.MAX_VALUE;
+        
+        for (com.ptithcm.lottemart.data.models.Branch b : availableBranches) {
+            Location branchLocation = getMockBranchLocation(b.getName());
+            if (branchLocation != null) {
+                float distance = userLocation.distanceTo(branchLocation);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestBranch = b;
+                }
+            }
+        }
+        
+        if (nearestBranch != null) {
+            sessionManager.saveSelectedBranch(nearestBranch.getId(), nearestBranch.getName(), nearestBranch.getAddress());
+            updateLocationUI(nearestBranch.getName(), nearestBranch.getAddress());
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Đã tự động chọn chi nhánh gần bạn nhất: " + nearestBranch.getName(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    
+    private Location getMockBranchLocation(String branchName) {
+        Location loc = new Location("mock");
+        String lowerName = branchName != null ? branchName.toLowerCase() : "";
+        
+        if (lowerName.contains("nam sài gòn") || lowerName.contains("quận 7")) {
+            loc.setLatitude(10.735165);
+            loc.setLongitude(106.700142);
+        } else if (lowerName.contains("gò vấp")) {
+            loc.setLatitude(10.835472);
+            loc.setLongitude(106.666111);
+        } else if (lowerName.contains("tân bình")) {
+            loc.setLatitude(10.801648);
+            loc.setLongitude(106.655823);
+        } else if (lowerName.contains("hà nội") || lowerName.contains("ba đình")) {
+            loc.setLatitude(21.031580);
+            loc.setLongitude(105.812230);
+        } else {
+            // Default center of HCMC
+            loc.setLatitude(10.776889);
+            loc.setLongitude(106.700806);
+        }
+        return loc;
     }
 
     private void setupBannerCarousel(View view) {
@@ -301,4 +548,4 @@ public class HomeFragment extends Fragment {
             }
         }
     }
-}
+ }

@@ -315,7 +315,18 @@ public class MapPickerActivity extends AppCompatActivity {
             fusedLocationClient.getCurrentLocation(com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(this, location -> {
                     if (location != null) {
-                        String js = String.format("if (typeof map !== 'undefined') map.flyTo([%s, %s], 16);", location.getLatitude(), location.getLongitude());
+                        double lat = location.getLatitude();
+                        double lng = location.getLongitude();
+
+                        // Kiểm tra nếu là tọa độ mặc định của máy ảo Android (Mountain View, California)
+                        // Vĩ độ khoảng 37.42, Kinh độ khoảng -122.08
+                        if (Math.abs(lat - 37.422) < 0.05 && Math.abs(lng - (-122.084)) < 0.05) {
+                            // Bay đến Lotte Mart Quận 7, TP.HCM để hiển thị bản đồ Việt Nam
+                            lat = 10.741589;
+                            lng = 106.701292;
+                        }
+
+                        String js = String.format("if (typeof map !== 'undefined') map.flyTo([%s, %s], 16);", lat, lng);
                         mapWebView.evaluateJavascript(js, null);
                     } else {
                         Toast.makeText(this, "Không thể lấy vị trí hiện tại. Hãy chắc chắn bạn đã bật GPS/Location trên máy.", Toast.LENGTH_LONG).show();

@@ -139,10 +139,64 @@ public class ProductDetailActivity extends AppCompatActivity {
         tvProductName.setText(product.getName());
         tvPrice.setText(String.format("%,.0f đ", product.getPrice()));
         
+        // Cập nhật Rating, Sold, Review Count
+        TextView tvRating = findViewById(R.id.tvRating);
+        if (tvRating != null) tvRating.setText(String.valueOf(product.getRating()));
+        
+        TextView tvReviewCount = findViewById(R.id.tvReviewCount);
+        if (tvReviewCount != null) tvReviewCount.setText(String.format("(%d đánh giá)", product.getReviewCount()));
+        
+        TextView tvSoldCount = findViewById(R.id.tvSoldCount);
+        if (tvSoldCount != null) tvSoldCount.setText(String.format("Đã bán: %d", product.getSoldCount()));
+        
+        // Brand, Origin, Unit
+        TextView tvBrand = findViewById(R.id.tvBrand);
+        if (tvBrand != null) tvBrand.setText(product.getBrand() != null && !product.getBrand().isEmpty() ? product.getBrand() : "Đang cập nhật");
+        
+        TextView tvOrigin = findViewById(R.id.tvOrigin);
+        if (tvOrigin != null) tvOrigin.setText(product.getOrigin() != null && !product.getOrigin().isEmpty() ? product.getOrigin() : "Đang cập nhật");
+        
+        TextView tvUnit = findViewById(R.id.tvUnit);
+        if (tvUnit != null) tvUnit.setText(product.getUnit() != null && !product.getUnit().isEmpty() ? product.getUnit() : "Đang cập nhật");
+        
+        // Highlights
+        TextView tvHighlights = findViewById(R.id.tvHighlights);
+        if (tvHighlights != null) {
+            if (product.getHighlights() != null && !product.getHighlights().isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (String h : product.getHighlights()) {
+                    sb.append("• ").append(h).append("\n");
+                }
+                tvHighlights.setText(sb.toString().trim());
+            } else {
+                tvHighlights.setText("Chưa có thông tin.");
+            }
+        }
+        
+        // Description
         if (product.getDescription() != null && !product.getDescription().isEmpty()) {
             tvDescription.setText(product.getDescription());
         } else {
             tvDescription.setText("Sản phẩm chưa có mô tả.");
+        }
+        
+        // Specifications
+        android.widget.LinearLayout llSpecifications = findViewById(R.id.llSpecifications);
+        if (llSpecifications != null) {
+            llSpecifications.removeAllViews();
+            if (product.getSpecifications() != null && !product.getSpecifications().isEmpty()) {
+                for (Product.Specification spec : product.getSpecifications()) {
+                    TextView tvSpec = new TextView(this);
+                    tvSpec.setText("• " + spec.getLabel() + ": " + spec.getValue());
+                    tvSpec.setTextColor(getResources().getColor(R.color.on_surface));
+                    tvSpec.setPadding(0, 8, 0, 8);
+                    llSpecifications.addView(tvSpec);
+                }
+            } else {
+                TextView tvEmpty = new TextView(this);
+                tvEmpty.setText("Chưa có thông số kỹ thuật.");
+                llSpecifications.addView(tvEmpty);
+            }
         }
         
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
