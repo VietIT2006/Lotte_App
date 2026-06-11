@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setItemActiveIndicatorEnabled(false);
+        bottomNav.setItemIconTintList(null);
         com.ptithcm.lottemart.data.local.SessionManager sessionManager = new com.ptithcm.lottemart.data.local.SessionManager(this);
 
         if (sessionManager.isLoggedIn() && ("admin".equalsIgnoreCase(sessionManager.getUserRole()) || "superAdmin".equalsIgnoreCase(sessionManager.getUserRole()))) {

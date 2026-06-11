@@ -6,6 +6,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -22,6 +23,40 @@ public interface DeliveryApiService {
             @Body UpdateStatusRequest request
     );
 
+    // Lấy thông tin ví shipper
+    @GET("delivery/shipper/wallet")
+    Call<ApiResponse<WalletInfo>> getWalletInfo();
+
+    // Cập nhật trạng thái hoạt động của shipper (online/offline)
+    @PATCH("delivery/shipper/status")
+    Call<ApiResponse<Void>> updateShipperStatus(@Body UpdateStatusPayload payload);
+
+    // Nạp tiền vào ví shipper
+    @POST("delivery/shipper/wallet/topup")
+    Call<ApiResponse<WalletInfo>> topupWallet(@Body TopupPayload payload);
+
+    @POST("payments/wallet-link")
+    Call<ApiResponse<PayosWalletLinkResponse>> createWalletPayosLink(@Body PayosWalletLinkRequest request);
+
+    class PayosWalletLinkRequest {
+        public double amount;
+        public PayosWalletLinkRequest(double amount) {
+            this.amount = amount;
+        }
+    }
+
+    class PayosWalletLinkResponse {
+        public String checkoutUrl;
+        public String orderCode;
+    }
+
+    class TopupPayload {
+        public double amount;
+        public TopupPayload(double amount) {
+            this.amount = amount;
+        }
+    }
+
     class UpdateStatusRequest {
         public String status;
         public String note;
@@ -31,6 +66,26 @@ public interface DeliveryApiService {
             this.status = status;
             this.note = note;
         }
+    }
+
+    class UpdateStatusPayload {
+        public String status;
+        public UpdateStatusPayload(String status) {
+            this.status = status;
+        }
+    }
+
+    class WalletInfo {
+        public double balance;
+        public List<WalletTransaction> transactions;
+    }
+
+    class WalletTransaction {
+        public String id;
+        public double amount;
+        public String type;
+        public String description;
+        public String created_at;
     }
 
     class Location {

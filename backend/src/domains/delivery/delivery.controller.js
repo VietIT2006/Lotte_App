@@ -48,6 +48,38 @@ class DeliveryController {
         }
     }
 
+    async getWalletInfo(req, res, next) {
+        try {
+            const shipperId = req.user.id;
+            const result = await deliveryService.getWalletInfo(shipperId);
+            res.json({ success: true, data: result });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateShipperStatus(req, res, next) {
+        try {
+            const { status } = req.body;
+            const shipperId = req.user.id;
+            const result = await deliveryService.updateShipperStatus(shipperId, status);
+            res.json({ success: true, data: result, message: 'Cập nhật trạng thái thành công' });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async topupWallet(req, res, next) {
+        try {
+            const { amount } = req.body;
+            const shipperId = req.user.id;
+            const result = await deliveryService.topupWallet(shipperId, amount);
+            res.json({ success: true, data: result, message: 'Nạp tiền vào ví thành công' });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getShippers(req, res, next) {
         try {
             // Require admin role check here in real app

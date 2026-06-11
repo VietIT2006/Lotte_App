@@ -73,6 +73,8 @@ public class LoginActivity extends AppCompatActivity {
         if (sessionManager.isLoggedIn()) {
             if ("admin".equalsIgnoreCase(sessionManager.getUserRole()) || "superAdmin".equalsIgnoreCase(sessionManager.getUserRole())) {
                 navigateToAdminMain();
+            } else if ("shipper".equalsIgnoreCase(sessionManager.getUserRole())) {
+                navigateToShipperMain();
             } else {
                 navigateToMain();
             }
@@ -256,13 +258,15 @@ public class LoginActivity extends AppCompatActivity {
                     // CẬP NHẬT TOKEN VÀO HỆ THỐNG MẠNG NGAY LẬP TỨC
                     com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
                     
-                    showSuccessDialog("Chào mừng trở lại!", () -> {
-                        if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
-                            navigateToAdminMain();
-                        } else {
-                            navigateToMain();
-                        }
-                    });
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    
+                    if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
+                        navigateToAdminMain();
+                    } else if ("shipper".equalsIgnoreCase(data.getUser().getRole())) {
+                        navigateToShipperMain();
+                    } else {
+                        navigateToMain();
+                    }
                 } else {
                     String errorMsg = "Email hoặc mật khẩu không hợp lệ";
                     if (response.body() != null && response.body().getMessage() != null) {
@@ -347,13 +351,14 @@ public class LoginActivity extends AppCompatActivity {
                     // Cập nhật Retrofit với token mới
                     com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
                     
-                    showSuccessDialog("Đăng nhập thành công!", () -> {
-                        if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
-                            navigateToAdminMain();
-                        } else {
-                            navigateToMain();
-                        }
-                    });
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
+                        navigateToAdminMain();
+                    } else if ("shipper".equalsIgnoreCase(data.getUser().getRole())) {
+                        navigateToShipperMain();
+                    } else {
+                        navigateToMain();
+                    }
                 } else {
                     String errorMsg = "Lỗi đăng nhập mạng xã hội";
                     if (response.body() != null && response.body().getMessage() != null) {

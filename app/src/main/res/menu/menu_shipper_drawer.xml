@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_shipper_dashboard"
+            android:icon="@android:drawable/ic_menu_myplaces"
+            android:title="Bảng điều khiển" />
+        
+        <item
+            android:id="@+id/nav_shipper_orders"
+            android:icon="@android:drawable/ic_menu_agenda"
+            android:title="Đơn hàng của tôi" />
+
+        <item
+            android:id="@+id/nav_shipper_history"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Lịch sử đơn hàng" />
+
+        <item
+            android:id="@+id/nav_shipper_wallet"
+            android:icon="@android:drawable/ic_menu_view"
+            android:title="Ví &amp; Thu nhập" />
+            
+        <item
+            android:id="@+id/nav_shipper_notifications"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="Thông báo" />
+    </group>
+
+    <item android:title="Khác">
+        <menu>
+            <item
+                android:id="@+id/nav_shipper_help"
+                android:icon="@android:drawable/ic_menu_help"
+                android:title="Trung tâm trợ giúp" />
+            <item
+                android:id="@+id/nav_shipper_logout"
+                android:icon="@android:drawable/ic_lock_power_off"
+                android:title="Đăng xuất" />
+        </menu>
+    </item>
+
+</menu>

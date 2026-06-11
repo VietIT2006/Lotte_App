@@ -139,6 +139,9 @@
             android:name=".features.shopping.PaymentFailureActivity"
             android:exported="false" />
         <activity
+            android:name=".features.shopping.PayosPaymentActivity"
+            android:exported="false" />
+        <activity
             android:name=".features.shopping.AddressBookActivity"
             android:exported="false" />
         <activity
@@ -164,6 +167,12 @@
             android:exported="false" />
         <activity
             android:name=".features.shipper.ShipperTrackingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shipper.ShipperHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.shipper.ShipperWalletActivity"
             android:exported="false" />
         <activity
             android:name=".features.admin.AdminUserMapActivity"

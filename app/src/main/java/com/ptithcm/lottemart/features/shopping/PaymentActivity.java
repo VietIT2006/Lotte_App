@@ -14,19 +14,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.ptithcm.lottemart.R;
-import com.ptithcm.lottemart.data.api.PayOSApiService;
-import com.ptithcm.lottemart.utils.PayOSUtils;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 import com.ptithcm.lottemart.data.api.ApiResponse;
+import com.ptithcm.lottemart.data.api.UserApiService;
 import com.ptithcm.lottemart.data.api.OrderApiService;
 import com.ptithcm.lottemart.data.models.Order;
 import com.ptithcm.lottemart.data.remote.RetrofitClient;
 import com.ptithcm.lottemart.data.local.SessionManager;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PaymentActivity extends AppCompatActivity {
     private String orderId;
@@ -53,73 +50,42 @@ public class PaymentActivity extends AppCompatActivity {
         layoutFallback = findViewById(R.id.layoutFallback);
 
         if ("PayOS".equalsIgnoreCase(paymentMethod)) {
-            initPayOS();
+            Toast.makeText(this, "Đang khởi tạo cổng thanh toán PayOS...", Toast.LENGTH_LONG).show();
+            UserApiService userApiService = RetrofitClient.getClient().create(UserApiService.class);
+            userApiService.createPayosLink(new UserApiService.PayosLinkRequest(orderId, totalAmount))
+                .enqueue(new Callback<ApiResponse<UserApiService.PayosLinkResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<UserApiService.PayosLinkResponse>> call, Response<ApiResponse<UserApiService.PayosLinkResponse>> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                            UserApiService.PayosLinkResponse data = response.body().getData();
+                            Intent intent = new Intent(PaymentActivity.this, PayosPaymentActivity.class);
+                            intent.putExtra("PAYMENT_URL", data.checkoutUrl);
+                            intent.putExtra("ORDER_CODE", data.orderCode);
+                            intent.putExtra("ORDER_ID", orderId);
+                            intent.putExtra("TOTAL_AMOUNT", totalAmount);
+                            intent.putExtra("CUSTOMER_ADDRESS", customerAddress);
+                            intent.putExtra("TYPE", "order");
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(PaymentActivity.this, "Không tạo được liên kết thanh toán PayOS!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(PaymentActivity.this, PaymentFailureActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<UserApiService.PayosLinkResponse>> call, Throwable t) {
+                        Toast.makeText(PaymentActivity.this, "Lỗi kết nối PayOS: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(PaymentActivity.this, PaymentFailureActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
         } else {
             initFallback();
         }
-    }
-
-    private void initPayOS() {
-        progressBar.setVisibility(View.VISIBLE);
-        layoutFallback.setVisibility(View.GONE);
-        webViewPayment.setVisibility(View.GONE);
-
-        webViewPayment.getSettings().setJavaScriptEnabled(true);
-        webViewPayment.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                if (url.contains("payment-success")) {
-                    handlePaymentSuccess();
-                    return true;
-                } else if (url.contains("payment-cancel")) {
-                    handlePaymentFailure();
-                    return true;
-                }
-                return super.shouldOverrideUrlLoading(view, request);
-            }
-        });
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api-merchant.payos.vn/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        PayOSApiService apiService = retrofit.create(PayOSApiService.class);
-
-        long orderCode = System.currentTimeMillis() / 1000;
-        int amount = (int) totalAmount;
-        if (amount <= 0) amount = 10000; // Mock safe amount
-        String description = "LotteMart " + orderCode;
-        String cancelUrl = "https://your-domain.com/payment-cancel";
-        String returnUrl = "https://your-domain.com/payment-success";
-
-        String signature = PayOSUtils.createSignature(orderCode, amount, description, cancelUrl, returnUrl, PayOSUtils.PAYOS_CHECKSUM_KEY);
-
-        PayOSApiService.PayOSRequest request = new PayOSApiService.PayOSRequest(
-                orderCode, amount, description, cancelUrl, returnUrl, signature
-        );
-
-        apiService.createPaymentLink(PayOSUtils.PAYOS_CLIENT_ID, PayOSUtils.PAYOS_API_KEY, request).enqueue(new Callback<PayOSApiService.PayOSResponse>() {
-            @Override
-            public void onResponse(Call<PayOSApiService.PayOSResponse> call, Response<PayOSApiService.PayOSResponse> response) {
-                progressBar.setVisibility(View.GONE);
-                if (response.isSuccessful() && response.body() != null && "00".equals(response.body().code) && response.body().data != null) {
-                    webViewPayment.setVisibility(View.VISIBLE);
-                    webViewPayment.loadUrl(response.body().data.checkoutUrl);
-                } else {
-                    Toast.makeText(PaymentActivity.this, "Lỗi tạo link thanh toán PayOS: " + (response.body() != null ? response.body().desc : "Unknown error"), Toast.LENGTH_LONG).show();
-                    initFallback();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PayOSApiService.PayOSResponse> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(PaymentActivity.this, "Không thể kết nối PayOS", Toast.LENGTH_SHORT).show();
-                initFallback();
-            }
-        });
     }
 
     private void handlePaymentSuccess() {
