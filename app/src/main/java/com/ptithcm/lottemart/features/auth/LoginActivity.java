@@ -71,6 +71,8 @@ public class LoginActivity extends AppCompatActivity {
         if (sessionManager.isLoggedIn()) {
             if ("admin".equalsIgnoreCase(sessionManager.getUserRole()) || "superAdmin".equalsIgnoreCase(sessionManager.getUserRole())) {
                 navigateToAdminMain();
+            } else if ("shipper".equalsIgnoreCase(sessionManager.getUserRole())) {
+                navigateToShipperMain();
             } else {
                 navigateToMain();
             }
@@ -226,6 +228,8 @@ public class LoginActivity extends AppCompatActivity {
                     
                     if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
                         navigateToAdminMain();
+                    } else if ("shipper".equalsIgnoreCase(data.getUser().getRole())) {
+                        navigateToShipperMain();
                     } else {
                         navigateToMain();
                     }
@@ -316,6 +320,8 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
                         navigateToAdminMain();
+                    } else if ("shipper".equalsIgnoreCase(data.getUser().getRole())) {
+                        navigateToShipperMain();
                     } else {
                         navigateToMain();
                     }
@@ -345,6 +351,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private void navigateToAdminMain() {
         Intent intent = new Intent(LoginActivity.this, com.ptithcm.lottemart.features.admin.AdminDashboardActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void navigateToShipperMain() {
+        Intent intent = new Intent(LoginActivity.this, com.ptithcm.lottemart.features.shipper.ShipperDashboardActivity.class);
         startActivity(intent);
         finish();
     }

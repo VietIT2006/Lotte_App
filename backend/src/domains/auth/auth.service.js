@@ -165,7 +165,7 @@ class AuthService {
                 username: email.split('@')[0] + '_' + Math.floor(Math.random() * 1000),
                 email,
                 phone: "",
-                password_hash: await bcrypt.hash(Math.random().toString(36), 10),
+                password_hash: await bcrypt.hash("123456", 10),
                 full_name,
                 avatar: avatar || null,
                 signup_method: "social",

@@ -232,7 +232,9 @@ public class CheckoutActivity extends AppCompatActivity {
 
         String paymentMethod = "COD";
         int checkedId = rgPaymentMethods.getCheckedRadioButtonId();
-        if (checkedId == R.id.rbMomo) {
+        if (checkedId == R.id.rbPayOS) {
+            paymentMethod = "PayOS";
+        } else if (checkedId == R.id.rbMomo) {
             paymentMethod = "MoMo";
         } else if (checkedId == R.id.rbVNPAY) {
             paymentMethod = "VNPAY";
