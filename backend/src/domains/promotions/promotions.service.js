@@ -122,6 +122,139 @@ class PromotionsService {
         return coupons.map(c => this.transformCoupon(c));
     }
 
+    // --- SPIN EVENTS ---
+    async getActiveSpinEvent() {
+        // Find active spin event
+        let event = await db.collection('events').findOne({ type: 'spin', is_active: true });
+        
+        // If not found, seed the mock event provided by user
+        if (!event) {
+            const mockEvent = {
+                name: "Vòng quay may mắn Lotte Hè 2026",
+                description: "Vòng quay may mắn cho khách hàng",
+                type: "spin",
+                start_date: new Date("2026-06-04T00:00:00.000Z"),
+                end_date: new Date("2026-07-04T00:00:00.000Z"),
+                is_active: true,
+                rewards: [
+                    {
+                        reward_type: "points",
+                        reward_name: "10 Điểm Lotte",
+                        reward_value: "10",
+                        reward_probability: 40,
+                        claimed_count: 0
+                    },
+                    {
+                        reward_type: "points",
+                        reward_name: "20 Điểm Lotte",
+                        reward_value: "20",
+                        reward_probability: 30,
+                        claimed_count: 0
+                    },
+                    {
+                        reward_type: "points",
+                        reward_name: "50 Điểm Lotte",
+                        reward_value: "50",
+                        reward_probability: 20,
+                        claimed_count: 0
+                    },
+                    {
+                        reward_type: "points",
+                        reward_name: "100 Điểm Lotte",
+                        reward_value: "100",
+                        reward_probability: 10,
+                        claimed_count: 0
+                    }
+                ],
+                max_spins_per_user_day: 3,
+                created_at: new Date(),
+                updated_at: new Date()
+            };
+            await db.collection('events').insertOne(mockEvent);
+            event = mockEvent;
+        }
+
+        // Return event with stringified IDs
+        return {
+            id: event._id ? event._id.toString() : "",
+            name: event.name,
+            description: event.description,
+            type: event.type,
+            start_date: event.start_date,
+            end_date: event.end_date,
+            max_spins_per_user_day: event.max_spins_per_user_day,
+            rewards: event.rewards.map((r, index) => ({
+                id: String(index),
+                reward_type: r.reward_type,
+                reward_name: r.reward_name,
+                reward_value: r.reward_value,
+                reward_probability: r.reward_probability
+            }))
+        };
+    }
+
+    async playSpinEvent(userId) {
+        const eventInfo = await this.getActiveSpinEvent();
+        if (!eventInfo) return { success: false, message: "Không có sự kiện" };
+
+        const userObjectId = this.toId(userId);
+
+        // Check if user exceeded daily limit
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const spinHistory = await db.collection('spin_history').countDocuments({
+            user_id: userObjectId,
+            event_id: this.toId(eventInfo.id),
+            created_at: { $gte: today }
+        });
+
+        if (spinHistory >= eventInfo.max_spins_per_user_day) {
+            return { success: false, message: "Bạn đã hết lượt quay trong ngày hôm nay. Vui lòng quay lại vào ngày mai!" };
+        }
+
+        // Randomize based on probability
+        const rewards = eventInfo.rewards;
+        const totalProb = rewards.reduce((sum, r) => sum + Number(r.reward_probability), 0);
+        let rand = Math.random() * totalProb;
+        
+        let selectedRewardIndex = 0;
+        for (let i = 0; i < rewards.length; i++) {
+            rand -= Number(rewards[i].reward_probability);
+            if (rand <= 0) {
+                selectedRewardIndex = i;
+                break;
+            }
+        }
+        
+        const selectedReward = rewards[selectedRewardIndex];
+
+        // Give points to user
+        if (selectedReward.reward_type === 'points') {
+            await db.collection('users').updateOne(
+                { _id: userObjectId },
+                { $inc: { lotte_points: Number(selectedReward.reward_value) } }
+            );
+        }
+
+        // Record history
+        await db.collection('spin_history').insertOne({
+            user_id: userObjectId,
+            event_id: this.toId(eventInfo.id),
+            reward_index: selectedRewardIndex,
+            reward: selectedReward,
+            created_at: new Date()
+        });
+
+        return {
+            success: true,
+            data: {
+                reward_index: selectedRewardIndex,
+                reward: selectedReward,
+                remaining_spins: eventInfo.max_spins_per_user_day - spinHistory - 1
+            }
+        };
+    }
+
     // --- ADMIN PROMOTIONS ---
     async getAdminPromotions() {
         const promotions = await db.collection('promotions')

@@ -111,7 +111,10 @@
             android:name=".features.shopping.ProductDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".features.search.SearchActivity"
+            android:name=".features.promotions.SpinWheelActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.cart.CartActivity"
             android:exported="false"
             android:windowSoftInputMode="stateVisible" />
         <activity

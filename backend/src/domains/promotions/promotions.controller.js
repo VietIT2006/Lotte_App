@@ -25,6 +25,31 @@ class PromotionsController {
         }
     }
 
+    // --- SPIN EVENTS ---
+    async getActiveSpinEvent(req, res, next) {
+        try {
+            const event = await promotionsService.getActiveSpinEvent();
+            if (!event) {
+                return res.status(404).json({ success: false, message: 'Không có sự kiện vòng quay nào đang diễn ra' });
+            }
+            res.status(200).json({ success: true, data: event });
+        } catch (error) { next(error); }
+    }
+
+    async playSpinEvent(req, res, next) {
+        try {
+            const userId = req.user ? req.user.id : null;
+            if (!userId) {
+                return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập' });
+            }
+            const result = await promotionsService.playSpinEvent(userId);
+            if (!result.success) {
+                return res.status(400).json({ success: false, message: result.message });
+            }
+            res.status(200).json({ success: true, data: result.data });
+        } catch (error) { next(error); }
+    }
+
     // --- ADMIN ---
     async getAdminPromotions(req, res, next) {
         try {

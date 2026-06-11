@@ -12,6 +12,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.DELETE;
 import retrofit2.http.Header;
 import retrofit2.http.Body;
+import retrofit2.http.POST;
 
 public interface ProductApiService {
     @GET("catalog/categories")
@@ -60,6 +61,48 @@ public interface ProductApiService {
     // --- PROMOTIONS (BANNERS) ---
     @GET("/api/v1/promotions")
     Call<ApiResponse<List<Promotion>>> getPromotions();
+
+    @GET("/api/v1/promotions/spin/active")
+    Call<ApiResponse<SpinEvent>> getActiveSpinEvent();
+
+    @POST("/api/v1/promotions/spin/play")
+    Call<ApiResponse<SpinPlayResponse>> playSpin(@Header("Authorization") String token);
+
+    class SpinEvent {
+        private String id;
+        private String name;
+        private int max_spins_per_user_day;
+        private List<Reward> rewards;
+
+        public String getId() { return id; }
+        public String getName() { return name; }
+        public int getMaxSpinsPerUserDay() { return max_spins_per_user_day; }
+        public List<Reward> getRewards() { return rewards; }
+
+        public static class Reward {
+            private String id;
+            private String reward_type;
+            private String reward_name;
+            private String reward_value;
+            private int reward_probability;
+
+            public String getId() { return id; }
+            public String getRewardType() { return reward_type; }
+            public String getRewardName() { return reward_name; }
+            public String getRewardValue() { return reward_value; }
+            public int getRewardProbability() { return reward_probability; }
+        }
+    }
+
+    class SpinPlayResponse {
+        private int reward_index;
+        private SpinEvent.Reward reward;
+        private int remaining_spins;
+
+        public int getRewardIndex() { return reward_index; }
+        public SpinEvent.Reward getReward() { return reward; }
+        public int getRemainingSpins() { return remaining_spins; }
+    }
 
     class Promotion {
         @com.google.gson.annotations.SerializedName("_id")

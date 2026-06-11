@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="Vòng Quay May Mắn" />
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thử vận may - Nhận quà ngay!"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <TextView
+        android:id="@+id/tvRemainingSpins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Số lượt quay còn lại: 0"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textColor="@color/lotte_red"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/tvDescription" />
+
+    <RelativeLayout
+        android:id="@+id/wheelContainer"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/tvRemainingSpins"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.ptithcm.lottemart.ui.views.SpinWheelView
+            android:id="@+id/spinWheelView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Pointer (Kim chỉ) -->
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_baseline_keyboard_arrow_down_24"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-10dp"
+            android:tint="@color/lotte_red" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnSpin"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="QUAY NGAY"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:backgroundTint="@color/lotte_red"
+        android:textColor="@color/white"
+        android:padding="12dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/wheelContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -176,5 +176,19 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Spin Wheel Button -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabSpinWheel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        android:text="Vòng Quay"
+        app:icon="@drawable/ic_baseline_card_giftcard_24"
+        android:backgroundTint="@color/lotte_red"
+        android:textColor="@color/white"
+        app:iconTint="@color/white" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

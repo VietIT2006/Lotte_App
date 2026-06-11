@@ -157,7 +157,17 @@ public class HomeFragment extends Fragment {
             }).start();
         });
 
-
+        View fabSpinWheel = view.findViewById(R.id.fabSpinWheel);
+        if (fabSpinWheel != null) {
+            fabSpinWheel.setOnClickListener(v -> {
+                v.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100).withEndAction(() -> {
+                    v.animate().scaleX(1f).scaleY(1f).setDuration(100).withEndAction(() -> {
+                        Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.promotions.SpinWheelActivity.class);
+                        startActivity(intent);
+                    }).start();
+                }).start();
+            });
+        }
 
         categoryAdapter = new CategoryAdapter(getContext(), new ArrayList<>(), category -> {
             Intent intent = new Intent(getActivity(), com.ptithcm.lottemart.features.categories.CategoryProductsActivity.class);

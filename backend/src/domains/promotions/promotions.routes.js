@@ -1,10 +1,15 @@
 const express = require('express');
 const promotionsController = require('./promotions.controller');
+const authMiddleware = require('../../core/auth.middleware');
 
 const router = express.Router();
 
 router.get('/', promotionsController.getPromotions);
 router.get('/coupons', promotionsController.getCoupons);
+
+// --- SPIN EVENTS ---
+router.get('/spin/active', promotionsController.getActiveSpinEvent);
+router.post('/spin/play', authMiddleware, promotionsController.playSpinEvent);
 
 // --- ADMIN ---
 router.get('/admin/promotions', promotionsController.getAdminPromotions);
