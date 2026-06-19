@@ -60,7 +60,17 @@ class CatalogService {
             original_price: original_price,
             thumbnail: finalImage, // LUÔN TRẢ VỀ ẢNH SỐNG
             description: item.description || `Sản phẩm chất lượng từ thương hiệu ${item.brand || 'Lotte Mart'}.`,
-            category_id: item.category_id ? item.category_id.toString() : ""
+            category_id: item.category_id ? item.category_id.toString() : "",
+            brand: item.brand || "",
+            origin: item.origin || "",
+            unit: item.unit || "",
+            rating: Number(item.rating) || 0,
+            review_count: Number(item.review_count) || 0,
+            sold_count: Number(item.sold_count) || 0,
+            stock: item.branch_info && item.branch_info.length > 0 ? Number(item.branch_info[0].stock) || 0 : Number(item.stock) || 0,
+            highlights: item.tags || [],
+            gallery: item.images && item.images.length > 0 ? item.images : [finalImage],
+            specifications: item.specifications || []
         };
     }
 

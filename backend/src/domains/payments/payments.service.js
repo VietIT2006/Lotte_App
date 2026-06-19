@@ -147,6 +147,21 @@ class PaymentsService {
             return { success: false, message: 'Lỗi kiểm tra trạng thái giao dịch với PayOS' };
         }
     }
+
+    async savePaymentTransaction(data) {
+        const transaction = {
+            order_id: data.order_id && data.order_id !== 'undefined' ? this.toId(data.order_id) : data.order_id,
+            provider: data.provider || 'COD',
+            transaction_id: data.transaction_id || `TXN-${Date.now()}`,
+            amount: Number(data.amount) || 0,
+            status: data.status || 'COMPLETED',
+            created_at: new Date(),
+            updatedAt: new Date()
+        };
+
+        const result = await db.collection('paymenttransactions').insertOne(transaction);
+        return { ...transaction, _id: result.insertedId };
+    }
 }
 
 module.exports = new PaymentsService();

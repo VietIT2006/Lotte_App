@@ -12,5 +12,6 @@ router.use(authMiddleware);
 router.post('/create-link', paymentsController.createPayosLink);
 router.post('/wallet-link', paymentsController.createWalletTopupLink);
 router.get('/confirm/:orderCode', paymentsController.confirmPayment);
+router.post('/transactions', paymentsController.savePaymentTransaction);
 
 module.exports = router;

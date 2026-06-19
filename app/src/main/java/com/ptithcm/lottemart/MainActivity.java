@@ -17,7 +17,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        com.ptithcm.lottemart.data.remote.RetrofitClient.init(this);
         setContentView(R.layout.user_activity_main);
 
         bottomNav = findViewById(R.id.bottom_navigation);
@@ -32,10 +31,17 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         
-        // Mặc định nạp HomeFragment khi vừa vào MainActivity
-        if (savedInstanceState == null) {
-            loadFragment(new HomeFragment());
-        }
+        // Quét tìm IP backend và sau đó mới khởi tạo Retrofit + nạp HomeFragment
+        com.ptithcm.lottemart.data.remote.NetworkConfig.discoverBackendIP(this, () -> {
+            runOnUiThread(() -> {
+                com.ptithcm.lottemart.data.remote.RetrofitClient.init(MainActivity.this);
+                
+                // Mặc định nạp HomeFragment khi vừa vào MainActivity (chỉ sau khi đã có IP)
+                if (savedInstanceState == null) {
+                    loadFragment(new HomeFragment());
+                }
+            });
+        });
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();

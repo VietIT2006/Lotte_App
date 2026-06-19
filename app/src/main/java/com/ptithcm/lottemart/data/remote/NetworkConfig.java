@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class NetworkConfig {
     private static final String TAG = "NetworkConfig";
+    public static boolean isIPDiscovered = false;
     
     // Mặc định ban đầu dùng 10.0.2.2 cho máy ảo hoặc IP LAN của máy tính cho máy thật
     public static String BASE_URL = isEmulator() 
@@ -54,9 +55,15 @@ public class NetworkConfig {
      * Tự động quét tìm kiếm máy tính chạy backend Node.js trong mạng Wi-Fi nội bộ
      */
     public static void discoverBackendIP(Context context, Runnable onComplete) {
+        if (isIPDiscovered) {
+            if (onComplete != null) onComplete.run();
+            return;
+        }
+
         if (isEmulator()) {
             // Máy ảo luôn dùng 10.0.2.2, không cần quét
             BASE_URL = "http://10.0.2.2:3000/api/v1/";
+            isIPDiscovered = true;
             if (onComplete != null) onComplete.run();
             return;
         }
@@ -125,10 +132,12 @@ public class NetworkConfig {
                         Log.w(TAG, "No backend server found on local network, using default fallback IP");
                     }
                 }
+                isIPDiscovered = true;
                 if (onComplete != null) onComplete.run();
             }).start();
         } catch (SecurityException e) {
             Log.e(TAG, "SecurityException: Missing ACCESS_WIFI_STATE permission", e);
+            isIPDiscovered = true;
             if (onComplete != null) onComplete.run();
         }
     }

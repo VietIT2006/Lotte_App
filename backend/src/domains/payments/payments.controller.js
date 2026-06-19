@@ -60,6 +60,15 @@ class PaymentsController {
             next(error);
         }
     }
+
+    async savePaymentTransaction(req, res, next) {
+        try {
+            const result = await paymentsService.savePaymentTransaction(req.body);
+            res.json({ success: true, data: result });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new PaymentsController();
