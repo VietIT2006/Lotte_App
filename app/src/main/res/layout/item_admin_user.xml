@@ -66,6 +66,26 @@
                     android:paddingVertical="2dp"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvUserEmailPhone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="email@example.com - 0123456789"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:id="@+id/tvUserAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="123 Street, City"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:layout_marginTop="2dp"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
             </LinearLayout>
 
             <LinearLayout

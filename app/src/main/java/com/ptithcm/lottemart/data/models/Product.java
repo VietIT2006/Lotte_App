@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Product implements Serializable {
-    @SerializedName("id")
+    @SerializedName(value = "id", alternate = {"_id"})
     private String id;
     
     @SerializedName("name")
@@ -56,13 +56,13 @@ public class Product implements Serializable {
     @SerializedName("unit")
     private String unit;
     @SerializedName("rating")
-    private double rating;
+    private Double rating;
     @SerializedName("review_count")
-    private int reviewCount;
+    private Integer reviewCount;
     @SerializedName("sold_count")
-    private int soldCount;
+    private Integer soldCount;
     @SerializedName("stock")
-    private int stock;
+    private Integer stock;
     @SerializedName("highlights")
     private java.util.List<String> highlights;
     @SerializedName("gallery")
@@ -88,14 +88,14 @@ public class Product implements Serializable {
     public void setOrigin(String origin) { this.origin = origin; }
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }
-    public double getRating() { return rating; }
-    public void setRating(double rating) { this.rating = rating; }
-    public int getReviewCount() { return reviewCount; }
-    public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
-    public int getSoldCount() { return soldCount; }
-    public void setSoldCount(int soldCount) { this.soldCount = soldCount; }
-    public int getStock() { return stock; }
-    public void setStock(int stock) { this.stock = stock; }
+    public Double getRating() { return rating != null ? rating : 0.0; }
+    public void setRating(Double rating) { this.rating = rating; }
+    public Integer getReviewCount() { return reviewCount != null ? reviewCount : 0; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
+    public Integer getSoldCount() { return soldCount != null ? soldCount : 0; }
+    public void setSoldCount(Integer soldCount) { this.soldCount = soldCount; }
+    public Integer getStock() { return stock != null ? stock : 0; }
+    public void setStock(Integer stock) { this.stock = stock; }
     public java.util.List<String> getHighlights() { return highlights; }
     public void setHighlights(java.util.List<String> highlights) { this.highlights = highlights; }
     public java.util.List<String> getGallery() { return gallery; }

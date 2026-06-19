@@ -52,7 +52,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         
         // Handle Role Badge
         String role = user.getRole();
-        if ("superAdmin".equalsIgnoreCase(role)) {
+        if ("superAdmin".equalsIgnoreCase(role) || "super_admin".equalsIgnoreCase(role)) {
             holder.tvUserRole.setText("Super Admin");
             holder.tvUserRole.setTextColor(Color.parseColor("#E53935")); // Red
             holder.tvUserRole.setBackgroundColor(Color.parseColor("#FFF0F0"));
@@ -77,8 +77,17 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
             holder.ivUserAvatar.setImageResource(R.mipmap.ic_launcher_round);
         }
 
+        // Email & Phone
+        String email = user.getEmail() != null ? user.getEmail() : "Chưa cập nhật email";
+        String phone = user.getPhone() != null ? user.getPhone() : "Chưa cập nhật SĐT";
+        holder.tvUserEmailPhone.setText(email + " - " + phone);
+
+        // Address
+        String address = user.getAddress() != null ? user.getAddress() : "Chưa cập nhật địa chỉ";
+        holder.tvUserAddress.setText(address);
+
         // Stats (Points)
-        if (!"admin".equalsIgnoreCase(role) && !"superAdmin".equalsIgnoreCase(role)) {
+        if (!"admin".equalsIgnoreCase(role) && !"superAdmin".equalsIgnoreCase(role) && !"super_admin".equalsIgnoreCase(role)) {
             holder.tvStatLabel.setText("Lotte Points");
             holder.tvStatValue.setText(String.valueOf(user.getLottePoints()));
             
@@ -127,6 +136,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         ImageView ivUserAvatar;
         TextView tvUserName, tvUserRole, tvStatLabel, tvStatValue;
         TextView tvTaskValue, tvMembershipValue;
+        TextView tvUserEmailPhone, tvUserAddress;
         MaterialButton btnMessage, btnPermissions, btnMap;
 
         public UserViewHolder(@NonNull View itemView) {
@@ -138,6 +148,8 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
             tvStatValue = itemView.findViewById(R.id.tvStatValue);
             tvTaskValue = itemView.findViewById(R.id.tvTaskValue);
             tvMembershipValue = itemView.findViewById(R.id.tvMembershipValue);
+            tvUserEmailPhone = itemView.findViewById(R.id.tvUserEmailPhone);
+            tvUserAddress = itemView.findViewById(R.id.tvUserAddress);
             btnMessage = itemView.findViewById(R.id.btnMessage);
             btnPermissions = itemView.findViewById(R.id.btnPermissions);
             btnMap = itemView.findViewById(R.id.btnMap);

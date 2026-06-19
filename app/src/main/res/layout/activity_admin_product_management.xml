@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -16,6 +16,23 @@
             android:background="@color/admin_primary"
             app:titleTextColor="@color/white"
             app:title="Quản lý Sản phẩm" />
+            
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/admin_bg"
+            android:padding="8dp">
+            <EditText
+                android:id="@+id/etAdminSearch"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_search_bar"
+                android:hint="Tìm kiếm sản phẩm..."
+                android:paddingHorizontal="16dp"
+                android:textSize="14sp"
+                android:imeOptions="actionSearch"
+                android:inputType="text" />
+        </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView

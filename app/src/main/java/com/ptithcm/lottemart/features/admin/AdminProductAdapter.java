@@ -36,7 +36,8 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
         this.productList = productList;
         this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         SessionManager sessionManager = new SessionManager(context);
-        this.isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
+        String role = sessionManager.getUserRole();
+        this.isSuperAdmin = "superAdmin".equalsIgnoreCase(role) || "super_admin".equalsIgnoreCase(role);
     }
 
     @NonNull
@@ -63,8 +64,14 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
 
         holder.btnEditProduct.setOnClickListener(v -> {
             if (isSuperAdmin) {
-                // TODO: Open Edit Product Activity/Dialog
-                Toast.makeText(context, "Sửa sản phẩm: " + product.getName(), Toast.LENGTH_SHORT).show();
+                android.content.Intent intent = new android.content.Intent(context, AdminProductFormActivity.class);
+                intent.putExtra("PRODUCT_ID", product.getId());
+                intent.putExtra("PRODUCT_NAME", product.getName());
+                intent.putExtra("PRODUCT_PRICE", product.getPrice());
+                intent.putExtra("PRODUCT_ORIGINAL_PRICE", product.getOriginalPrice());
+                intent.putExtra("PRODUCT_IMAGE", product.getImageUrl());
+                intent.putExtra("PRODUCT_DESC", product.getDescription());
+                context.startActivity(intent);
             } else {
                 showPermissionDialog();
             }

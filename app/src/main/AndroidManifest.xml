@@ -121,6 +121,10 @@
             android:name=".features.categories.CategoryProductsActivity"
             android:exported="false" />
         <activity
+            android:name=".features.search.SearchActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateVisible" />
+        <activity
             android:name=".features.search.SearchResultsActivity"
             android:exported="false" />
         <activity

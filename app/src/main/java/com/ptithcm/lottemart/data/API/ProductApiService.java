@@ -45,6 +45,12 @@ public interface ProductApiService {
         @Query("limit") int limit
     );
 
+    @POST("catalog/products")
+    Call<ApiResponse<Product>> addProduct(@Header("Authorization") String token, @Body Product product);
+
+    @PUT("catalog/products/{id}")
+    Call<ApiResponse<Product>> updateProduct(@Header("Authorization") String token, @Path("id") String id, @Body Product product);
+
     @PUT("/api/v1/catalog/branches/{id}")
     Call<ApiResponse<Branch>> updateBranch(@Header("Authorization") String token, @Path("id") String id, @Body Branch branch);
 

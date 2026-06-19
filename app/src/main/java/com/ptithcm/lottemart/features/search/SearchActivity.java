@@ -28,6 +28,8 @@ public class SearchActivity extends AppCompatActivity {
     private boolean isLoading = false;
     private boolean isLastPage = false;
     private String currentQuery = "";
+    private android.os.Handler searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable searchRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +73,7 @@ public class SearchActivity extends AppCompatActivity {
                     if(layoutManager != null && layoutManager.findLastCompletelyVisibleItemPosition() == productAdapter.getItemCount() - 1) {
                         if(!isLoading && !isLastPage) {
                             currentPage++;
-                            performSearch(currentQuery, false);
+                            performSearch(currentQuery, false, false);
                         }
                     }
                 }
@@ -86,7 +88,7 @@ public class SearchActivity extends AppCompatActivity {
             chip.setCheckable(false);
             chip.setOnClickListener(v -> {
                 etSearch.setText(s);
-                performSearch(s, true);
+                performSearch(s, true, true);
             });
             chipGroupHistory.addView(chip);
         }
@@ -114,7 +116,15 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 btnClearSearch.setVisibility(s.length() > 0 ? android.view.View.VISIBLE : android.view.View.GONE);
-                if (s.length() == 0) showSuggestions();
+                if (s.length() == 0) {
+                    showSuggestions();
+                } else {
+                    if (searchRunnable != null) {
+                        searchHandler.removeCallbacks(searchRunnable);
+                    }
+                    searchRunnable = () -> performSearch(s.toString().trim(), true, false);
+                    searchHandler.postDelayed(searchRunnable, 500);
+                }
             }
             @Override
             public void afterTextChanged(android.text.Editable s) {}
@@ -122,7 +132,7 @@ public class SearchActivity extends AppCompatActivity {
 
         etSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
-                performSearch(etSearch.getText().toString().trim(), true);
+                performSearch(etSearch.getText().toString().trim(), true, true);
                 return true;
             }
             return false;
@@ -138,7 +148,7 @@ public class SearchActivity extends AppCompatActivity {
                         currentSort = "price_asc";
                         ((android.widget.TextView)v).setText("Sắp xếp: Giá thấp đến cao");
                     }
-                    performSearch(etSearch.getText().toString().trim(), true);
+                    performSearch(etSearch.getText().toString().trim(), true, false);
                 }).start();
             }).start();
         });
@@ -159,7 +169,7 @@ public class SearchActivity extends AppCompatActivity {
         layoutResults.setVisibility(android.view.View.GONE);
     }
 
-    private void performSearch(String query, boolean isNewSearch) {
+    private void performSearch(String query, boolean isNewSearch, boolean hideKeyboard) {
         if (query.isEmpty()) return;
         
         if (isNewSearch) {
@@ -168,11 +178,13 @@ public class SearchActivity extends AppCompatActivity {
             currentQuery = query;
         }
 
-        // Hide keyboard
-        android.view.View view = this.getCurrentFocus();
-        if (view != null) {
-            android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager)getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (hideKeyboard) {
+            // Hide keyboard
+            android.view.View view = this.getCurrentFocus();
+            if (view != null) {
+                android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager)getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
 
         layoutSuggestions.setVisibility(android.view.View.GONE);

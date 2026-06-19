@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
 import com.ptithcm.lottemart.R;
@@ -65,6 +67,16 @@ public abstract class BaseAdminActivity extends AppCompatActivity {
         btnLogout.setOnClickListener(v -> handleLogout());
 
         setupSidebarNavigation();
+        if (navView != null) {
+            Menu menu = navView.getMenu();
+            if (menu != null) {
+                MenuItem rolesItem = menu.findItem(R.id.nav_roles);
+                if (rolesItem != null) {
+                    String role = sessionManager.getUserRole();
+                    rolesItem.setVisible("superAdmin".equalsIgnoreCase(role) || "super_admin".equalsIgnoreCase(role));
+                }
+            }
+        }
     }
 
     protected void setHeaderTitle(String title, String subtitle) {

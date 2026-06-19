@@ -35,6 +35,11 @@ public class AdminProductManagementActivity extends BaseAdminActivity {
     private int limit = 20;
     private boolean isLoading = false;
     private boolean isLastPage = false;
+    
+    private String currentQuery = "";
+    private android.widget.EditText etAdminSearch;
+    private android.os.Handler searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable searchRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +74,8 @@ public class AdminProductManagementActivity extends BaseAdminActivity {
 
         FloatingActionButton fabAddProduct = findViewById(R.id.fabAddProduct);
         SessionManager sessionManager = new SessionManager(this);
-        boolean isSuperAdmin = "superAdmin".equalsIgnoreCase(sessionManager.getUserRole());
+        String role = sessionManager.getUserRole();
+        boolean isSuperAdmin = "superAdmin".equalsIgnoreCase(role) || "super_admin".equalsIgnoreCase(role);
         
         fabAddProduct.setOnClickListener(v -> {
             if (isSuperAdmin) {
@@ -80,14 +86,51 @@ public class AdminProductManagementActivity extends BaseAdminActivity {
             }
         });
 
+        etAdminSearch = findViewById(R.id.etAdminSearch);
+        etAdminSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+                searchRunnable = () -> {
+                    currentQuery = s.toString().trim();
+                    currentPage = 1;
+                    fetchProducts();
+                };
+                searchHandler.postDelayed(searchRunnable, 500);
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
         // Lấy danh sách sản phẩm (truyền null để lấy tất cả)
+        fetchProducts();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        currentPage = 1;
         fetchProducts();
     }
 
     private void fetchProducts() {
         isLoading = true;
         ProductApiService apiService = RetrofitClient.getClient().create(ProductApiService.class);
-        apiService.getProducts(null, currentPage, limit).enqueue(new Callback<ApiResponse<List<Product>>>() {
+        
+        Call<ApiResponse<List<Product>>> call;
+        if (currentQuery != null && !currentQuery.isEmpty()) {
+            call = apiService.searchProducts(currentQuery, "latest", currentPage, limit);
+        } else {
+            call = apiService.getProducts(null, currentPage, limit);
+        }
+        
+        call.enqueue(new Callback<ApiResponse<List<Product>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Product>>> call, Response<ApiResponse<List<Product>>> response) {
                 isLoading = false;

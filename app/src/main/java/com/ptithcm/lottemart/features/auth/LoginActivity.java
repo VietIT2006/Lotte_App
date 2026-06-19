@@ -71,7 +71,8 @@ public class LoginActivity extends AppCompatActivity {
         
         // Kiểm tra Tự động đăng nhập
         if (sessionManager.isLoggedIn()) {
-            if ("admin".equalsIgnoreCase(sessionManager.getUserRole()) || "superAdmin".equalsIgnoreCase(sessionManager.getUserRole())) {
+            String role = sessionManager.getUserRole();
+            if ("admin".equalsIgnoreCase(role) || "superAdmin".equalsIgnoreCase(role) || "super_admin".equalsIgnoreCase(role)) {
                 navigateToAdminMain();
             } else if ("shipper".equalsIgnoreCase(sessionManager.getUserRole())) {
                 navigateToShipperMain();
@@ -260,9 +261,10 @@ public class LoginActivity extends AppCompatActivity {
                     
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     
-                    if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
+                    String role = data.getUser().getRole();
+                    if ("admin".equalsIgnoreCase(role) || "superAdmin".equalsIgnoreCase(role) || "super_admin".equalsIgnoreCase(role)) {
                         navigateToAdminMain();
-                    } else if ("shipper".equalsIgnoreCase(data.getUser().getRole())) {
+                    } else if ("shipper".equalsIgnoreCase(role)) {
                         navigateToShipperMain();
                     } else {
                         navigateToMain();
@@ -352,9 +354,10 @@ public class LoginActivity extends AppCompatActivity {
                     com.ptithcm.lottemart.data.remote.RetrofitClient.init(LoginActivity.this);
                     
                     Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    if ("admin".equalsIgnoreCase(data.getUser().getRole()) || "superAdmin".equalsIgnoreCase(data.getUser().getRole())) {
+                    String role = data.getUser().getRole();
+                    if ("admin".equalsIgnoreCase(role) || "superAdmin".equalsIgnoreCase(role) || "super_admin".equalsIgnoreCase(role)) {
                         navigateToAdminMain();
-                    } else if ("shipper".equalsIgnoreCase(data.getUser().getRole())) {
+                    } else if ("shipper".equalsIgnoreCase(role)) {
                         navigateToShipperMain();
                     } else {
                         navigateToMain();
