@@ -13,6 +13,7 @@ import com.ptithcm.lottemart.features.home.HomeFragment;
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
+    private boolean isRetrofitReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +32,20 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         
-        // Quét tìm IP backend và sau đó mới khởi tạo Retrofit + nạp HomeFragment
+        // Đợi quét tìm IP backend thật trong mạng LAN xong mới nạp HomeFragment
         com.ptithcm.lottemart.data.remote.NetworkConfig.discoverBackendIP(this, () -> {
             runOnUiThread(() -> {
+                // Reinit RetrofitClient với IP mới phát hiện được
                 com.ptithcm.lottemart.data.remote.RetrofitClient.init(MainActivity.this);
-                
-                // Mặc định nạp HomeFragment khi vừa vào MainActivity (chỉ sau khi đã có IP)
+                isRetrofitReady = true;
+
+                // Ẩn màn hình loading
+                android.view.View loadingView = findViewById(R.id.ipLoadingView);
+                if (loadingView != null) {
+                    loadingView.setVisibility(android.view.View.GONE);
+                }
+
+                // Nạp HomeFragment sau khi đã quét xong IP để đảm bảo call API thành công
                 if (savedInstanceState == null) {
                     loadFragment(new HomeFragment());
                 }
@@ -44,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bottomNav.setOnItemSelectedListener(item -> {
+            if (!isRetrofitReady) return false; // Không cho phép chuyển tab khi chưa quét xong IP
             int itemId = item.getItemId();
             
             // Trang chủ và Danh mục cho phép xem không cần đăng nhập

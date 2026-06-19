@@ -68,7 +68,9 @@ public class CartFragment extends Fragment {
         setupRecyclerView();
 
         view.findViewById(R.id.btnBackToHome).setOnClickListener(v -> {
-            ((com.ptithcm.lottemart.MainActivity)getActivity()).navigateToHome();
+            if (getActivity() instanceof com.ptithcm.lottemart.MainActivity) {
+                ((com.ptithcm.lottemart.MainActivity) getActivity()).navigateToHome();
+            }
         });
 
         apiService = RetrofitClient.getClient().create(ProductApiService.class);

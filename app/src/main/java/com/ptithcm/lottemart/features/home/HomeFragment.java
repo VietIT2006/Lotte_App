@@ -117,7 +117,15 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         
         initViews(view);
-        apiService = RetrofitClient.getClient().create(ProductApiService.class);
+        try {
+            apiService = RetrofitClient.getClient().create(ProductApiService.class);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to init API service", e);
+            if (isAdded() && getContext() != null) {
+                Toast.makeText(getContext(), "Không thể kết nối đến máy chủ", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         
         fetchCategories();
@@ -246,7 +254,9 @@ public class HomeFragment extends Fragment {
             public void onFailure(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<java.util.List<com.ptithcm.lottemart.data.models.Category>>> call, Throwable t) {
                 checkDataLoaded();
                 Log.e(TAG, "Error fetching categories", t);
-                Toast.makeText(getContext(), "Không thể tải danh mục", Toast.LENGTH_SHORT).show();
+                if (isAdded() && getContext() != null) {
+                    Toast.makeText(getContext(), "Không thể tải danh mục", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -288,7 +298,9 @@ public class HomeFragment extends Fragment {
                 isLoadingMore = false;
                 if (progressBarLoadMore != null) progressBarLoadMore.setVisibility(View.GONE);
                 Log.e(TAG, "Error fetching featured products", t);
-                Toast.makeText(getContext(), "Không thể tải sản phẩm nổi bật", Toast.LENGTH_SHORT).show();
+                if (isAdded() && getContext() != null) {
+                    Toast.makeText(getContext(), "Không thể tải sản phẩm nổi bật", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

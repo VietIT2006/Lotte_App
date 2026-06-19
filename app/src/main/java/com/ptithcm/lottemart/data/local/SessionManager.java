@@ -107,7 +107,7 @@ public class SessionManager {
      */
     public boolean validateMockLogin(String email, String password) {
         // 1. Tài khoản Admin cố định
-        if (email.equals("admin@lottemart.com") && password.equals("123456")) {
+        if ("admin@lottemart.com".equals(email) && "123456".equals(password)) {
             return true;
         }
 
@@ -120,7 +120,7 @@ public class SessionManager {
      * Lấy tên của tài khoản mock vừa đăng nhập
      */
     public String getMockName(String email) {
-        if (email.equals("admin@lottemart.com")) return "Admin Lotte";
+        if ("admin@lottemart.com".equals(email)) return "Admin Lotte";
         return pref.getString("mock_name_" + email, "Người dùng");
     }
 
@@ -173,7 +173,7 @@ public class SessionManager {
 
     public java.util.List<com.ptithcm.lottemart.data.models.Address> getAddressList(String userId) {
         String json = pref.getString("user_addresses_" + userId, null);
-        if (json == null) return null;
+        if (json == null) return new java.util.ArrayList<>();
         
         com.google.gson.Gson gson = new com.google.gson.Gson();
         java.lang.reflect.Type type = new com.google.gson.reflect.TypeToken<java.util.List<com.ptithcm.lottemart.data.models.Address>>(){}.getType();

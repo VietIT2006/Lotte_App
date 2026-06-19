@@ -79,6 +79,7 @@ public class ProfileFragment extends Fragment {
         userApiService.getProfile(token).enqueue(new retrofit2.Callback<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.User>>() {
             @Override
             public void onResponse(retrofit2.Call<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.User>> call, retrofit2.Response<com.ptithcm.lottemart.data.api.ApiResponse<com.ptithcm.lottemart.data.models.User>> response) {
+                if (!isAdded() || getContext() == null) return;
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     com.ptithcm.lottemart.data.models.User user = response.body().getData();
                     sessionManager.saveLottePoints(user.getLottePoints());
@@ -91,7 +92,7 @@ public class ProfileFragment extends Fragment {
                             avatarUrl = com.ptithcm.lottemart.data.remote.NetworkConfig.getBaseDomain() + avatarUrl;
                         }
                         ivProfileAvatar.setImageTintList(null);
-                        com.bumptech.glide.Glide.with(ProfileFragment.this).load(avatarUrl).circleCrop().into(ivProfileAvatar);
+                        com.bumptech.glide.Glide.with(getContext()).load(avatarUrl).circleCrop().into(ivProfileAvatar);
                     }
                 }
             }

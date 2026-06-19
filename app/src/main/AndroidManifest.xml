@@ -34,9 +34,6 @@
             android:name=".features.auth.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".features.fogotPassword.ForgotPasswordActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

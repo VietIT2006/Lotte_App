@@ -69,7 +69,9 @@ public class CategoriesFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ApiResponse<List<Category>>> call, Throwable t) {
-                Toast.makeText(getContext(), "Không thể tải danh mục", Toast.LENGTH_SHORT).show();
+                if (isAdded() && getContext() != null) {
+                    Toast.makeText(getContext(), "Không thể tải danh mục", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

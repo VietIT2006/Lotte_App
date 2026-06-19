@@ -20,7 +20,7 @@ public class NetworkConfig {
     // Mặc định ban đầu dùng 10.0.2.2 cho máy ảo hoặc IP LAN của máy tính cho máy thật
     public static String BASE_URL = isEmulator() 
             ? "http://10.0.2.2:3000/api/v1/" 
-            : "http://192.168.1.48:3000/api/v1/";
+            : "http://192.168.1.47:3000/api/v1/";
 
     // Timeout (ms)
     public static final int CONNECT_TIMEOUT = 30000;
